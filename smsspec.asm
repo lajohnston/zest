@@ -54,8 +54,10 @@ retn
  * Start runner
  */
 .orga $0000
-call smsspec.suite
--: jp -
+.section "smsspec.main" force
+    call smsspec.suite
+    -: jp -
+.ends
 
 
 
