@@ -55,8 +55,11 @@ retn
  */
 .orga $0000
 .section "smsspec.main" force
-    call smsspec.suite
-    -: jp -
+    di              ; disable interrupts
+    im 1            ; Interrupt mode 1
+    ld sp, $dff0    ; set stack pointer
+
+    jp smsspec.init
 .ends
 
 
@@ -124,6 +127,11 @@ retn
 ; SMSSpec internal procedures
 ;===================================================================
 
+.section "smsspec.init" free
+    smsspec.init:
+        jp smsspec.suite
+.ends
+
 .section "smsspec.clearSystemState" free
     smsspec.clearSystemState:
         xor a
@@ -151,7 +159,7 @@ retn
         ret
 .ends
 
-.section "on failure" free
+.section "smsspec.onFailure" free
     assertionFailed:
         call smsspec.console.out
         -: jp -
@@ -162,6 +170,6 @@ retn
 ;===================================================================
 ; Import user's test suite file
 ;===================================================================
-smsspec.suite:
-    .include "test_suite.asm"
-    ret
+
+.include "test_suite.asm"
+-: jr -
