@@ -20,3 +20,6 @@ all:
 	@echo smsspec.o >> $(LINKFILE)
 
 	@wlalink -drvs $(LINKFILE) bin/smsspec.sms
+
+tdd:
+	while true; do make 1>/dev/null; sleep 3; done

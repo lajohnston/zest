@@ -149,8 +149,21 @@ retn
         ld bc, smsspec.font_data_size          ; Counter for number of bytes to write
         call smsspec.copyToVDP
 
+        ; Turn screen on
+        ld a,%01000000
+    ;          ||||||`- Zoomed sprites -> 16x16 pixels
+    ;          |||||`-- Doubled sprites -> 2 tiles per sprite, 8x16
+    ;          ||||`--- Mega Drive mode 5 enable
+    ;          |||`---- 30 row/240 line mode
+    ;          ||`----- 28 row/224 line mode
+    ;          |`------ VBlank interrupts
+    ;          `------- Enable display
+        out (smsspec.ports.vdp.control), a
+        ld a, $81
+        out (smsspec.ports.vdp.control), a
 
-        jp smsspec.suite
+        call smsspec.startSuite
+        -: jr -
 .ends
 
 
@@ -184,22 +197,21 @@ retn
         ret
 
     smsspec.copyToVDP:
-    ; Copies data to the VDP
-    ; Parameters: hl = data address, bc = data length
-    ; Affects: a, hl, bc
-    -:
-        ld a, (hl)    ; Get data byte
-        out (smsspec.ports.vdp.data), a
-        inc hl       ; Point to next letter
-        dec bc
-        ld a, b
-        or c
-    jr nz,-
+        ; Copies data to the VDP
+        ; Parameters: hl = data address, bc = data length
+        ; Affects: a, hl, bc
+        -:
+            ld a, (hl)    ; Get data byte
+            out (smsspec.ports.vdp.data), a
+            inc hl       ; Point to next letter
+            dec bc
+            ld a, b
+            or c
+        jr nz,-
 
-    ret
+        ret
 
 .ends
-
 
 .section "smsspec.clearSystemState" free
     smsspec.clearSystemState:
@@ -220,6 +232,22 @@ retn
 
 .section "smsspec.console" free
     smsspec.console.out:
+        ; 1. Set VRAM write address to tilemap index 0
+        ld hl,$3800 | smsspec.vdp.VRAMWrite
+        call smsspec.setVDPAddress
+
+        ; 2. Output tilemap data
+        ld hl, Message
+        -:
+            ld a, (hl)
+            cp $ff
+            jr z,+
+            out (smsspec.ports.vdp.data), a
+            xor a
+            out (smsspec.ports.vdp.data), a
+            inc hl
+            jr -
+        +:
         ret
 .ends
 
@@ -240,7 +268,10 @@ retn
 ;===================================================================
 
 .include "test_suite.asm"
--: jr -
+.section "smsspec.startSuite" free
+    smsspec.startSuite:
+        jp smsspec.suite
+.ends
 
 
 
@@ -252,6 +283,10 @@ retn
     .asciitable
     map " " to "~" = 0
     .enda
+
+    Message:
+    .asc "Hello world!"
+    .db $ff
 
     smsspec.palette_data:
         .db $00,$0C ; Black, green
