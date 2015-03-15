@@ -1,11 +1,11 @@
 ;==============================================================
 ; SMS defines
 ;==============================================================
-.define Ports.Vdp.Control $bf
-.define Ports.Vdp.Data $be
-.define Ports.Vdp.Status $be ; same as Vdp.Data, as that is write only and this is read only
-.define Vdp.VRAMWrite $4000
-.define Vdp.CRAMWrite $c000
+.define smsspec.ports.vdp.control $bf
+.define smsspec.ports.vdp.data $be
+.define smsspec.ports.vdp.status $be ; same as Vdp.data, as that is write only and this is read only
+.define smsspec.vdp.VRAMWrite $4000
+.define smsspec.vdp.CRAMWrite $c000
 
 ;==============================================================
 ; WLA-DX banking setup
@@ -42,7 +42,7 @@ retn
 .orga $0038
 .section "Interrupt handler" force
     push af
-        in a, (Ports.Vdp.Status) ; satisfy interrupt
+        in a, (smsspec.ports.vdp.status) ; satisfy interrupt
         call smsspec.onVBlank
     pop af
     ei
@@ -51,7 +51,7 @@ retn
 
 
 /**
- * Start runner
+ * Boot sequence
  */
 .orga $0000
 .section "smsspec.main" force
@@ -119,18 +119,87 @@ retn
 
 
 
-
-
-
-
 ;===================================================================
 ; SMSSpec internal procedures
 ;===================================================================
 
 .section "smsspec.init" free
     smsspec.init:
+        ; Set up VDP registers
+        ld hl, smsspec.vdp_init_data
+        ld b, smsspec.vdp_init_data_end - smsspec.vdp_init_data
+        ld c, smsspec.ports.vdp.control
+        otir
+
+        call smsspec.clearVram
+
+        ; Load palette
+        ld hl, $0000 | smsspec.vdp.CRAMWrite
+        call smsspec.setVDPAddress
+        ld hl, smsspec.palette_data
+        ld bc, smsspec.palette_data_end - smsspec.palette_data
+        call smsspec.copyToVDP
+
+        ; Load tiles
+        ld hl,$0000 | smsspec.vdp.VRAMWrite
+        call smsspec.setVDPAddress         ; Set VRAM write address to tile index 0
+
+        ; Output tile data
+        ld hl, smsspec.font_data              ; Location of tile data
+        ld bc, smsspec.font_data_size          ; Counter for number of bytes to write
+        call smsspec.copyToVDP
+
+
         jp smsspec.suite
 .ends
+
+
+.section "smsspec.vdp" free
+    smsspec.clearVram:
+        ; Set VRAM write address to $0000
+        ld hl, $0000 | smsspec.vdp.VRAMWrite
+        call smsspec.setVDPAddress
+
+        ; Output 16KB of zeroes
+        ld bc, $4000     ; Counter for 16KB of VRAM
+        -:
+            xor a
+            out (smsspec.ports.vdp.data),a ; Output to VRAM address, which is auto-incremented after each write
+            dec bc
+            ld a, b
+            or c
+        jr nz,-
+        ret
+
+
+    smsspec.setVDPAddress:
+    ; Sets the VDP address
+    ; Parameters: hl = address
+        push af
+            ld a, l
+            out (smsspec.ports.vdp.control), a
+            ld a, h
+            out (smsspec.ports.vdp.control), a
+        pop af
+        ret
+
+    smsspec.copyToVDP:
+    ; Copies data to the VDP
+    ; Parameters: hl = data address, bc = data length
+    ; Affects: a, hl, bc
+    -:
+        ld a, (hl)    ; Get data byte
+        out (smsspec.ports.vdp.data), a
+        inc hl       ; Point to next letter
+        dec bc
+        ld a, b
+        or c
+    jr nz,-
+
+    ret
+
+.ends
+
 
 .section "smsspec.clearSystemState" free
     smsspec.clearSystemState:
@@ -166,10 +235,33 @@ retn
 .ends
 
 
-
 ;===================================================================
 ; Import user's test suite file
 ;===================================================================
 
 .include "test_suite.asm"
 -: jr -
+
+
+
+;===================================================================
+; Data
+;===================================================================
+
+.section "smsspec.data" free
+    .asciitable
+    map " " to "~" = 0
+    .enda
+
+    smsspec.palette_data:
+        .db $00,$0C ; Black, green
+    smsspec.palette_data_end:
+
+    ; VDP initialisation data
+    smsspec.vdp_init_data:
+    .db $04,$80,$00,$81,$ff,$82,$ff,$85,$ff,$86,$ff,$87,$00,$88,$00,$89,$ff,$8a
+    smsspec.vdp_init_data_end:
+
+    smsspec.font_data:
+    .incbin "assets/font.bin" fsize smsspec.font_data_size
+.ends
