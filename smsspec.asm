@@ -162,7 +162,7 @@ retn
         ld a, $81
         out (smsspec.ports.vdp.control), a
 
-        call smsspec.startSuite
+        call smsspec.suite
         -: jr -
 .ends
 
@@ -230,6 +230,11 @@ retn
         ret       
 .ends
 
+.ramsection "smsspec.console.variables" bank 0 slot 0
+    smsspec.console.hpos  db
+    smsspec.console.ypos  db
+.ends
+
 .section "smsspec.console" free
     smsspec.console.out:
         ; 1. Set VRAM write address to tilemap index 0
@@ -237,7 +242,7 @@ retn
         call smsspec.setVDPAddress
 
         ; 2. Output tilemap data
-        ld hl, Message
+        ld hl, smsspec.heading
         -:
             ld a, (hl)
             cp $ff
@@ -246,9 +251,10 @@ retn
             xor a
             out (smsspec.ports.vdp.data), a
             inc hl
-            jr -
+        jr -
+        
         +:
-        ret
+            ret
 .ends
 
 .section "smsspec.onVBlank" free
@@ -264,18 +270,6 @@ retn
 
 
 ;===================================================================
-; Import user's test suite file
-;===================================================================
-
-.include "test_suite.asm"
-.section "smsspec.startSuite" free
-    smsspec.startSuite:
-        jp smsspec.suite
-.ends
-
-
-
-;===================================================================
 ; Data
 ;===================================================================
 
@@ -284,12 +278,12 @@ retn
     map " " to "~" = 0
     .enda
 
-    Message:
-    .asc "Hello world!"
+    smsspec.heading:
+    .asc "SMSSpec"
     .db $ff
 
     smsspec.palette_data:
-        .db $00,$0C ; Black, green
+        .db $00,$0C,$03 ; Black, green, red
     smsspec.palette_data_end:
 
     ; VDP initialisation data

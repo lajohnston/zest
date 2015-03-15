@@ -1,3 +1,5 @@
+.include "smsspec.asm"
+
 ; Incrementer tests
 .include "example/incrementer.spec.asm"
 
