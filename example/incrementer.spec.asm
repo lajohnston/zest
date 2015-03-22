@@ -12,6 +12,27 @@
 			call Incrementer.increment
 
 			; Test assertions
-			assertAccEquals 101, "a"
+			assertAccEquals 101
+
+
+		it "should do something else"
+
+			jr +
+			blahHandler:
+				halt
+			+:
+
+			;ld hl, (blahMock.address)
+			;ld (hl), _blah
+
+			;jr +
+			;_blah:
+		;		ld hl, $C060
+		;		ld (hl), $AB
+		;		ret
+		;	+:
+
+
+
 		ret
 .ends

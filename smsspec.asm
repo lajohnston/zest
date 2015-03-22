@@ -9,18 +9,22 @@
 
 ;==============================================================
 ; WLA-DX banking setup
-; Allows 32KB ROM (starts at 0, ends at $8000 bytes)
 ;==============================================================
 .memorymap
     defaultslot 0
-    slotsize $8000
+    slotsize $4000
     slot 0 $0000
+    slot 1 $4000
+
+    slotsize $2000      ; 8KB RAM
+    slot 2 $C000
 .endme
 
+; ROM - 2 x 16KB ROM Slots
 .rombankmap
-    bankstotal 1
-    banksize $8000
-    banks 1
+    bankstotal 2
+    banksize $4000
+    banks 2
 .endro
 
 
@@ -58,6 +62,7 @@ retn
     di              ; disable interrupts
     im 1            ; Interrupt mode 1
     ld sp, $dff0    ; set stack pointer
+
 
     jp smsspec.init
 .ends
@@ -102,7 +107,7 @@ retn
     push af
         ld a, register
         cp expected
-        
+
         jr z, +
             pop af
             assertionFailed "Failed"
@@ -213,8 +218,29 @@ retn
 
 .ends
 
+
 .section "smsspec.clearSystemState" free
     smsspec.clearSystemState:
+        ; Clear mocks to defaults
+        ld b, (smsspec.mocks.end - smsspec.mocks.start - 1) / 3 ; number of mocks
+
+        _clearMocks:
+            ld hl, smsspec.mocks.start
+
+            -:  ; Each mock
+                inc hl
+
+                ; Clear times called
+                ld (hl), 0
+
+                ; Reset mock handler to the default
+                inc hl
+                ld (hl), < smsspec.mock.default_handler
+                inc hl
+                ld (hl), > smsspec.mock.default_handler
+            djnz -
+
+        ; Clear registers
         xor a
         ld b, a
         ld c, a
@@ -222,23 +248,37 @@ retn
         ld e, a
         ld h, a
         ld l, a
+        ld ix, 0
+        ld iy, 0
+
+        ; do same for shadow flags
 
         ; reset fps counter
 
-        ; do same for shadow flags 
-        
-        ret       
+
+
+
+        ret
 .ends
 
-.ramsection "smsspec.console.variables" bank 0 slot 0
-    smsspec.console.hpos  db
-    smsspec.console.ypos  db
+
+.ramsection "smsspec.console.variables" slot 2
+    smsspec.console.hpos:  db
+    smsspec.console.ypos:  db
 .ends
+
 
 .section "smsspec.console" free
     smsspec.console.out:
+        ;ld hl, (smsspec.console.hpos)
+        ;ld (hl), $AB
+        ;inc hl
+        ;ld (hl), $CD
+        ;inc hl
+        ;ld (hl), $DE
+
         ; 1. Set VRAM write address to tilemap index 0
-        ld hl,$3800 | smsspec.vdp.VRAMWrite
+        ld hl, $3804 | smsspec.vdp.VRAMWrite
         call smsspec.setVDPAddress
 
         ; 2. Output tilemap data
@@ -252,10 +292,16 @@ retn
             out (smsspec.ports.vdp.data), a
             inc hl
         jr -
-        
+
         +:
             ret
 .ends
+
+.macro "smsspec.console.out"
+
+.endm
+
+
 
 .section "smsspec.onVBlank" free
     smsspec.onVBlank:
@@ -267,6 +313,88 @@ retn
         call smsspec.console.out
         -: jp -
 .ends
+
+
+
+;===================================================================
+; Mocks
+;===================================================================
+
+.struct smsspec.mock
+    times_called    db
+    address         dw
+.endst
+
+.macro "smsspec.mock.call" args mock
+    push hl
+        ld hl, mock
+        jp smsspec.mock.mediator
+    ; pop hl handled by mediator
+.endm
+
+
+/**
+ * Reserves space in RAM to store temporary opcodes for use when jumping to a
+ * mock handler without clobbing hl
+ */
+.ramsection "smsspec.mock.jump" slot 2
+    smsspec.mock.jump.pop:  db
+    smsspec.mock.jump.jp:   db
+    smsspec.mock.jump.jp_address:   dw
+.ends
+
+.section "smsspec.mock" free
+    smsspec.mock.default_handler:
+        inc a
+        inc a
+        ret ; by default, mocks just return to caller
+
+    /**
+     * Jumps to an address defined in RAM at runtime without clobbing hl.
+     * It does this by writing 'pop hl' and 'jp, n' opcodes to RAM and executing 
+     * them from there so that control is passed to the destination code as if
+     * this mediator didn't exist, and so there's no need to have a pop hl instruction
+     * in the destination code
+     *
+     * @param hl    the start address of the smsspec mock in RAM
+     */
+    smsspec.mock.mediator:
+        ; Increment mock's times_called counter in RAM
+        push af
+            inc (hl)
+            ; TODO - add overflow logic
+        pop af
+
+        push de
+            ; Load address of mock handler from RAM into DE
+            inc hl
+            ld e, (hl)
+            inc hl
+            ld d, (hl)
+
+            ; To jump to handler without clobbing hl, write a couple of instructions
+            ; to RAM which will pop hl then jp to the address
+
+            ; Write 'pop hl' opcode to RAM
+            ld hl, smsspec.mock.jump.pop
+            ld (hl), $E1    ; $E1 = pop hl
+
+            ; Write jp opcode to RAM
+            inc hl
+            ld (hl), $C3    ; $C3 = jp, n
+
+            ; Write jump address to RAM
+            inc hl
+            ld (hl), e
+            inc hl
+            ld (hl), d
+        pop de
+
+        ; Jump to opcodes in RAM
+        jp smsspec.mock.jump.pop
+.ends
+
+
 
 
 ;===================================================================
