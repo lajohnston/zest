@@ -15,22 +15,25 @@
 			assertAccEquals 101
 
 
-		it "should do something else"
+		it "should increment the value by a random amount"
+			; Set up conditions
+			ld a, 100
+
+			; Mock the random generator
+			smsspec.mock.set randomGeneratorMock, _random
 
 			jr +
-			blahHandler:
-				halt
+			_random:
+				; Mock will return the value of 50 in register a
+				ld a, 50
+				ret
 			+:
 
-			;ld hl, (blahMock.address)
-			;ld (hl), _blah
+			; Run test
+			call Incrementer.incrementRandom
 
-			;jr +
-			;_blah:
-		;		ld hl, $C060
-		;		ld (hl), $AB
-		;		ret
-		;	+:
+			; Test assertions
+			assertAccEquals 150
 
 
 

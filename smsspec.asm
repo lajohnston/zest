@@ -317,7 +317,7 @@ retn
 
 
 ;===================================================================
-; Mocks
+; Label mocks
 ;===================================================================
 
 .struct smsspec.mock
@@ -334,6 +334,23 @@ retn
 
 
 /**
+ * Set the destination address for a label mock
+ */
+.macro "smsspec.mock.set" args mock, address
+    push hl
+    push de
+        ld de, address
+        ld hl, mock
+        inc hl
+        ld (hl), e
+        inc hl
+        ld (hl), d
+    pop de
+    pop hl
+.endm
+
+
+/**
  * Reserves space in RAM to store temporary opcodes for use when jumping to a
  * mock handler without clobbing hl
  */
@@ -345,9 +362,9 @@ retn
 
 .section "smsspec.mock" free
     smsspec.mock.default_handler:
-        inc a
-        inc a
-        ret ; by default, mocks just return to caller
+        ; by default, mocks just return to caller
+        ret
+
 
     /**
      * Jumps to an address defined in RAM at runtime without clobbing hl.

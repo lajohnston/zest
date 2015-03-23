@@ -4,14 +4,14 @@
 .ramsection "mock instances" slot 2
 	smsspec.mocks.start: db
 
-	blahMock instanceof smsspec.mock
-	blahMock2 instanceof smsspec.mock
+	randomGeneratorMock instanceof smsspec.mock
+
 
 	smsspec.mocks.end: db
 .ends
 
 .section "mock labels" free
-	blah: smsspec.mock.call blahMock
+	RandomGenerator.generateByte: smsspec.mock.call randomGeneratorMock
 .ends
 
 
