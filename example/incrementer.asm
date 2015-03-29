@@ -1,7 +1,7 @@
 .section "Incrementer" free
 	Incrementer.increment:
 		; Intentional bug, dec instead of inc
-		inc a
+		dec a
 		ret
 
 

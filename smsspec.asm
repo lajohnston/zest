@@ -62,67 +62,8 @@ retn
     di              ; disable interrupts
     im 1            ; Interrupt mode 1
     ld sp, $dff0    ; set stack pointer
-
-
     jp smsspec.init
 .ends
-
-
-
-;===================================================================
-; Assertion and test macros
-;===================================================================
-
-
-/**
- * Can be used to describe the unit being tested
- */
-.macro "describe" args unit_name
-
-.endm
-
-/**
- * Specified a new test with a description.
- * Resets the Z80 registers ready for the new test
- */
-.macro "it" args message
-    ; Write message to buffer
-
-    ; Clear system state
-    call smsspec.clearSystemState
-.endm
-
-
-.macro "assertAccEquals" args expected
-    cp expected
-
-    jr z, +
-        assertionFailed "Failed"
-    +:
-.endm
-
-
-/*
-.macro "assertRegisterEquals" args expected, register
-    push af
-        ld a, register
-        cp expected
-
-        jr z, +
-            pop af
-            assertionFailed "Failed"
-        +:
-    pop af
-.endm
- */
-
-
-.macro "assertionFailed" args message, actual
-    jp assertionFailed
-.endm
-
-
-
 
 ;===================================================================
 ; SMSSpec internal procedures
@@ -154,6 +95,12 @@ retn
         ld bc, smsspec.font_data_size          ; Counter for number of bytes to write
         call smsspec.copyToVDP
 
+        ; Init console
+        ld hl, smsspec.console.cursor_pos
+        ld (hl), $40
+        inc hl
+        ld (hl), $38
+
         ; Turn screen on
         ld a,%01000000
     ;          ||||||`- Zoomed sprites -> 16x16 pixels
@@ -169,6 +116,174 @@ retn
 
         call smsspec.suite
         -: jr -
+.ends
+
+
+.section "smsspec.clearSystemState" free
+    smsspec.clearSystemState:
+        ; Clear mocks to defaults
+        ld b, (smsspec.mocks.end - smsspec.mocks.start - 1) / 3 ; number of mocks
+
+        _clearMocks:
+            ld hl, smsspec.mocks.start
+
+            -:  ; Each mock
+                inc hl
+
+                ; Clear times called
+                ld (hl), 0
+
+                ; Reset mock handler to the default
+                inc hl
+                ld (hl), < smsspec.mock.default_handler
+                inc hl
+                ld (hl), > smsspec.mock.default_handler
+            djnz -
+
+        ; Clear registers
+        xor a
+        ld b, a
+        ld c, a
+        ld d, a
+        ld e, a
+        ld h, a
+        ld l, a
+        ld ix, 0
+        ld iy, 0
+
+        ; do same for shadow flags
+
+        ; reset fps counter
+
+
+
+
+        ret
+.ends
+
+.section "smsspec.onVBlank" free
+    smsspec.onVBlank:
+        ret
+.ends
+
+.section "smsspec.onFailure" free
+    assertionFailed:
+        ld hl, (smsspec.current_describe_message_addr)
+        call smsspec.console.out
+ 
+        ;smsspec.current_test_message_addr: dw
+
+        ; Stop program
+        -: jp -
+.ends
+
+
+/**
+ * Stores text in the ROM and adds a pointer to it at the given
+ * RAM location
+ */
+.macro "smsspec.storeText" args text, ram_pointer
+    jr +
+    _text\@:
+        .asc text
+        .db $ff    ; terminator byte
+    +:
+
+    ld hl, ram_pointer
+    ld (hl), <_text\@
+    inc hl
+    ld (hl), >_text\@
+.endm
+
+
+
+;===================================================================
+; Console
+;===================================================================
+
+.define smsspec.console.COLUMNS 31
+
+.ramsection "smsspec.console.variables" slot 2
+    smsspec.console.cursor_pos:  dw
+.ends
+
+
+.section "smsspec.console" free
+    /**
+     * Write text to the console
+     * @param hl    the address of the text to write. The text should be
+     *              terminated by an $FF byte
+     */
+    smsspec.console.out:
+        ;push af
+        ;push bc
+            ; 1. Set VRAM write address to tilemap index 0
+            push hl
+                ; Get remaining characters left in the current line
+                ld hl, (smsspec.console.cursor_pos)
+                ld a, h
+                or $40
+                ld h, a
+
+
+                ;ld hl, $3800 | smsspec.vdp.VRAMWrite
+                call smsspec.setVDPAddress
+
+                ld d, h
+                ld e, l
+            pop hl
+
+
+
+            ; 2. Output tilemap data
+            -:
+                ld a, (hl)
+                
+                ; If $FF terminator, stop
+                cp $FF
+                jr z, +
+
+                out (smsspec.ports.vdp.data), a
+                xor a   ; set a to 0
+                out (smsspec.ports.vdp.data), a
+                inc hl
+
+                inc de
+                inc de
+            jr -
+
+        ;pop bc
+        ;pop af
+
+        +:
+            ld hl, smsspec.console.cursor_pos
+            ld (hl), e
+            inc hl
+            ld (hl), d
+            ret
+
+    smsspec.console.newline:
+        ld hl, (smsspec.console.cursor_pos)
+        ld d, h
+        ld e, l
+
+        ld b, 0
+        ld c, 66
+
+        ; Add 66 until address is higher than cursor 
+        ld hl, $3800 | smsspec.vdp.VRAMWrite
+        -:
+            add hl, bc
+
+            ; cp 16 bits
+            or a ; reset carry flag
+            sbc hl, de
+            add hl, de
+
+        jp -
+
+        +:
+            ret
 .ends
 
 
@@ -219,112 +334,25 @@ retn
 .ends
 
 
-.section "smsspec.clearSystemState" free
-    smsspec.clearSystemState:
-        ; Clear mocks to defaults
-        ld b, (smsspec.mocks.end - smsspec.mocks.start - 1) / 3 ; number of mocks
-
-        _clearMocks:
-            ld hl, smsspec.mocks.start
-
-            -:  ; Each mock
-                inc hl
-
-                ; Clear times called
-                ld (hl), 0
-
-                ; Reset mock handler to the default
-                inc hl
-                ld (hl), < smsspec.mock.default_handler
-                inc hl
-                ld (hl), > smsspec.mock.default_handler
-            djnz -
-
-        ; Clear registers
-        xor a
-        ld b, a
-        ld c, a
-        ld d, a
-        ld e, a
-        ld h, a
-        ld l, a
-        ld ix, 0
-        ld iy, 0
-
-        ; do same for shadow flags
-
-        ; reset fps counter
-
-
-
-
-        ret
-.ends
-
-
-.ramsection "smsspec.console.variables" slot 2
-    smsspec.console.hpos:  db
-    smsspec.console.ypos:  db
-.ends
-
-
-.section "smsspec.console" free
-    smsspec.console.out:
-        ;ld hl, (smsspec.console.hpos)
-        ;ld (hl), $AB
-        ;inc hl
-        ;ld (hl), $CD
-        ;inc hl
-        ;ld (hl), $DE
-
-        ; 1. Set VRAM write address to tilemap index 0
-        ld hl, $3804 | smsspec.vdp.VRAMWrite
-        call smsspec.setVDPAddress
-
-        ; 2. Output tilemap data
-        ld hl, smsspec.heading
-        -:
-            ld a, (hl)
-            cp $ff
-            jr z,+
-            out (smsspec.ports.vdp.data), a
-            xor a
-            out (smsspec.ports.vdp.data), a
-            inc hl
-        jr -
-
-        +:
-            ret
-.ends
-
-.macro "smsspec.console.out"
-
-.endm
-
-
-
-.section "smsspec.onVBlank" free
-    smsspec.onVBlank:
-        ret
-.ends
-
-.section "smsspec.onFailure" free
-    assertionFailed:
-        call smsspec.console.out
-        -: jp -
-.ends
-
-
-
 ;===================================================================
 ; Label mocks
 ;===================================================================
 
+/**
+ * Structure for mock instances in RAM, which hold a counter for the times
+ * the mock has been called and the address to jump to to handle the 
+ * mock logic
+ */
 .struct smsspec.mock
     times_called    db
     address         dw
 .endst
 
+
+/**
+ * Calls a handler for a mock, which is stored within the mock instance
+ * in RAM.
+ */
 .macro "smsspec.mock.call" args mock
     push hl
         ld hl, mock
@@ -361,6 +389,9 @@ retn
 .ends
 
 .section "smsspec.mock" free
+    /**
+     * Defines a procedure that mocks run by default
+     */
     smsspec.mock.default_handler:
         ; by default, mocks just return to caller
         ret
@@ -412,6 +443,70 @@ retn
 .ends
 
 
+;===================================================================
+; Standard macros
+;===================================================================
+
+.ramsection "smsspec.current_test_info" slot 2
+    smsspec.current_describe_message_addr: dw
+    smsspec.current_test_message_addr: dw
+.ends
+
+/**
+ * Can be used to describe the unit being tested
+ * Stores a pointer to the description test which is used to
+ * identify the test to the user if it fails
+ */
+.macro "describe" args unit_name
+    smsspec.storeText unit_name, smsspec.current_describe_message_addr
+.endm
+
+
+/**
+ * Specified a new test with a description.
+ * Resets the Z80 registers ready for the new test
+ */
+.macro "it" args message
+    smsspec.storeText message, smsspec.current_test_message_addr
+
+    ; Clear system state
+    call smsspec.clearSystemState
+.endm
+
+
+;===================================================================
+; Assertions
+;===================================================================
+
+
+
+.macro "assertAccEquals" args expected
+    cp expected
+
+    jr z, +
+        assertionFailed "Failed"
+    +:
+.endm
+
+
+/*
+.macro "assertRegisterEquals" args expected, register
+    push af
+        ld a, register
+        cp expected
+
+        jr z, +
+            pop af
+            assertionFailed "Failed"
+        +:
+    pop af
+.endm
+ */
+
+
+.macro "assertionFailed" args message, actual
+    jp assertionFailed
+.endm
 
 
 ;===================================================================
