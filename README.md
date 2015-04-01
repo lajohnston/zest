@@ -1,7 +1,7 @@
 #SMSSpec
 
 ##What is it?
-SMSSpec is a unit test/spec runner for the Sega Master System, for use with the WLA DX assembler. It can be used to help you to implement TDD in retro homebrew projects, so you can build the project incrementally without it getting to complex to debug.
+SMSSpec is a unit test/spec runner for the Sega Master System, for use with the WLA DX assembler. It can be used to help you to implement TDD in retro homebrew projects, so you can build the project incrementally without it getting too complex to debug.
 
 
 ## Why?
