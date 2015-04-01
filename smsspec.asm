@@ -219,7 +219,7 @@ retn
 .define smsspec.console.COLUMNS 31
 
 .ramsection "smsspec.console.variables" slot 2
-    smsspec.console.cursor_pos:  dw
+    smsspec.console.cursor_pos:  dw ; x (1-byte), y (1-byte)
 .ends
 
 
@@ -230,52 +230,75 @@ retn
      *              terminated by an $FF byte
      */
     smsspec.console.out:
-        ;push af
-        ;push bc
-            ; 1. Set VRAM write address to tilemap index 0
+        push bc
+        push de
+            ; Calculate and set VRAM write address based on x and y caret position
             push hl
-                ; Get remaining characters left in the current line
                 ld hl, (smsspec.console.cursor_pos)
-                ld a, h
-                or $40
-                ld h, a
+                ld b, l     ; y offset
 
+                ; Set de to x tile (x pos * 2), always an 8-bit number
+                ld d, 0
+                ld e, h     ; x offset            
+                sla e       ; multiply by 2 (2 bytes per tile)
 
-                ;ld hl, $3800 | smsspec.vdp.VRAMWrite
+                ; Get first tile addr and add x offset
+                ld hl, $3800 | smsspec.vdp.VRAMWrite
+                add hl, de
+
+                ; Add 66 for each y offset
+                ld de, 66
+                -:
+                    add hl, de
+                    djnz -
+
                 call smsspec.setVDPAddress
-
-                ld d, h
-                ld e, l
+                ld hl, (smsspec.console.cursor_pos)
+                ld d, h     ; x tile
+                ld e, l     ; y tile
             pop hl
 
-
-
-            ; 2. Output tilemap data
+            ; Write each character
             -:
                 ld a, (hl)
                 
                 ; If $FF terminator, stop
                 cp $FF
-                jr z, +
+                jr z, _stopWrite
 
                 out (smsspec.ports.vdp.data), a
                 xor a   ; set a to 0
                 out (smsspec.ports.vdp.data), a
                 inc hl
 
-                inc de
-                inc de
+                ; Calculate x and y tiles
+                inc e
+                ld a, e
+                cp 31
+                jr z, -
+
+                ; Wrap x tile, calculate next y tile
+                ld e, 0     ; wrap x tile
+                inc d
+                ld a, d
+                cp 31
+                jr z, -
+                ld d, 0     ; wrap y tile
+
             jr -
 
-        ;pop bc
-        ;pop af
+    _stopWrite:
+        pop bc
+        pop de
+        ret
 
-        +:
-            ld hl, smsspec.console.cursor_pos
-            ld (hl), e
-            inc hl
-            ld (hl), d
-            ret
+
+
+
+
+
+        
+
 
     smsspec.console.newline:
         ld hl, (smsspec.console.cursor_pos)
