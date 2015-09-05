@@ -2,14 +2,15 @@ var gulp = require('gulp'),
   del = require('del'),
   concat = require('gulp-concat'),
   wrapper = require('gulp-wrapper'),
-  src = ['./src/main/asm', './src/**/*.asm']
+  run = require('gulp-run'),
+  src = ['./src/main.asm', './src/**/*.asm']
 ;
 
 gulp.task('clean', function() {
   return del([
     'dist/*'
   ]);
-})
+});
 
 gulp.task('concat', function() {
   var commentLine = ';========================================\n';
@@ -19,6 +20,7 @@ gulp.task('concat', function() {
     }))
     .pipe(concat('smsspec.asm'))
     .pipe(gulp.dest('./dist/'))
+  ;
 });
 
 gulp.task(
@@ -29,6 +31,10 @@ gulp.task(
   )
 );
 
-gulp.task('watch', function() {
+gulp.task('watch', gulp.series('build', function() {
   return gulp.watch(src, gulp.series('build'));
-});
+}));
+
+gulp.task('build-sample', gulp.series('build', function() {
+
+}));

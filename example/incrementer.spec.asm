@@ -1,4 +1,4 @@
-.include "example/incrementer.asm"
+.include "incrementer.asm"
 
 .section "Incrementer spec" free
 	incrementer.spec:
