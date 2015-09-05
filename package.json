@@ -1,0 +1,30 @@
+{
+  "name": "smsspec",
+  "version": "1.0.0",
+  "description": "SMSSpec is a unit test/spec runner for the Sega Master System, for use with the WLA DX assembler. It can be used to help you to implement TDD in retro homebrew projects, so you can build the project incrementally without it getting too complex to debug.",
+  "main": "index.js",
+  "directories": {
+    "example": "example"
+  },
+  "scripts": {
+    "start": "gulpfile.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eljay26/smsspec.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/eljay26/smsspec/issues"
+  },
+  "homepage": "https://github.com/eljay26/smsspec#readme",
+  "devDependencies": {
+    "del": "^2.0.1",
+    "gulp": "gulpjs/gulp#4.0",
+    "gulp-concat": "^2.6.0",
+    "gulp-run": "^1.6.10",
+    "gulp-wrapper": "^1.0.0"
+  }
+}
