@@ -3,7 +3,7 @@ var gulp = require('gulp'),
   concat = require('gulp-concat'),
   wrapper = require('gulp-wrapper'),
   run = require('gulp-run'),
-  src = ['./src/main.asm', './src/**/*.asm']
+  src = ['./src/**/constants.asm', './src/main.asm', './src/**/*.asm']
 ;
 
 gulp.task('clean', function() {
