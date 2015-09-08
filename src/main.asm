@@ -70,9 +70,9 @@
 
         ; Init console
         ld hl, smsspec.console.cursor_pos
-        ld (hl), $40
+        ld (hl), $01
         inc hl
-        ld (hl), $38
+        ld (hl), $00
 
         ; Turn screen on
         ld a,%01000000
