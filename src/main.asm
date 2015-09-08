@@ -43,27 +43,8 @@
 
         call smsspec.clearVram
 
-        ; Load palette
-        ld hl, $0000 | smsspec.vdp.CRAMWrite
-        call smsspec.setVDPAddress
-        ld hl, smsspec.palette_data
-        ld bc, smsspec.palette_data_end - smsspec.palette_data
-        call smsspec.copyToVDP
-
-        ; Load tiles
-        ld hl,$0000 | smsspec.vdp.VRAMWrite
-        call smsspec.setVDPAddress         ; Set VRAM write address to tile index 0
-
-        ; Output tile data
-        ld hl, smsspec.font_data              ; Location of tile data
-        ld bc, smsspec.font_data_end - smsspec.font_data          ; Counter for number of bytes to write
-        call smsspec.copyToVDP
-
         ; Init console
-        ld hl, smsspec.console.cursor_pos
-        ld (hl), $01
-        inc hl
-        ld (hl), $00
+        call smsspec.console.init
 
         ; Turn screen on
         ld a,%01000000
