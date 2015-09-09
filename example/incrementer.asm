@@ -4,7 +4,6 @@
 		dec a
 		ret
 
-
 	Incrementer.incrementRandom:
 		push bc
 			ld b, a
