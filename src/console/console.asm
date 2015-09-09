@@ -22,8 +22,8 @@
       call smsspec.setVDPAddress         ; Set VRAM write address to tile index 0
 
       ; Output tile data
-      ld hl, smsspec.font_data              ; Location of tile data
-      ld bc, smsspec.font_data_end - smsspec.font_data          ; Counter for number of bytes to write
+      ld hl, smsspec.console.data.font              ; Location of tile data
+      ld bc, smsspec.console.data.font_end - smsspec.console.data.font          ; Counter for number of bytes to write
       call smsspec.copyToVDP
 
       ; Initial cursor position
