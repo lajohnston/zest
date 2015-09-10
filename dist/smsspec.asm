@@ -1,5 +1,5 @@
 ;========================================
-; vdp/constants.asm
+; console/vdp/constants.asm
 ;========================================
 .define smsspec.ports.vdp.control $bf
 .define smsspec.ports.vdp.data $be
@@ -118,26 +118,6 @@
         ; Stop program
         -: jp -
 .ends
-
-;========================================
-; common/store-text.asm
-;========================================
-/**
- * Stores text in the ROM and adds a pointer to it at the given
- * RAM location
- */
-.macro "smsspec.storeText" args text, ram_pointer
-    jr +
-    _text\@:
-        .asc text
-        .db $ff    ; terminator byte
-    +:
-
-    ld hl, ram_pointer
-    ld (hl), <_text\@
-    inc hl
-    ld (hl), >_text\@
-.endm
 
 ;========================================
 ; console/console.asm
@@ -623,7 +603,7 @@
 .ends
 
 ;========================================
-; test-runner/clear-system-state.asm
+; testing/clear-system-state.asm
 ;========================================
 .section "smsspec.clearSystemState" free
     smsspec.clearSystemState:
@@ -664,7 +644,7 @@
 .ends
 
 ;========================================
-; test-runner/current-test-info.asm
+; testing/current-test-info.asm
 ;========================================
 .ramsection "smsspec.current_test_info" slot 2
     smsspec.current_describe_message_addr: dw
@@ -672,7 +652,7 @@
 .ends
 
 ;========================================
-; test-runner/describe.asm
+; testing/describe.asm
 ;========================================
 /**
  * Can be used to describe the unit being tested
@@ -684,7 +664,7 @@
 .endm
 
 ;========================================
-; test-runner/it.asm
+; testing/it.asm
 ;========================================
 /**
  * Specified a new test with a description.
@@ -698,7 +678,27 @@
 .endm
 
 ;========================================
-; vdp/vdp.asm
+; testing/store-text.asm
+;========================================
+/**
+ * Stores text in the ROM and adds a pointer to it at the given
+ * RAM location
+ */
+.macro "smsspec.storeText" args text, ram_pointer
+    jr +
+    _text\@:
+        .asc text
+        .db $ff    ; terminator byte
+    +:
+
+    ld hl, ram_pointer
+    ld (hl), <_text\@
+    inc hl
+    ld (hl), >_text\@
+.endm
+
+;========================================
+; console/vdp/vdp.asm
 ;========================================
 .section "smsspec.vdp" free
     smsspec.clearVram:
