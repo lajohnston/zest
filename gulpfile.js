@@ -58,7 +58,7 @@ gulp.task('build-example', gulp.series(
   'link-example'
 ));
 
-gulp.task('watch-example', function() {
+gulp.task('watch-example', gulp.series('build-example', function() {
   //gulp.watch(src, gulp.series('build'));
   gulp.watch('./example/**/*.asm', gulp.series('build-example'));
-});
+}));
