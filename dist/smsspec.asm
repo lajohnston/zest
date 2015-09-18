@@ -87,39 +87,6 @@
 .endm
 
 ;========================================
-; assertions/assertion-failed.asm
-;========================================
-.macro "assertionFailed" args message, actual
-    jp assertionFailed
-.endm
-
-.section "smsspec.onFailure" free
-    assertionFailed:
-        ld hl, (smsspec.current_describe_message_addr)
-        call smsspec.console.out
-
-        ld hl, (smsspec.current_describe_message_addr)
-        call smsspec.console.out
-
-        ld hl, (smsspec.current_describe_message_addr)
-        call smsspec.console.out
-
-        ld hl, (smsspec.current_describe_message_addr)
-        call smsspec.console.out
-
-        ld hl, (smsspec.current_describe_message_addr)
-        call smsspec.console.out
-
-        ld hl, (smsspec.current_describe_message_addr)
-        call smsspec.console.out
-
-        ;smsspec.current_test_message_addr: dw
-
-        ; Stop program
-        -: jp -
-.ends
-
-;========================================
 ; console/console.asm
 ;========================================
 ;===================================================================
@@ -162,6 +129,7 @@
      * Write text to the console
      * @param hl    the address of the text to write. The text should be
      *              terminated by an $FF byte
+     * @clobbers hl
      */
     smsspec.console.out:
         push bc
@@ -209,7 +177,7 @@
                 inc e
                 ld a, e
                 cp 31
-                jr z, -
+                jr nz, -
 
                 ; Wrap x tile, calculate next y tile
                 ld e, 0     ; wrap x tile
@@ -222,10 +190,18 @@
             jr -
 
     _stopWrite:
+        ; Store new cursor positions
+        ld hl, smsspec.console.cursor_pos
+        ld (hl), e
+        inc hl
+        ld (hl), d
+
         pop bc
         pop de
         ret
+.ends
 
+.section "smsspec.console.newlineSection" free
     smsspec.console.newline:
         ld hl, (smsspec.console.cursor_pos)
         ld d, h
@@ -243,11 +219,7 @@
             or a ; reset carry flag
             sbc hl, de
             add hl, de
-
         jp -
-
-        +:
-            ret
 .ends
 
 ;========================================
@@ -601,6 +573,27 @@
         ; Jump to opcodes in RAM
         jp smsspec.mock.jump.pop
 .ends
+
+;========================================
+; testing/assertion-failed.asm
+;========================================
+.section "smsspec.testing.assertionFailedSection" free
+    smsspec.testing.assertionFailed:
+        ld hl, (smsspec.current_describe_message_addr)
+        call smsspec.console.out
+
+        ld hl, (smsspec.current_test_message_addr)
+        call smsspec.console.out
+
+        ;smsspec.current_test_message_addr: dw
+
+        ; Stop program
+        -: jp -
+.ends
+
+.macro "assertionFailed" args message, actual
+    jp smsspec.testing.assertionFailed
+.endm
 
 ;========================================
 ; testing/clear-system-state.asm

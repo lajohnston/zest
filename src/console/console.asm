@@ -38,6 +38,7 @@
      * Write text to the console
      * @param hl    the address of the text to write. The text should be
      *              terminated by an $FF byte
+     * @clobbers hl
      */
     smsspec.console.out:
         push bc
@@ -85,7 +86,7 @@
                 inc e
                 ld a, e
                 cp 31
-                jr z, -
+                jr nz, -
 
                 ; Wrap x tile, calculate next y tile
                 ld e, 0     ; wrap x tile
@@ -98,10 +99,18 @@
             jr -
 
     _stopWrite:
+        ; Store new cursor positions
+        ld hl, smsspec.console.cursor_pos
+        ld (hl), e
+        inc hl
+        ld (hl), d
+
         pop bc
         pop de
         ret
+.ends
 
+.section "smsspec.console.newlineSection" free
     smsspec.console.newline:
         ld hl, (smsspec.console.cursor_pos)
         ld d, h
@@ -119,9 +128,5 @@
             or a ; reset carry flag
             sbc hl, de
             add hl, de
-
         jp -
-
-        +:
-            ret
 .ends
