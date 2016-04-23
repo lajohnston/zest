@@ -3,10 +3,7 @@
 ; Define mocks
 .ramsection "mock instances" slot 2
 	smsspec.mocks.start: db
-
 	randomGeneratorMock instanceof smsspec.mock
-
-
 	smsspec.mocks.end: db
 .ends
 
@@ -14,13 +11,9 @@
 	RandomGenerator.generateByte: smsspec.mock.call randomGeneratorMock
 .ends
 
-
-
-
-; Incrementer tests
-.include "incrementer.spec.asm"
+.include "incrementer.asm"
 
 .section "smsspec.suite" free
 	smsspec.suite:
-		call incrementer.spec
+		.include "incrementer.spec.asm"
 .ends

@@ -1,41 +1,25 @@
-.include "incrementer.asm"
+describe "Incrementer"
+	it "should increment the value in the a register"
+		ld a, 100					; Set up conditions
+		call Incrementer.increment	; Call function
+		assertAccEquals 101			; Test output
 
-.section "Incrementer spec" free
-	incrementer.spec:
-		describe "Incrementer"
+	it "should increment the value by a random amount"
+		; Set up conditions
+		ld a, 100
 
-		it "should increment the value in the a register"
-			; Set up conditions
-			ld a, 100
+		; Mock the random generator
+		smsspec.mock.set randomGeneratorMock, _random
 
-			; Run function
-			call Incrementer.increment
+		jr +
+		_random:
+			; Mock will return the value of 50 in register a
+			ld a, 50
+			ret
+		+:
 
-			; Test assertions
-			assertAccEquals 101
+		; Run test
+		call Incrementer.incrementRandom
 
-
-		it "should increment the value by a random amount"
-			; Set up conditions
-			ld a, 100
-
-			; Mock the random generator
-			smsspec.mock.set randomGeneratorMock, _random
-
-			jr +
-			_random:
-				; Mock will return the value of 50 in register a
-				ld a, 50
-				ret
-			+:
-
-			; Run test
-			call Incrementer.incrementRandom
-
-			; Test assertions
-			assertAccEquals 150
-
-
-
-		ret
-.ends
+		; Test assertions
+		assertAccEquals 150
