@@ -18,7 +18,7 @@
       call smsspec.copyToVDP
 
       ; Load tiles
-      ld hl,$0000 | smsspec.vdp.VRAMWrite
+      ld hl, $0000 | smsspec.vdp.VRAMWrite
       call smsspec.setVDPAddress         ; Set VRAM write address to tile index 0
 
       ; Output tile data
@@ -28,7 +28,7 @@
 
       ; Initial cursor position
       ld hl, smsspec.console.cursor_pos
-      ld (hl), $01 ; y
+      ld (hl), $00 ; y
       inc hl
       ld (hl), $00 ; x
 
@@ -41,72 +41,97 @@
      * @clobbers hl
      */
     smsspec.console.out:
-        push bc
+        push af
         push de
-            ; Calculate and set VRAM write address based on x and y caret position
-            push hl
-                ld hl, (smsspec.console.cursor_pos)
-                ld b, l     ; y offset
-
-                ; Set de to x tile (x pos * 2), always an 8-bit number
-                ld d, 0
-                ld e, h     ; x offset
-                sla e       ; multiply by 2 (2 bytes per tile)
-
-                ; Get first tile addr and add x offset
-                ld hl, $3800 | smsspec.vdp.VRAMWrite
-                add hl, de
-
-                ; Add 66 for each y offset
-                ld de, 66
-                -:
-                    add hl, de
-                    djnz -
-
-                call smsspec.setVDPAddress
-                ld hl, (smsspec.console.cursor_pos)
-                ld d, h     ; x tile
-                ld e, l     ; y tile
-            pop hl
+        push hl
+            ; Set VRAM write address based on console caret position
+            ld de, (smsspec.console.cursor_pos)  ; d = y caret, e = x caret
+            call _setVramToCaret
 
             ; Write each character
-            -:
-                ld a, (hl)
+            _nextCharacter:
+                ld a, (hl)  ; a = next character
 
-                ; If $FF terminator, stop
-                cp $FF
+                ; If character is an $ff terminator, stop
+                cp $ff
                 jr z, _stopWrite
 
+                ; Output character to VRAM
                 out (smsspec.ports.vdp.data), a
-                xor a   ; set a to 0
+                xor a   ; a = 0
                 out (smsspec.ports.vdp.data), a
                 inc hl
 
-                ; Calculate x and y tiles
-                inc e
-                ld a, e
-                cp 31
-                jr nz, -
+                ; Inc x caret
+                inc e   ; inc x caret
+                ld a, 31
+                cp e
+                jr nz, _nextCharacter    ; if x caret hasn't wrapped, continue to next character
 
-                ; Wrap x tile, calculate next y tile
+                ; x caret has wrapped - calculate next y tile
                 ld e, 0     ; wrap x tile
-                inc d
-                ld a, d
-                cp 31
-                jr z, -
-                ld d, 0     ; wrap y tile
+                inc d       ; inc y caret
+                ld a, 28
+                cp d
+                jr nz, _nextCharacter   ; if y caret hasn't wrapped, continue to next character
 
-            jr -
+                ; y caret has wrapped
+                ld d, 0     ; wrap y caret
+                ld hl, $3800 | smsspec.vdp.VRAMWrite    ; set vram write to first tile
+
+            ; Keep looping until $ff terminator is reached
+            jr _nextCharacter
 
     _stopWrite:
         ; Store new cursor positions
         ld hl, smsspec.console.cursor_pos
-        ld (hl), e
+        ld (hl), e  ; store x caret
         inc hl
-        ld (hl), d
+        ld (hl), d  ; store y caret
 
-        pop bc
+        pop hl
         pop de
+        pop af
+        ret
+
+
+    /**
+     * Set the VRAM write address to the console caret position
+     * @param d y caret
+     * @param e x caret
+     */
+    _setVramToCaret:
+        push af
+        push bc
+        push hl
+            ld hl, $3800 | smsspec.vdp.VRAMWrite ; hl = vram addr. of first tile
+
+            ld a, e ; a = x caret
+            ld b, d ; b = y caret
+
+            ; Add xCaret*2 to vram address (2 bytes per tile in vram)
+            sla a       ; a = a * 2
+
+            _addHlA:
+                add a, l    ; add l to a
+                ld l, a     ; store result back to l
+                adc a, h
+                sub l
+                ld h, a     ; store result in h
+
+            ; Add 66 to vram address for every y caret position
+            xor a   ; x = 0
+            cp b    ; check if y caret = 0
+            jp z, +
+                ld a, 66
+                dec b
+                jp _addHlA  ; add 66 to hl
+            +:
+
+            call smsspec.setVDPAddress  ; set vdp write address to hl
+        pop hl
+        pop bc
+        pop af
         ret
 .ends
 
