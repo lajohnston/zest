@@ -173,18 +173,20 @@
             ; Keep looping until $ff terminator is reached
             jr _nextCharacter
 
-    _stopWrite:
+    _saveCaret:
         ; Store new cursor positions
         ld hl, smsspec.console.cursor_pos
         ld (hl), e  ; store x caret
         inc hl
         ld (hl), d  ; store y caret
+        ret
 
+    _stopWrite:
+        call _saveCaret
         pop hl
         pop de
         pop af
         ret
-
 
     /**
      * Set the VRAM write address to the console caret position
@@ -224,27 +226,26 @@
         pop bc
         pop af
         ret
-.ends
 
-.section "smsspec.console.newlineSection" free
     smsspec.console.newline:
-        ld hl, (smsspec.console.cursor_pos)
-        ld d, h
-        ld e, l
+        ld de, (smsspec.console.cursor_pos)  ; d = y caret, e = x caret
 
-        ld b, 0
-        ld c, 66
+        ld a, 32
+        cp e
+        jp nz, +
+            ; if x caret at end, inc y
+            inc d
+            ld a, 28
+            cp d
 
-        ; Add 66 until address is higher than cursor
-        ld hl, $3800 | smsspec.vdp.VRAMWrite
-        -:
-            add hl, bc
+            jp nz, +
+                ld d, 0 ; wrap
 
-            ; cp 16 bits
-            or a ; reset carry flag
-            sbc hl, de
-            add hl, de
-        jp -
+        +:
+
+        ld e, 32    ; set x caret to end of line
+        jp _saveCaret
+
 .ends
 
 ;========================================
@@ -607,6 +608,9 @@
         ld hl, (smsspec.current_describe_message_addr)
         call smsspec.console.out
 
+        call smsspec.console.newline
+        call smsspec.console.newline
+
         ld hl, (smsspec.current_test_message_addr)
         call smsspec.console.out
 
@@ -677,8 +681,8 @@
  * Stores a pointer to the description test which is used to
  * identify the test to the user if it fails
  */
-.macro "describe" args unit_name
-    smsspec.storeText unit_name, smsspec.current_describe_message_addr
+.macro "describe" args unitName
+    smsspec.storeText unitName, smsspec.current_describe_message_addr
 .endm
 
 ;========================================

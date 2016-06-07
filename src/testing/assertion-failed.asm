@@ -3,6 +3,9 @@
         ld hl, (smsspec.current_describe_message_addr)
         call smsspec.console.out
 
+        call smsspec.console.newline
+        call smsspec.console.newline
+
         ld hl, (smsspec.current_test_message_addr)
         call smsspec.console.out
 
