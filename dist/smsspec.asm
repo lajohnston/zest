@@ -118,12 +118,8 @@
       call smsspec.copyToVDP
 
       ; Initial cursor position
-      ld hl, smsspec.console.cursor_pos
-      ld (hl), $00 ; y
-      inc hl
-      ld (hl), $00 ; x
-
-      ret
+      ld de, $0000
+      jp _saveCaret
 
     /**
      * Write text to the console
@@ -147,11 +143,11 @@
                 cp $ff
                 jr z, _stopWrite
 
-                ; Output character to VRAM
+                ; Output character to VRAM (auto-increments VRAM position)
                 out (smsspec.ports.vdp.data), a
                 xor a   ; a = 0
                 out (smsspec.ports.vdp.data), a
-                inc hl
+                inc hl  ; next character
 
                 ; Inc x caret
                 inc e   ; inc x caret
@@ -212,11 +208,11 @@
                 sub l
                 ld h, a     ; store result in h
 
-            ; Add 66 to vram address for every y caret position
+            ; Add 64 to vram address for every y caret position
             xor a   ; x = 0
             cp b    ; check if y caret = 0
             jp z, +
-                ld a, 66
+                ld a, 64
                 dec b
                 jp _addHlA  ; add 66 to hl
             +:
@@ -229,21 +225,16 @@
 
     smsspec.console.newline:
         ld de, (smsspec.console.cursor_pos)  ; d = y caret, e = x caret
+        ld e, 0 ; x caret = 0
+        inc d   ; inc y caret
 
-        ld a, 32
-        cp e
+        ; check if y caret at end
+        ld a, 28
+        cp d
         jp nz, +
-            ; if x caret at end, inc y
-            inc d
-            ld a, 28
-            cp d
-
-            jp nz, +
-                ld d, 0 ; wrap
-
+            ld d, 0 ; wrap
         +:
 
-        ld e, 32    ; set x caret to end of line
         jp _saveCaret
 
 .ends
@@ -613,8 +604,6 @@
 
         ld hl, (smsspec.current_test_message_addr)
         call smsspec.console.out
-
-        ;smsspec.current_test_message_addr: dw
 
         ; Stop program
         -: jp -
