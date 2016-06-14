@@ -20,7 +20,7 @@
 
 
 ; SDSC tag and SMS rom header
-.sdsctag 1.2,"SMSSpec", "Sega Master System Unit Test Runner", "eljay"
+.sdsctag 1.2,"SMSSpec", "Sega Master System Unit Test Runner", "lajohnston"
 
 /**
  * Boot sequence

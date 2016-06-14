@@ -146,4 +146,15 @@
 
         jp _saveCaret
 
+    /**
+     * Set the console text color.
+     * @param a     the color to set (%xxBBGGRR)
+     */
+    smsspec.console.setTextColor:
+        push hl
+            ld hl, (smsspec.vdp.CRAMWrite + 1) | $4000
+            call smsspec.setVDPAddress
+        pop hl
+        out (smsspec.ports.vdp.data), a
+        ret
 .ends

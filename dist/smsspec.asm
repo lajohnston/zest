@@ -32,7 +32,7 @@
 
 
 ; SDSC tag and SMS rom header
-.sdsctag 1.2,"SMSSpec", "Sega Master System Unit Test Runner", "eljay"
+.sdsctag 1.2,"SMSSpec", "Sega Master System Unit Test Runner", "lajohnston"
 
 /**
  * Boot sequence
@@ -237,6 +237,17 @@
 
         jp _saveCaret
 
+    /**
+     * Set the console text color.
+     * @param a     the color to set (%xxBBGGRR)
+     */
+    smsspec.console.setTextColor:
+        push hl
+            ld hl, (smsspec.vdp.CRAMWrite + 1) | $4000
+            call smsspec.setVDPAddress
+        pop hl
+        out (smsspec.ports.vdp.data), a
+        ret
 .ends
 
 ;========================================
@@ -596,6 +607,10 @@
 ;========================================
 .section "smsspec.testing.assertionFailedSection" free
     smsspec.testing.assertionFailed:
+        ; Set console text color to red
+        ld a, %00000011
+        call smsspec.console.setTextColor   ; set to a
+
         ld hl, (smsspec.current_describe_message_addr)
         call smsspec.console.out
 
@@ -753,4 +768,5 @@
         jr nz,-
 
         ret
+
 .ends
