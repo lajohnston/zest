@@ -8,15 +8,10 @@ describe "Incrementer"
 		; Set up conditions
 		ld a, 100
 
-		; Mock the random generator
-		smsspec.mock.set randomGeneratorMock, _random
-
-		jr +
-		_random:
-			; Mock will return the value of 50 in register a
-			ld a, 50
-			ret
-		+:
+		; Mock the random generator so it returns a fixed value we can test
+		smsspec.mock.start randomGeneratorMock
+			ld a, 50	; Mock will return the value of 50 in register a
+		smsspec.mock.end
 
 		; Run test
 		call Incrementer.incrementRandom

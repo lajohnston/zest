@@ -537,6 +537,25 @@
     pop hl
 .endm
 
+/**
+ * Define the start of a mock handler. smsspec.mock.end must be called at the
+ * end of the handler
+ *
+ * @param   mockAddress the address of the mock instance to define the handler for
+ */
+.macro "smsspec.mock.start" args mockAddress
+    smsspec.mock.set mockAddress, _mockHandlerStart\@
+    jp _mockHandlerEnd\@    ; skip mock code until it is called
+    _mockHandlerStart\@:    ; define start of the mock handler
+.endm
+
+/**
+ * Define the end of a mock handler
+ */
+.macro "smsspec.mock.end"
+    ret                 ; return from the handler
+    _mockHandlerEnd\@:  ; define end of the mock handler
+.endm
 
 /**
  * Reserves space in RAM to store temporary opcodes for use when jumping to a
