@@ -9,7 +9,7 @@ describe "Incrementer"
 		ld a, 100
 
 		; Mock the random generator so it returns a fixed value we can test
-		smsspec.mock.start randomGeneratorMock
+		smsspec.mock.start RandomGenerator.generateByte
 			ld a, 50	; Mock will return the value of 50 in register a
 		smsspec.mock.end
 
