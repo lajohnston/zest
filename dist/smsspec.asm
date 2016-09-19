@@ -83,18 +83,6 @@
 .ends
 
 ;==============================================================
-; assertions/assert-acc-equals.asm
-;==============================================================
-
-.macro "assertAccEquals" args expected
-    cp expected
-
-    jr z, +
-        smsspec.runner.assertionFailed "Failed"
-    +:
-.endm
-
-;==============================================================
 ; console/console.asm
 ;==============================================================
 
@@ -526,6 +514,19 @@
 .ends
 
 ;==============================================================
+; expect.asm
+;==============================================================
+
+/**
+ * Fails the test if the value in register a does not
+ * match the expected value
+ */
+.macro "expect.a.toBe" args expected
+    cp expected
+    call nz, smsspec.runner.expectationFailed
+.endm
+
+;==============================================================
 ; handlers/pause.asm
 ;==============================================================
 
@@ -701,8 +702,8 @@
     smsspec.runner.current_test_message_addr: dw
 .ends
 
-.section "smsspec.runner.assertionFailed" free
-    smsspec.runner.assertionFailed:
+.section "smsspec.runner.expectationFailed" free
+    smsspec.runner.expectationFailed:
         ; Set console text color to red
         ld a, %00000011
         call smsspec.console.setTextColor   ; set to a
@@ -720,8 +721,8 @@
         -: jp -
 .ends
 
-.macro "smsspec.runner.assertionFailed" args message, actual
-    jp smsspec.runner.assertionFailed
+.macro "smsspec.runner.expectationFailed" args message, actual
+    jp smsspec.runner.expectationFailed
 .endm
 
 .section "smsspec.runner.clearSystemState" free

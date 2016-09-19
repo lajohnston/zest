@@ -21,7 +21,7 @@ You can use the 'describe' macro to define each unit being tested, and the 'it' 
         it "should increment the value in the accumulator"
             ld a, 5
             call counter.increment
-            assertAccEquals 6
+            expect.a.toBe 6
 
 When you compile the test suite and run it in an emulator (SMSSpec is currently untested on real hardware), you be notified on screen if any tests fail. If the above test failed, you would see the following message in red: 'Counter should increment the value in the accumulator'.
 

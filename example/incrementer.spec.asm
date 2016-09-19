@@ -2,7 +2,7 @@ describe "Incrementer"
 	it "should increment the value in the a register"
 		ld a, 100					; Set up conditions
 		call Incrementer.increment	; Call function
-		assertAccEquals 101			; Test output
+		expect.a.toBe 101			; Test output
 
 	it "should increment the value by a random amount"
 		; Set up conditions
@@ -17,4 +17,4 @@ describe "Incrementer"
 		call Incrementer.incrementRandom
 
 		; Test assertions
-		assertAccEquals 150
+		expect.a.toBe 150
