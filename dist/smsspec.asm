@@ -90,7 +90,7 @@
     cp expected
 
     jr z, +
-        assertionFailed "Failed"
+        smsspec.runner.assertionFailed "Failed"
     +:
 .endm
 
@@ -553,7 +553,7 @@
 .ends
 
 ;==============================================================
-; mock/mock.asm
+; mock.asm
 ;==============================================================
 
 /**
@@ -693,38 +693,39 @@
 .ends
 
 ;==============================================================
-; testing/assertion-failed.asm
+; runner.asm
 ;==============================================================
 
-.section "smsspec.testing.assertionFailedSection" free
-    smsspec.testing.assertionFailed:
+.ramsection "smsspec.runner.current_test_info" slot 2
+    smsspec.runner.current_describe_message_addr: dw
+    smsspec.runner.current_test_message_addr: dw
+.ends
+
+.section "smsspec.runner.assertionFailed" free
+    smsspec.runner.assertionFailed:
         ; Set console text color to red
         ld a, %00000011
         call smsspec.console.setTextColor   ; set to a
 
-        ld hl, (smsspec.current_describe_message_addr)
+        ld hl, (smsspec.runner.current_describe_message_addr)
         call smsspec.console.out
 
         call smsspec.console.newline
         call smsspec.console.newline
 
-        ld hl, (smsspec.current_test_message_addr)
+        ld hl, (smsspec.runner.current_test_message_addr)
         call smsspec.console.out
 
         ; Stop program
         -: jp -
 .ends
 
-.macro "assertionFailed" args message, actual
-    jp smsspec.testing.assertionFailed
+.macro "smsspec.runner.assertionFailed" args message, actual
+    jp smsspec.runner.assertionFailed
 .endm
 
-;==============================================================
-; testing/clear-system-state.asm
-;==============================================================
-
-.section "smsspec.clearSystemState" free
-    smsspec.clearSystemState:
+.section "smsspec.runner.clearSystemState" free
+    smsspec.runner.clearSystemState:
         ; Clear mocks to defaults
         ld hl, smsspec.mocks.start + 1
         ld b, (smsspec.mocks.end - smsspec.mocks.start - 1) / _sizeof_smsspec.mock ; number of mocks
@@ -747,52 +748,31 @@
         ret
 .ends
 
-;==============================================================
-; testing/current-test-info.asm
-;==============================================================
-
-.ramsection "smsspec.current_test_info" slot 2
-    smsspec.current_describe_message_addr: dw
-    smsspec.current_test_message_addr: dw
-.ends
-
-;==============================================================
-; testing/describe.asm
-;==============================================================
-
 /**
  * Can be used to describe the unit being tested
  * Stores a pointer to the description test which is used to
  * identify the test to the user if it fails
  */
 .macro "describe" args unitName
-    smsspec.storeText unitName, smsspec.current_describe_message_addr
+    smsspec.runner.storeText unitName, smsspec.runner.current_describe_message_addr
 .endm
-
-;==============================================================
-; testing/it.asm
-;==============================================================
 
 /**
  * Initialises a new test.
  * Resets the Z80 registers and stores the test description in case the test fails
  */
 .macro "it" args message
-    smsspec.storeText message, smsspec.current_test_message_addr
+    smsspec.runner.storeText message, smsspec.runner.current_test_message_addr
 
     ; Clear system state
-    call smsspec.clearSystemState
+    call smsspec.runner.clearSystemState
 .endm
-
-;==============================================================
-; testing/store-text.asm
-;==============================================================
 
 /**
  * Stores text in the ROM and adds a pointer to it at the given
  * RAM location
  */
-.macro "smsspec.storeText" args text, ram_pointer
+.macro "smsspec.runner.storeText" args text, ram_pointer
     jr +
     _text\@:
         .asc text

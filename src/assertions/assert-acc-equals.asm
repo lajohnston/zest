@@ -2,6 +2,6 @@
     cp expected
 
     jr z, +
-        assertionFailed "Failed"
+        smsspec.runner.assertionFailed "Failed"
     +:
 .endm
