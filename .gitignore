@@ -1,5 +1,2 @@
 bin
 build
-*.o
-.wla*
-node_modules

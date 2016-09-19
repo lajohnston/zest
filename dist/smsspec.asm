@@ -1,15 +1,22 @@
-;========================================
+
+;==============================================================
+; SMSSpec
+;==============================================================
+
+;==============================================================
 ; console/vdp/constants.asm
-;========================================
+;==============================================================
+
 .define smsspec.ports.vdp.control $bf
 .define smsspec.ports.vdp.data $be
 .define smsspec.ports.vdp.status $be ; same as Vdp.data, as that is write only and this is read only
 .define smsspec.vdp.VRAMWrite $4000
 .define smsspec.vdp.CRAMWrite $c000
 
-;========================================
+;==============================================================
 ; main.asm
-;========================================
+;==============================================================
+
 ;==============================================================
 ; WLA-DX banking setup
 ;==============================================================
@@ -75,9 +82,10 @@
         -: jr -
 .ends
 
-;========================================
+;==============================================================
 ; assertions/assert-acc-equals.asm
-;========================================
+;==============================================================
+
 .macro "assertAccEquals" args expected
     cp expected
 
@@ -86,9 +94,10 @@
     +:
 .endm
 
-;========================================
+;==============================================================
 ; console/console.asm
-;========================================
+;==============================================================
+
 ;===================================================================
 ; Console
 ;===================================================================
@@ -250,9 +259,10 @@
         ret
 .ends
 
-;========================================
+;==============================================================
 ; console/data.asm
-;========================================
+;==============================================================
+
 .section "smsspec.console.data" free
     .asciitable
     map " " to "~" = 0
@@ -466,16 +476,67 @@
     smsspec.console.data.font_end:
 .ends
 
-;========================================
+;==============================================================
+; console/vdp/vdp.asm
+;==============================================================
+
+.section "smsspec.vdp" free
+    smsspec.clearVram:
+        ; Set VRAM write address to $0000
+        ld hl, $0000 | smsspec.vdp.VRAMWrite
+        call smsspec.setVDPAddress
+
+        ; Output 16KB of zeroes
+        ld bc, $4000     ; Counter for 16KB of VRAM
+        -:
+            xor a
+            out (smsspec.ports.vdp.data),a ; Output to VRAM address, which is auto-incremented after each write
+            dec bc
+            ld a, b
+            or c
+        jr nz,-
+        ret
+
+    smsspec.setVDPAddress:
+    ; Sets the VDP address
+    ; Parameters: hl = address
+        push af
+            ld a, l
+            out (smsspec.ports.vdp.control), a
+            ld a, h
+            out (smsspec.ports.vdp.control), a
+        pop af
+        ret
+
+    smsspec.copyToVDP:
+        ; Copies data to the VDP
+        ; Parameters: hl = data address, bc = data length
+        ; Affects: a, hl, bc
+        -:
+            ld a, (hl)    ; Get data byte
+            out (smsspec.ports.vdp.data), a
+            inc hl       ; Point to next letter
+            dec bc
+            ld a, b
+            or c
+        jr nz,-
+
+        ret
+
+.ends
+
+;==============================================================
 ; handlers/pause.asm
-;========================================
+;==============================================================
+
 .bank 0 slot 0
     .orga $0066
     retn
 
-;========================================
+;==============================================================
 ; handlers/vblank.asm
-;========================================
+;==============================================================
+
 .orga $0038
 .section "Interrupt handler" force
     push af
@@ -491,9 +552,10 @@
         ret
 .ends
 
-;========================================
+;==============================================================
 ; mock/mock.asm
-;========================================
+;==============================================================
+
 /**
  * Structure for mock instances in RAM, which hold a counter for the times
  * the mock has been called and the address to jump to to handle the
@@ -630,9 +692,10 @@
         jp smsspec.mock.jump.pop
 .ends
 
-;========================================
+;==============================================================
 ; testing/assertion-failed.asm
-;========================================
+;==============================================================
+
 .section "smsspec.testing.assertionFailedSection" free
     smsspec.testing.assertionFailed:
         ; Set console text color to red
@@ -656,17 +719,47 @@
     jp smsspec.testing.assertionFailed
 .endm
 
-;========================================
+;==============================================================
+; testing/clear-system-state.asm
+;==============================================================
+
+.section "smsspec.clearSystemState" free
+    smsspec.clearSystemState:
+        ; Clear mocks to defaults
+        ld hl, smsspec.mocks.start + 1
+        ld b, (smsspec.mocks.end - smsspec.mocks.start - 1) / _sizeof_smsspec.mock ; number of mocks
+        call smsspec.mock.initAll
+
+        ; Clear registers
+        xor a
+        ld b, a
+        ld c, a
+        ld d, a
+        ld e, a
+        ld h, a
+        ld l, a
+        ld ix, 0
+        ld iy, 0
+
+        ; do same for shadow flags
+
+        ; reset fps counter
+        ret
+.ends
+
+;==============================================================
 ; testing/current-test-info.asm
-;========================================
+;==============================================================
+
 .ramsection "smsspec.current_test_info" slot 2
     smsspec.current_describe_message_addr: dw
     smsspec.current_test_message_addr: dw
 .ends
 
-;========================================
+;==============================================================
 ; testing/describe.asm
-;========================================
+;==============================================================
+
 /**
  * Can be used to describe the unit being tested
  * Stores a pointer to the description test which is used to
@@ -676,9 +769,10 @@
     smsspec.storeText unitName, smsspec.current_describe_message_addr
 .endm
 
-;========================================
+;==============================================================
 ; testing/it.asm
-;========================================
+;==============================================================
+
 /**
  * Initialises a new test.
  * Resets the Z80 registers and stores the test description in case the test fails
@@ -690,9 +784,10 @@
     call smsspec.clearSystemState
 .endm
 
-;========================================
+;==============================================================
 ; testing/store-text.asm
-;========================================
+;==============================================================
+
 /**
  * Stores text in the ROM and adds a pointer to it at the given
  * RAM location
@@ -710,50 +805,3 @@
     ld (hl), >_text\@
 .endm
 
-;========================================
-; console/vdp/vdp.asm
-;========================================
-.section "smsspec.vdp" free
-    smsspec.clearVram:
-        ; Set VRAM write address to $0000
-        ld hl, $0000 | smsspec.vdp.VRAMWrite
-        call smsspec.setVDPAddress
-
-        ; Output 16KB of zeroes
-        ld bc, $4000     ; Counter for 16KB of VRAM
-        -:
-            xor a
-            out (smsspec.ports.vdp.data),a ; Output to VRAM address, which is auto-incremented after each write
-            dec bc
-            ld a, b
-            or c
-        jr nz,-
-        ret
-
-    smsspec.setVDPAddress:
-    ; Sets the VDP address
-    ; Parameters: hl = address
-        push af
-            ld a, l
-            out (smsspec.ports.vdp.control), a
-            ld a, h
-            out (smsspec.ports.vdp.control), a
-        pop af
-        ret
-
-    smsspec.copyToVDP:
-        ; Copies data to the VDP
-        ; Parameters: hl = data address, bc = data length
-        ; Affects: a, hl, bc
-        -:
-            ld a, (hl)    ; Get data byte
-            out (smsspec.ports.vdp.data), a
-            inc hl       ; Point to next letter
-            dec bc
-            ld a, b
-            or c
-        jr nz,-
-
-        ret
-
-.ends
