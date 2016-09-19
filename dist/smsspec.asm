@@ -52,6 +52,26 @@
     jp smsspec.init
 .ends
 
+/**
+ * VBlank handler
+ */
+.orga $0038
+.section "Interrupt handler" force
+    push af
+        in a, (smsspec.ports.vdp.status) ; satisfy interrupt
+        ret
+    pop af
+    ei
+    reti
+.ends
+
+/**
+ * Pause handler
+ */
+.bank 0 slot 0
+    .orga $0066
+    retn
+
 .section "smsspec.init" free
     smsspec.init:
         ; Set up VDP registers
@@ -525,33 +545,6 @@
     cp expected
     call nz, smsspec.runner.expectationFailed
 .endm
-
-;==============================================================
-; handlers/pause.asm
-;==============================================================
-
-.bank 0 slot 0
-    .orga $0066
-    retn
-
-;==============================================================
-; handlers/vblank.asm
-;==============================================================
-
-.orga $0038
-.section "Interrupt handler" force
-    push af
-        in a, (smsspec.ports.vdp.status) ; satisfy interrupt
-        call smsspec.onVBlank
-    pop af
-    ei
-    reti
-.ends
-
-.section "smsspec.onVBlank" free
-    smsspec.onVBlank:
-        ret
-.ends
 
 ;==============================================================
 ; mock.asm

@@ -18,7 +18,6 @@
     banks 2
 .endro
 
-
 ; SDSC tag and SMS rom header
 .sdsctag 1.2,"SMSSpec", "Sega Master System Unit Test Runner", "lajohnston"
 
@@ -32,6 +31,26 @@
     ld sp, $dff0    ; set stack pointer
     jp smsspec.init
 .ends
+
+/**
+ * VBlank handler
+ */
+.orga $0038
+.section "Interrupt handler" force
+    push af
+        in a, (smsspec.ports.vdp.status) ; satisfy interrupt
+        ret
+    pop af
+    ei
+    reti
+.ends
+
+/**
+ * Pause handler
+ */
+.bank 0 slot 0
+    .orga $0066
+    retn
 
 .section "smsspec.init" free
     smsspec.init:
