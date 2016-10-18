@@ -1,7 +1,3 @@
-;===================================================================
-; Console
-;===================================================================
-
 .define smsspec.console.COLUMNS 31
 
 .ramsection "smsspec.console.variables" slot 2

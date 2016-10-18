@@ -6,7 +6,6 @@ all: example/bin/test_suite.sms
 # SMSSpec
 ###
 SMSSPEC_SRC := $(shell (\
-	find src -type f -name *constants.asm;\
 	echo src/main.asm;\
 	find src -type f -name *.asm\
 ) | awk '!x[$$0]++')

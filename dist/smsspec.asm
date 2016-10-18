@@ -4,22 +4,21 @@
 ;==============================================================
 
 ;==============================================================
-; console/vdp/constants.asm
+; main.asm
 ;==============================================================
 
+/**
+ * Constants
+ */
 .define smsspec.ports.vdp.control $bf
 .define smsspec.ports.vdp.data $be
 .define smsspec.ports.vdp.status $be ; same as Vdp.data, as that is write only and this is read only
 .define smsspec.vdp.VRAMWrite $4000
 .define smsspec.vdp.CRAMWrite $c000
 
-;==============================================================
-; main.asm
-;==============================================================
-
-;==============================================================
-; WLA-DX banking setup
-;==============================================================
+/**
+ * WLA-DX banking setup
+ */
 .memorymap
     defaultslot 0
     slotsize $4000
@@ -36,7 +35,6 @@
     banksize $4000
     banks 2
 .endro
-
 
 ; SDSC tag and SMS rom header
 .sdsctag 1.2,"SMSSpec", "Sega Master System Unit Test Runner", "lajohnston"
@@ -105,10 +103,6 @@
 ;==============================================================
 ; console/console.asm
 ;==============================================================
-
-;===================================================================
-; Console
-;===================================================================
 
 .define smsspec.console.COLUMNS 31
 
@@ -485,7 +479,7 @@
 .ends
 
 ;==============================================================
-; console/vdp/vdp.asm
+; console/vdp.asm
 ;==============================================================
 
 .section "smsspec.vdp" free
