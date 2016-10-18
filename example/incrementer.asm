@@ -1,6 +1,6 @@
 .section "Incrementer" free
     Incrementer.increment:
-        dec a ; Intentional bug, dec instead of inc
+        inc a
         ret
 
     Incrementer.incrementRandom:

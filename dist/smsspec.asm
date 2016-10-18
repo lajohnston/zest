@@ -757,6 +757,30 @@
 .endm
 
 /**
+ * Displays message to signal end of test suite
+ */
+.macro "smsspec.end"
+    jr +
+        _smsspecTitleText:
+            .asc "SMSSpec"
+            .db $ff ; terminator byte
+
+        _allTestsPassedText:
+            .asc "All tests passed!"
+            .db $ff ; terminator byte
+    +:
+
+    ld hl, _smsspecTitleText
+    call smsspec.console.out
+
+    call smsspec.console.newline
+    call smsspec.console.newline
+
+    ld hl, _allTestsPassedText
+    call smsspec.console.out
+.endm
+
+/**
  * Stores text in the ROM and adds a pointer to it at the given
  * RAM location
  */

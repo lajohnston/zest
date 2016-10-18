@@ -16,5 +16,7 @@
     smsspec.suite:
         ; Include your test suite files
         .include "incrementer.spec.asm"
-        ret
+
+        ; Signal end of test suite
+        smsspec.end
 .ends
