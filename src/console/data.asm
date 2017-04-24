@@ -1,11 +1,15 @@
 .section "smsspec.console.data" free
     .asciitable
-    map " " to "~" = 0
+        map " " to "~" = 0
     .enda
 
-    smsspec.heading:
-    .asc "SMSSpec"
-    .db $ff
+    smsspec.console.data.heading:
+        .asc "SMSSpec"
+        .db $ff ; terminator byte
+
+    smsspec.console.data.allTestsPassed:
+        .asc "All tests passed!"
+        .db $ff ; terminator byte
 
     smsspec.palette_data:
         .db $00,$0C,$03 ; Black, green, red
