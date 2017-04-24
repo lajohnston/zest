@@ -36,6 +36,8 @@
         push af
         push de
         push hl
+            call smsspec.console.vdp.disableDisplay
+
             ; Set VRAM write address based on console caret position
             ld de, (smsspec.console.cursor_pos)  ; d = y caret, e = x caret
             call _setVramToCaret
@@ -84,6 +86,8 @@
 
     _stopWrite:
         call _saveCaret
+        call smsspec.console.vdp.enableDisplay
+
         pop hl
         pop de
         pop af
