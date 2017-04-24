@@ -1,7 +1,7 @@
-#SMSSpec
+# SMSSpec
 
 ## What is it?
-SMSSpec is a unit test/spec runner for use with Sega Master System/WLA DX assembler. Utilising the WLA DX macro features, it provides a high-level syntax so you can feed routines with fixed inputs and assert their output.
+SMSSpec is a unit test/spec runner for use with the Sega Master System/WLA DX assembler. Utilising the WLA DX macro features, it provides a high-level syntax so you can feed routines with fixed inputs and assert their output.
 
 ## Why?
 Pinpointing bugs in assembly code can be very time consuming, so the TDD mantra 'Debugging sucks. Testing rocks' applies extremely well here.
@@ -9,19 +9,32 @@ Pinpointing bugs in assembly code can be very time consuming, so the TDD mantra 
 With a TDD workflow you can define the expected behaviour of a routine before you start work on it, and once the tests pass you can tighten and optimize the code while being informed if you break anything.
 
 ## How to use it
-Create one or more test suite asm files which use .include to pull in the SMSSpec library and the code files you want to test.
+There's an example project included in the repo (see /example). Create a blank test suite asm file that will serve as the entry point. In this file, use .include to pull in the SMSSpec library and the code files you want to test.
 
     ; Within your test suite file
     .include "smsspec.asm"      ; Include the smsspec.asm library
     .include "src/counter.asm"  ; Include the file(s) you want to test
 
-You can use the 'describe' macro to define each unit being tested, and the 'it' macro to describe the expected behaviour.
+Define an 'smsspec.suite' label that smsspec will call to start the tests, and within it include the tests you wish to include in the suite.
 
+    ; Within the test suite file
+    .section "smsspec.suite" free
+        smsspec.suite:
+            ; Include each test file you want to run as part of the suite
+            .include "counter.spec.asm"
+
+            ; End of test suite
+            ret
+    .ends
+
+In each test file, you can use the 'describe' macro to define each unit being tested, and the 'it' macro to describe the expected behaviour.
+
+    ; Within counter.spec.asm
     describe "Counter"
         it "should increment the value in the accumulator"
-            ld a, 5
+            ld a, 1
             call counter.increment
-            expect.a.toBe 6
+            expect.a.toBe 2
 
 When you compile the test suite and run it in an emulator (SMSSpec is currently untested on real hardware), you be notified on screen if any tests fail. If the above test failed, you would see the following message in red: 'Counter should increment the value in the accumulator'.
 
