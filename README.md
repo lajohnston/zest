@@ -12,7 +12,10 @@ With a TDD workflow you can define the expected behaviour of a routine before yo
 There's an example project included in the repo (see /example). Create a blank test suite asm file that will serve as the entry point. In this file, use .include to pull in the SMSSpec library and the code files you want to test.
 
     ; Within your test suite file
-    .include "smsspec.asm"      ; Include the smsspec.asm library
+    .incdir "../smspec"         ; Point to smsspec directory
+        .include "smsspec.asm"  ; Include the smsspec.asm library
+    .incdir "."                 ; Return to current directory
+
     .include "src/counter.asm"  ; Include the file(s) you want to test
 
 Define an 'smsspec.suite' label that smsspec will call to start the tests, and within it include the tests you wish to include in the suite.
