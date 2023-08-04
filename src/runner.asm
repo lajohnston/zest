@@ -26,14 +26,8 @@
     jp smsspec.runner.expectationFailed
 .endm
 
-.section "smsspec.runner.clearSystemState" free
-    smsspec.runner.clearSystemState:
-        ; Clear mocks to defaults
-        ld hl, smsspec.mocks.start + 1
-        ld b, (smsspec.mocks.end - smsspec.mocks.start - 1) / _sizeof_smsspec.mock ; number of mocks
-        call smsspec.mock.initAll
-
-        ; Clear registers
+.section "smsspec.runner.clearRegisters" free
+    smsspec.runner.clearRegisters:
         xor a
         ld b, a
         ld c, a
@@ -44,9 +38,8 @@
         ld ix, 0
         ld iy, 0
 
-        ; do same for shadow flags
+        ; TODO - do same for shadow flags
 
-        ; reset fps counter
         ret
 .ends
 
@@ -67,7 +60,8 @@
     smsspec.runner.storeText message, smsspec.runner.current_test_message_addr
 
     ; Clear system state
-    call smsspec.runner.clearSystemState
+    call smsspec.mock.initAll
+    call smsspec.runner.clearRegisters
 .endm
 
 ;====

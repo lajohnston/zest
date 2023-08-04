@@ -50,11 +50,10 @@ Labels are set in stone at assemble time, so if you mock a label you won't be ab
 
 The mocking implementation in SMSSpec sets up a proxy routine in RAM, allowing you to define different mocks for each 'it' test. This mock gets reset at the start of each test, with a default handler that will simply return (ret) to the caller.
 
-    ; In your test suite, define your mocks in RAM (bookended by start and stop bytes)
-    .ramsection "mock instances" slot 2
-        smsspec.mocks.start: db
-        getPortA instanceof smsspec.mock    ; a call to getPortA will now point to this mock in RAM
-        smsspec.mocks.end: db
+    ; In your test suite, define your mocks in RAM (use 'appendto smsspec.mocks')
+    .ramsection "mock instances" appendto smsspec.mocks
+        ; Calls to getPortA will point to this mock in RAM
+        getPortA instanceof smsspec.mock
     .ends
 
     ; In your test files, mock the routine that fetches input from port A, so it returns a fixed value

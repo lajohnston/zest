@@ -11,14 +11,36 @@
     address             dw
 .endst
 
+;====
+; Start of mocks list. Mocks can be added by creating ramsections with
+; "appendto smsspec.mocks", and populating them with smsspec.mock instances
+;====
+.ramsection "smsspec.mocks" slot 2
+    smsspec.mocks.start:    db
+.ends
+
+;====
+; Marks the end of the mocks list
+;====
+.ramsection "smsspec.mocks.end" slot 2 after smsspec.mocks
+    smsspec.mocks.end:      db
+.ends
+
 .section "smsspec.mock.initAll"
     ;====
     ; Initialises one or more mocks in RAM
-    ;
-    ; @in hl    the address of the first mock in RAM
-    ; @in b     the number of mocks to initialise
     ;====
     smsspec.mock.initAll:
+        ; Get number of mocks
+        ld a, (smsspec.mocks.end - smsspec.mocks.start - 1) / _sizeof_smsspec.mock
+        or a    ; update flags
+        ret z   ; return if there are no mocks to clear
+
+        ; Point to first mock (skip start byte)
+        ld hl, smsspec.mocks.start + 1
+        ld b, a ; set B to number of mocks
+
+    _clearMock:
         ; Add call mediator instructions to the mock instance
         ld (hl), $e5    ; write push hl to RAM
         inc hl
@@ -38,7 +60,7 @@
         inc hl
         ld (hl), > smsspec.mock.defaultHandler
 
-        djnz smsspec.mock.initAll
+        djnz _clearMock
         ret
 .ends
 
