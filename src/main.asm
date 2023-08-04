@@ -1,15 +1,15 @@
-/**
- * Constants
- */
+;====
+; Constants
+;====
 .define smsspec.ports.vdp.control $bf
 .define smsspec.ports.vdp.data $be
 .define smsspec.ports.vdp.status $be ; same as Vdp.data, as that is write only and this is read only
 .define smsspec.vdp.VRAMWrite $4000
 .define smsspec.vdp.CRAMWrite $c000
 
-/**
- * WLA-DX banking setup
- */
+;====
+; WLA-DX banking setup
+;====
 .memorymap
     defaultslot 0
     slotsize $4000
@@ -30,9 +30,9 @@
 ; SDSC tag and SMS rom header
 .sdsctag 1.2, "smsspec", "Sega Master System Unit Test Runner", "lajohnston"
 
-/**
- * Boot sequence
- */
+;====
+; Boot sequence
+;====
 .orga $0000
 .section "smsspec.main" force
     di              ; disable interrupts
@@ -41,9 +41,9 @@
     jp smsspec.init
 .ends
 
-/**
- * VBlank handler
- */
+;====
+; VBlank handler
+;====
 .orga $0038
 .section "Interrupt handler" force
     push af
@@ -54,15 +54,18 @@
     reti
 .ends
 
-/**
- * Pause handler
- */
+;====
+; Pause handler
+;====
 .bank 0 slot 0
 .orga $0066
 .section "Pause handler" force
     retn
 .ends
 
+;====
+; Initialise the system and run the test suite
+;====
 .section "smsspec.init" free
     smsspec.init:
         ; Set up VDP registers
@@ -71,12 +74,14 @@
         ld c, smsspec.ports.vdp.control
         otir
 
+        ; Clear VRAM
         call smsspec.clearVram
 
-        ; Init console
+        ; Initialise console
         call smsspec.console.init
         call smsspec.console.vdp.enableDisplay
 
+        ; Run the test suite (label defined by user)
         call smsspec.suite
 
         ; All tests passed. Display message

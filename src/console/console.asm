@@ -26,12 +26,13 @@
       ld de, $0000
       jp _saveCaret
 
-    /**
-     * Write text to the console
-     * @param hl    the address of the text to write. The text should be
-     *              terminated by an $FF byte
-     * @clobbers hl
-     */
+    ;====
+    ; Write text to the console
+    ;
+    ; @in   hl  the address of the text to write. The text should be
+    ;           terminated by an $FF byte
+    ; @clobs hl
+    ;====
     smsspec.console.out:
         push af
         push de
@@ -93,11 +94,12 @@
         pop af
         ret
 
-    /**
-     * Set the VRAM write address to the console caret position
-     * @param d y caret
-     * @param e x caret
-     */
+    ;====
+    ; Set the VRAM write address to the console caret position
+    ;
+    ; @in   d   y caret
+    ; @in   e   x caret
+    ;====
     _setVramToCaret:
         push af
         push bc
@@ -146,10 +148,11 @@
 
         jp _saveCaret
 
-    /**
-     * Set the console text color.
-     * @param a     the color to set (%xxBBGGRR)
-     */
+    ;====
+    ; Set the console text color
+    ;
+    ; @in   a   the color to set (%xxBBGGRR)
+    ;====
     smsspec.console.setTextColor:
         push hl
             ld hl, (smsspec.vdp.CRAMWrite + 1) | $4000
