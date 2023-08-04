@@ -28,7 +28,7 @@
 .endro
 
 ; SDSC tag and SMS rom header
-.sdsctag 1.2,"SMSSpec", "Sega Master System Unit Test Runner", "lajohnston"
+.sdsctag 1.2, "smsspec", "Sega Master System Unit Test Runner", "lajohnston"
 
 /**
  * Boot sequence
@@ -58,8 +58,10 @@
  * Pause handler
  */
 .bank 0 slot 0
-    .orga $0066
+.orga $0066
+.section "Pause handler" force
     retn
+.ends
 
 .section "smsspec.init" free
     smsspec.init:
