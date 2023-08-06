@@ -1,4 +1,13 @@
 ;====
+; Constants
+;====
+.define smsspec.vdp.VRAMWrite       $4000
+.define smsspec.vdp.CRAMWrite       $c000
+.define smsspec.vdp.CONTROL_PORT    $bf
+.define smsspec.vdp.DATA_PORT       $be ; same as status port (write-only)
+.define smsspec.vdp.STATUS_PORT     $be ; same as data port (read-only)
+
+;====
 ; Initialises the VDP's registers to sensible defaults
 ;====
 .section "smsspec.vdp.init" free
@@ -6,7 +15,7 @@
         ; Set up VDP registers
         ld hl, _initData
         ld b, _initDataEnd - _initData
-        ld c, smsspec.ports.vdp.control
+        ld c, smsspec.vdp.CONTROL_PORT
         otir
         ret
 
@@ -23,14 +32,16 @@
         call smsspec.vdp.setAddress
 
         ; Output 16KB of zeroes
-        ld bc, $4000     ; Counter for 16KB of VRAM
+        ld bc, $4000    ; counter for 16KB of VRAM
         -:
-            xor a
-            out (smsspec.ports.vdp.data),a ; Output to VRAM address, which is auto-incremented after each write
+            xor a       ; set A to 0
+
+            ; Output to VRAM address, which is auto-incremented after each write
+            out (smsspec.vdp.DATA_PORT),a
             dec bc
             ld a, b
             or c
-        jr nz,-
+        jp nz,-
         ret
 
     ;====
@@ -41,9 +52,9 @@
     smsspec.vdp.setAddress:
         push af
             ld a, l
-            out (smsspec.ports.vdp.control), a
+            out (smsspec.vdp.CONTROL_PORT), a
             ld a, h
-            out (smsspec.ports.vdp.control), a
+            out (smsspec.vdp.CONTROL_PORT), a
         pop af
         ret
 
@@ -57,7 +68,7 @@
     smsspec.vdp.copyToVram:
         -:
             ld a, (hl)  ; Get data byte
-            out (smsspec.ports.vdp.data), a
+            out (smsspec.vdp.DATA_PORT), a
             inc hl      ; Point to next letter
             dec bc
             ld a, b
@@ -82,9 +93,9 @@
                ;|`------ VBlank interrupts
                ;`------- Enable display
 
-        out (smsspec.ports.vdp.control), a
+        out (smsspec.vdp.CONTROL_PORT), a
         ld a, $81
-        out (smsspec.ports.vdp.control), a
+        out (smsspec.vdp.CONTROL_PORT), a
         ret
 
     ;====
@@ -103,8 +114,8 @@
                ;|`------ VBlank interrupts
                ;`------- Enable display
 
-        out (smsspec.ports.vdp.control), a
+        out (smsspec.vdp.CONTROL_PORT), a
         ld a, $81
-        out (smsspec.ports.vdp.control), a
+        out (smsspec.vdp.CONTROL_PORT), a
         ret
 .ends

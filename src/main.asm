@@ -1,13 +1,4 @@
 ;====
-; Constants
-;====
-.define smsspec.ports.vdp.control $bf
-.define smsspec.ports.vdp.data $be
-.define smsspec.ports.vdp.status $be ; same as Vdp.data, as that is write only and this is read only
-.define smsspec.vdp.VRAMWrite $4000
-.define smsspec.vdp.CRAMWrite $c000
-
-;====
 ; WLA-DX banking setup
 ;====
 .memorymap
@@ -47,7 +38,7 @@
 .orga $0038
 .section "Interrupt handler" force
     push af
-        in a, (smsspec.ports.vdp.status) ; satisfy interrupt
+        in a, (smsspec.vdp.STATUS_PORT) ; satisfy interrupt
         ret
     pop af
     ei

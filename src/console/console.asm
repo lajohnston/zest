@@ -45,7 +45,7 @@
             ld hl, (smsspec.vdp.CRAMWrite + 1) | $4000
             call smsspec.vdp.setAddress
         pop hl
-        out (smsspec.ports.vdp.data), a
+        out (smsspec.vdp.DATA_PORT), a
         ret
 .ends
 
@@ -75,9 +75,9 @@
                 jr z, _stopWrite
 
                 ; Output character to VRAM (auto-increments VRAM position)
-                out (smsspec.ports.vdp.data), a
+                out (smsspec.vdp.DATA_PORT), a
                 xor a   ; a = 0
-                out (smsspec.ports.vdp.data), a
+                out (smsspec.vdp.DATA_PORT), a
                 inc hl  ; next character
 
                 ; Inc x caret
