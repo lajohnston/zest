@@ -86,6 +86,9 @@
     ; Clear system state
     call smsspec.mock.initAll
     call smsspec.runner.clearRegisters
+
+    ; Reset stack (base address minus return address from smsspec.suite)
+    ld sp, $dfee
 .endm
 
 ;====
