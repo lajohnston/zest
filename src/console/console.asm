@@ -3,7 +3,7 @@
 ;====
 
 .ramsection "smsspec.console.variables" slot 2
-    smsspec.console.cursor_pos:  dw ; x (1-byte), y (1-byte)
+    smsspec.console.cursor_vram_address:    dw
 .ends
 
 ;====
@@ -30,8 +30,9 @@
       call smsspec.vdp.copyToVram
 
       ; Initial cursor position
-      ld de, $0000
-      jp smsspec.console._saveCaret
+      ld hl, smsspec.vdp.TILEMAP_BASE | smsspec.vdp.VRAMWrite
+      ld (smsspec.console.cursor_vram_address), hl
+      ret
 .ends
 
 ;====
@@ -42,72 +43,63 @@
 .section "smsspec.console.setTextColor" free
     smsspec.console.setTextColor:
         push hl
-            ld hl, (smsspec.vdp.CRAMWrite + 1) | $4000
+            ld hl, (smsspec.vdp.CRAMWrite + 1) | smsspec.vdp.VRAMWrite
             call smsspec.vdp.setAddress
         pop hl
+
         out (smsspec.vdp.DATA_PORT), a
         ret
 .ends
 
 ;====
-; Write text to the console
+; Write text to the screen
 ;
 ; @in   hl  the address of the text to write. The text should be
 ;           terminated by an $FF byte
 ;====
 .section "smsspec.console.out" free
     smsspec.console.out:
+        ; Preserve registers
         push af
         push de
         push hl
-            call smsspec.vdp.disableDisplay
 
-            ; Set VRAM write address based on console caret position
-            ld de, (smsspec.console.cursor_pos)  ; d = y caret, e = x caret
-            call smsspec.console._setVramToCaret
+        call smsspec.vdp.disableDisplay
+        ld de, (smsspec.console.cursor_vram_address)
+        call smsspec.vdp.setAddressDE
 
-            ; Write each character
-            _nextCharacter:
-                ld a, (hl)  ; a = next character
+        _outputCharacter:
+            ld a, (hl)
+            cp $ff
+            jr z, _finish
 
-                ; If character is an $ff terminator, stop
-                cp $ff
-                jr z, _stopWrite
+            ; Output character to VRAM (auto-increments VRAM position)
+            out (smsspec.vdp.DATA_PORT), a
 
-                ; Output character to VRAM (auto-increments VRAM position)
-                out (smsspec.vdp.DATA_PORT), a
-                xor a   ; a = 0
-                out (smsspec.vdp.DATA_PORT), a
-                inc hl  ; next character
+            ; Output tile attributes (none)
+            xor a   ; a = 0
+            out (smsspec.vdp.DATA_PORT), a
 
-                ; Inc x caret
-                inc e   ; inc x caret
-                ld a, 31
-                cp e
-                jr nz, _nextCharacter    ; if x caret hasn't wrapped, continue to next character
+            ; Point to next character
+            inc hl
 
-                ; x caret has wrapped - calculate next y tile
-                ld e, 0     ; wrap x tile
-                inc d       ; inc y caret
-                ld a, 28
-                cp d
-                jr nz, _nextCharacter   ; if y caret hasn't wrapped, continue to next character
+            ; Increment VRAM address in DE by one tile
+            inc de  ; pattern ref
+            inc de  ; attributes
 
-                ; y caret has wrapped
-                ld d, 0     ; wrap y caret
-                ld hl, $3800 | smsspec.vdp.VRAMWrite    ; set vram write to first tile
+            jp _outputCharacter
 
-            ; Keep looping until $ff terminator is reached
-            jr _nextCharacter
+        _finish:
+            ; Store VRAM address
+            ld (smsspec.console.cursor_vram_address), de
+            call smsspec.vdp.enableDisplay
 
-    _stopWrite:
-        call smsspec.console._saveCaret
-        call smsspec.vdp.enableDisplay
+            ; Restore registers
+            pop hl
+            pop de
+            pop af
 
-        pop hl
-        pop de
-        pop af
-        ret
+            ret
 .ends
 
 ;====
@@ -115,76 +107,35 @@
 ;====
 .section "smsspec.console.newline" free
     smsspec.console.newline:
-        ld de, (smsspec.console.cursor_pos)  ; d = y caret, e = x caret
-        ld e, 0 ; x caret = 0
-        inc d   ; inc y caret
-
-        ; check if y caret at end
-        ld a, 28
-        cp d
-        jp nz, +
-            ld d, 0 ; wrap
-        +:
-
-        jp smsspec.console._saveCaret
-.ends
-
-;====
-; Saves the current caret position to RAM
-;
-; @de   the current cursor position (e = x/col, d = y/row)
-;====
-.section "smsspec.console._saveCaret" free
-    smsspec.console._saveCaret:
-        push hl
-            ; Store new cursor positions
-            ld hl, smsspec.console.cursor_pos
-            ld (hl), e  ; store x caret
-            inc hl
-            ld (hl), d  ; store y caret
-        pop hl
-        ret
-.ends
-
-
-;====
-; Set the VRAM write address to the console caret position
-;
-; @in   d   y caret
-; @in   e   x caret
-;====
-.section "smsspec.console._setVramToCaret" free
-    smsspec.console._setVramToCaret:
         push af
-        push bc
         push hl
-            ld hl, $3800 | smsspec.vdp.VRAMWrite ; hl = vram addr. of first tile
+            ;===
+            ; VRAM address format
+            ; ccbbbyyy yyxxxxx-
+            ;
+            ; c = command
+            ; b = base address
+            ; y = row
+            ; x = col
+            ;===
+            ld hl, (smsspec.console.cursor_vram_address)
 
-            ld a, e ; a = x caret
-            ld b, d ; b = y caret
+            ; Set column to zero
+            ld a, l         ; set A to low byte of address
+            and %11000000   ; mask out x bits
+            ld l, a         ; set low byte of address
 
-            ; Add xCaret*2 to vram address (2 bytes per tile in vram)
-            sla a       ; a = a * 2
+            ; Add 1 row
+            ld a, 32 * 2
+            add a, l  ; A = A+L
+            ld l, a   ; L = A+L
+            adc a, h  ; A = A+L+H+carry
+            sub l     ; A = H+carry
+            ld h, a   ; H = H+carry
 
-            _addHlA:
-                add a, l    ; add l to a
-                ld l, a     ; store result back to l
-                adc a, h
-                sub l
-                ld h, a     ; store result in h
-
-            ; Add 64 to vram address for every y caret position
-            xor a   ; x = 0
-            cp b    ; check if y caret = 0
-            jp z, +
-                ld a, 64
-                dec b
-                jp _addHlA  ; add 66 to hl
-            +:
-
-            call smsspec.vdp.setAddress ; set vdp write address to hl
+            ld (smsspec.console.cursor_vram_address), hl
         pop hl
-        pop bc
         pop af
+
         ret
 .ends

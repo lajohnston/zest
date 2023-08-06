@@ -3,6 +3,9 @@
 ;====
 .define smsspec.vdp.VRAMWrite       $4000
 .define smsspec.vdp.CRAMWrite       $c000
+
+.define smsspec.vdp.TILEMAP_BASE    $3800
+
 .define smsspec.vdp.CONTROL_PORT    $bf
 .define smsspec.vdp.DATA_PORT       $be ; same as status port (write-only)
 .define smsspec.vdp.STATUS_PORT     $be ; same as data port (read-only)
@@ -59,6 +62,22 @@
             ld a, l
             out (smsspec.vdp.CONTROL_PORT), a
             ld a, h
+            out (smsspec.vdp.CONTROL_PORT), a
+        pop af
+        ret
+.ends
+
+;====
+; Sets the VDP address
+;
+; @in   de  address
+;====
+.section "smsspec.vdp.setAddressDE" free
+    smsspec.vdp.setAddressDE:
+        push af
+            ld a, e
+            out (smsspec.vdp.CONTROL_PORT), a
+            ld a, d
             out (smsspec.vdp.CONTROL_PORT), a
         pop af
         ret
