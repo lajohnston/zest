@@ -75,11 +75,11 @@
         otir
 
         ; Clear VRAM
-        call smsspec.clearVram
+        call smsspec.vdp.clearVram
 
         ; Initialise console
         call smsspec.console.init
-        call smsspec.console.vdp.enableDisplay
+        call smsspec.vdp.enableDisplay
 
         ; Run the test suite (label defined by user)
         call smsspec.suite

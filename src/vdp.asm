@@ -1,8 +1,8 @@
 .section "smsspec.vdp" free
-    smsspec.clearVram:
+    smsspec.vdp.clearVram:
         ; Set VRAM write address to $0000
         ld hl, $0000 | smsspec.vdp.VRAMWrite
-        call smsspec.setVDPAddress
+        call smsspec.vdp.setAddress
 
         ; Output 16KB of zeroes
         ld bc, $4000     ; Counter for 16KB of VRAM
@@ -20,7 +20,7 @@
     ;
     ; @in   hl  address
     ;====
-    smsspec.setVDPAddress:
+    smsspec.vdp.setAddress:
         push af
             ld a, l
             out (smsspec.ports.vdp.control), a
@@ -36,7 +36,7 @@
     ; @in   bc  data length
     ; @clobs a, hl, bc
     ;====
-    smsspec.copyToVDP:
+    smsspec.vdp.copyToVram:
         -:
             ld a, (hl)  ; Get data byte
             out (smsspec.ports.vdp.data), a
@@ -53,7 +53,7 @@
     ;
     ; @clobs a
     ;====
-    smsspec.console.vdp.enableDisplay:
+    smsspec.vdp.enableDisplay:
         ; turn screen on
         ld a, %01000000
                ;||||||`- Zoomed sprites -> 16x16 pixels
@@ -74,7 +74,7 @@
     ;
     ; @clobs a
     ;====
-    smsspec.console.vdp.disableDisplay:
+    smsspec.vdp.disableDisplay:
         ; turn screen off
         ld a, %00000000
                ;||||||`- Zoomed sprites -> 16x16 pixels

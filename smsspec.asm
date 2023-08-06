@@ -12,7 +12,7 @@
 .include "./src/main.asm"
 .include "./src/mock.asm"
 .include "./src/runner.asm"
+.include "./src/vdp.asm"
 
 .include "./src/console/console.asm"
 .include "./src/console/data.asm"
-.include "./src/console/vdp.asm"

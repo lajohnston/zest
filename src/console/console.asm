@@ -8,19 +8,19 @@
     smsspec.console.init:
       ; Load palette
       ld hl, $0000 | smsspec.vdp.CRAMWrite
-      call smsspec.setVDPAddress
+      call smsspec.vdp.setAddress
       ld hl, smsspec.palette_data
       ld bc, smsspec.palette_data_end - smsspec.palette_data
-      call smsspec.copyToVDP
+      call smsspec.vdp.copyToVram
 
       ; Load tiles
       ld hl, $0000 | smsspec.vdp.VRAMWrite
-      call smsspec.setVDPAddress         ; Set VRAM write address to tile index 0
+      call smsspec.vdp.setAddress       ; Set VRAM write address to tile index 0
 
       ; Output tile data
       ld hl, smsspec.console.data.font              ; Location of tile data
       ld bc, smsspec.console.data.font_end - smsspec.console.data.font          ; Counter for number of bytes to write
-      call smsspec.copyToVDP
+      call smsspec.vdp.copyToVram
 
       ; Initial cursor position
       ld de, $0000
@@ -37,7 +37,7 @@
         push af
         push de
         push hl
-            call smsspec.console.vdp.disableDisplay
+            call smsspec.vdp.disableDisplay
 
             ; Set VRAM write address based on console caret position
             ld de, (smsspec.console.cursor_pos)  ; d = y caret, e = x caret
@@ -87,7 +87,7 @@
 
     _stopWrite:
         call _saveCaret
-        call smsspec.console.vdp.enableDisplay
+        call smsspec.vdp.enableDisplay
 
         pop hl
         pop de
@@ -128,7 +128,7 @@
                 jp _addHlA  ; add 66 to hl
             +:
 
-            call smsspec.setVDPAddress  ; set vdp write address to hl
+            call smsspec.vdp.setAddress ; set vdp write address to hl
         pop hl
         pop bc
         pop af
@@ -156,7 +156,7 @@
     smsspec.console.setTextColor:
         push hl
             ld hl, (smsspec.vdp.CRAMWrite + 1) | $4000
-            call smsspec.setVDPAddress
+            call smsspec.vdp.setAddress
         pop hl
         out (smsspec.ports.vdp.data), a
         ret
