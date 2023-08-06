@@ -94,5 +94,7 @@
         call smsspec.console.out
 
         ; End
-        -: jr -
+        -:
+            halt
+        jr -
 .ends

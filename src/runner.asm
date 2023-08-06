@@ -19,7 +19,9 @@
         call smsspec.console.out
 
         ; Stop program
-        -: jp -
+        -:
+            halt
+        jp -
 .ends
 
 .macro "smsspec.runner.expectationFailed" args message, actual
