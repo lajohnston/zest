@@ -35,19 +35,34 @@
     jp smsspec.runner.expectationFailed
 .endm
 
+.macro "smsspec.runner.clearMainRegisters"
+    xor a       ; set A to zero
+    or 1        ; clear all flags (but sets A to 1)
+    ld a, 0     ; set A to zero again (without affecting flags)
+
+    ; Set remaining register to A (zero)
+    ld b, a
+    ld c, a
+    ld d, a
+    ld e, a
+    ld h, a
+    ld l, a
+.endm
+
 .section "smsspec.runner.clearRegisters" free
     smsspec.runner.clearRegisters:
-        xor a
-        ld b, a
-        ld c, a
-        ld d, a
-        ld e, a
-        ld h, a
-        ld l, a
+        ; Clear main registers
+        smsspec.runner.clearMainRegisters
+
+        ; Clear shadow registers
+        ex af, af'
+        exx
+        smsspec.runner.clearMainRegisters
+
+        ; Clear additional registers
         ld ix, 0
         ld iy, 0
-
-        ; TODO - do same for shadow flags
+        ld i, a
 
         ret
 .ends
