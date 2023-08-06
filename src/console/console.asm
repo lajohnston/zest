@@ -73,7 +73,27 @@
             cp $ff
             jr z, _finish
 
+            ; Check if we're on the last column
+            ld a, e
+            and %00111110   ; mask X bits
+            cp %00111110    ; if X bits are all 1, we're on the last column (31)
+            jp nz, +
+                ; We're on the last column
+                ; Output dash character. VRAM auto-increments to next line
+                ld a, 13                        ; dash pattern
+                out (smsspec.vdp.DATA_PORT), a  ; output dash
+                xor a                           ; set attributes to 0
+                out (smsspec.vdp.DATA_PORT), a  ; output tile attributes
+
+                ; Increment cursor position
+                inc de  ; pattern
+                inc de  ; tile attributes
+
+                jp _outputCharacter
+            +:
+
             ; Output character to VRAM (auto-increments VRAM position)
+            ld a, (hl)  ; re-load character
             out (smsspec.vdp.DATA_PORT), a
 
             ; Output tile attributes (none)
