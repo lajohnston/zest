@@ -4,11 +4,15 @@
     .enda
 
     smsspec.console.data.heading:
-        .asc "SMSSpec"
+        .asc "            SMSSpec"
         .db $ff ; terminator byte
 
     smsspec.console.data.allTestsPassed:
-        .asc "All tests passed!"
+        .asc "       All tests passed!"
+        .db $ff ; terminator byte
+
+    smsspec.console.data.testFailed:
+        .asc "     SMSSpec - Test failed"
         .db $ff ; terminator byte
 
     smsspec.console.data.palette:

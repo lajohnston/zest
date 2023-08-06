@@ -9,12 +9,19 @@
         ld a, %00000011
         call smsspec.console.setTextColor   ; set to a
 
+        ; Write test failed message
+        ld hl, smsspec.console.data.testFailed
+        call smsspec.console.out
+
+        ; Write describe block description
+        call smsspec.console.newline
+        call smsspec.console.newline
         ld hl, (smsspec.runner.current_describe_message_addr)
         call smsspec.console.out
 
+        ; Write failing test
         call smsspec.console.newline
         call smsspec.console.newline
-
         ld hl, (smsspec.runner.current_test_message_addr)
         call smsspec.console.out
 
