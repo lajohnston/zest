@@ -1,10 +1,15 @@
-.define smsspec.console.COLUMNS 31
+;====
+; Writes text to the screen
+;====
 
 .ramsection "smsspec.console.variables" slot 2
     smsspec.console.cursor_pos:  dw ; x (1-byte), y (1-byte)
 .ends
 
-.section "smsspec.console" free
+;====
+; Initialises the console ready for use
+;====
+.section "smsspec.console.init" free
     smsspec.console.init:
       ; Load palette
       ld hl, $0000 | smsspec.vdp.CRAMWrite
@@ -15,24 +20,42 @@
 
       ; Load tiles
       ld hl, $0000 | smsspec.vdp.VRAMWrite
-      call smsspec.vdp.setAddress       ; Set VRAM write address to tile index 0
+      call smsspec.vdp.setAddress       ; set VRAM write address to tile index 0
 
       ; Output tile data
-      ld hl, smsspec.console.data.font              ; Location of tile data
-      ld bc, smsspec.console.data.font_end - smsspec.console.data.font          ; Counter for number of bytes to write
+      ld hl, smsspec.console.data.font  ; location of tile data
+
+      ; Counter for number of bytes to write
+      ld bc, smsspec.console.data.font_end - smsspec.console.data.font
       call smsspec.vdp.copyToVram
 
       ; Initial cursor position
       ld de, $0000
-      jp _saveCaret
+      jp smsspec.console._saveCaret
+.ends
 
-    ;====
-    ; Write text to the console
-    ;
-    ; @in   hl  the address of the text to write. The text should be
-    ;           terminated by an $FF byte
-    ; @clobs hl
-    ;====
+;====
+; Set the console text color
+;
+; @in   a   the color to set (%xxBBGGRR)
+;====
+.section "smsspec.console.setTextColor" free
+    smsspec.console.setTextColor:
+        push hl
+            ld hl, (smsspec.vdp.CRAMWrite + 1) | $4000
+            call smsspec.vdp.setAddress
+        pop hl
+        out (smsspec.ports.vdp.data), a
+        ret
+.ends
+
+;====
+; Write text to the console
+;
+; @in   hl  the address of the text to write. The text should be
+;           terminated by an $FF byte
+;====
+.section "smsspec.console.out" free
     smsspec.console.out:
         push af
         push de
@@ -41,7 +64,7 @@
 
             ; Set VRAM write address based on console caret position
             ld de, (smsspec.console.cursor_pos)  ; d = y caret, e = x caret
-            call _setVramToCaret
+            call smsspec.console._setVramToCaret
 
             ; Write each character
             _nextCharacter:
@@ -77,30 +100,61 @@
             ; Keep looping until $ff terminator is reached
             jr _nextCharacter
 
-    _saveCaret:
-        ; Store new cursor positions
-        ld hl, smsspec.console.cursor_pos
-        ld (hl), e  ; store x caret
-        inc hl
-        ld (hl), d  ; store y caret
-        ret
-
     _stopWrite:
-        call _saveCaret
+        call smsspec.console._saveCaret
         call smsspec.vdp.enableDisplay
 
         pop hl
         pop de
         pop af
         ret
+.ends
 
-    ;====
-    ; Set the VRAM write address to the console caret position
-    ;
-    ; @in   d   y caret
-    ; @in   e   x caret
-    ;====
-    _setVramToCaret:
+;====
+; Move the console cursor onto the next line
+;====
+.section "smsspec.console.newline" free
+    smsspec.console.newline:
+        ld de, (smsspec.console.cursor_pos)  ; d = y caret, e = x caret
+        ld e, 0 ; x caret = 0
+        inc d   ; inc y caret
+
+        ; check if y caret at end
+        ld a, 28
+        cp d
+        jp nz, +
+            ld d, 0 ; wrap
+        +:
+
+        jp smsspec.console._saveCaret
+.ends
+
+;====
+; Saves the current caret position to RAM
+;
+; @de   the current cursor position (e = x/col, d = y/row)
+;====
+.section "smsspec.console._saveCaret" free
+    smsspec.console._saveCaret:
+        push hl
+            ; Store new cursor positions
+            ld hl, smsspec.console.cursor_pos
+            ld (hl), e  ; store x caret
+            inc hl
+            ld (hl), d  ; store y caret
+        pop hl
+        ret
+.ends
+
+
+;====
+; Set the VRAM write address to the console caret position
+;
+; @in   d   y caret
+; @in   e   x caret
+;====
+.section "smsspec.console._setVramToCaret" free
+    smsspec.console._setVramToCaret:
         push af
         push bc
         push hl
@@ -132,32 +186,5 @@
         pop hl
         pop bc
         pop af
-        ret
-
-    smsspec.console.newline:
-        ld de, (smsspec.console.cursor_pos)  ; d = y caret, e = x caret
-        ld e, 0 ; x caret = 0
-        inc d   ; inc y caret
-
-        ; check if y caret at end
-        ld a, 28
-        cp d
-        jp nz, +
-            ld d, 0 ; wrap
-        +:
-
-        jp _saveCaret
-
-    ;====
-    ; Set the console text color
-    ;
-    ; @in   a   the color to set (%xxBBGGRR)
-    ;====
-    smsspec.console.setTextColor:
-        push hl
-            ld hl, (smsspec.vdp.CRAMWrite + 1) | $4000
-            call smsspec.vdp.setAddress
-        pop hl
-        out (smsspec.ports.vdp.data), a
         ret
 .ends
