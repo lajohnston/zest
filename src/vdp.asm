@@ -1,3 +1,21 @@
+;====
+; Initialises the VDP's registers to sensible defaults
+;====
+.section "smsspec.vdp.init" free
+    smsspec.vdp.init:
+        ; Set up VDP registers
+        ld hl, _initData
+        ld b, _initDataEnd - _initData
+        ld c, smsspec.ports.vdp.control
+        otir
+        ret
+
+    ; VDP initialisation data
+    _initData:
+        .db $04, $80, $00, $81, $ff, $82, $ff, $85, $ff, $86, $ff, $87, $00 ,$88 ,$00 ,$89 ,$ff ,$8a
+    _initDataEnd:
+.ends
+
 .section "smsspec.vdp" free
     smsspec.vdp.clearVram:
         ; Set VRAM write address to $0000

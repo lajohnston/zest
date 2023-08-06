@@ -15,11 +15,6 @@
         .db $00,$0C,$03 ; Black, green, red
     smsspec.console.data.paletteEnd:
 
-    ; VDP initialisation data
-    smsspec.vdp_init_data:
-    .db $04,$80,$00,$81,$ff,$82,$ff,$85,$ff,$86,$ff,$87,$00,$88,$00,$89,$ff,$8a
-    smsspec.vdp_init_data_end:
-
     ; Console font
     smsspec.console.data.font:
     .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00

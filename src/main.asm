@@ -68,13 +68,8 @@
 ;====
 .section "smsspec.init" free
     smsspec.init:
-        ; Set up VDP registers
-        ld hl, smsspec.vdp_init_data
-        ld b, smsspec.vdp_init_data_end - smsspec.vdp_init_data
-        ld c, smsspec.ports.vdp.control
-        otir
-
-        ; Clear VRAM
+        ; Initialise VDP
+        call smsspec.vdp.init
         call smsspec.vdp.clearVram
 
         ; Initialise console
