@@ -11,9 +11,9 @@
         .asc "All tests passed!"
         .db $ff ; terminator byte
 
-    smsspec.palette_data:
+    smsspec.console.data.palette:
         .db $00,$0C,$03 ; Black, green, red
-    smsspec.palette_data_end:
+    smsspec.console.data.paletteEnd:
 
     ; VDP initialisation data
     smsspec.vdp_init_data:

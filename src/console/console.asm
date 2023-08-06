@@ -14,8 +14,8 @@
       ; Load palette
       ld hl, $0000 | smsspec.vdp.CRAMWrite
       call smsspec.vdp.setAddress
-      ld hl, smsspec.palette_data
-      ld bc, smsspec.palette_data_end - smsspec.palette_data
+      ld hl, smsspec.console.data.palette
+      ld bc, smsspec.console.data.paletteEnd - smsspec.console.data.palette
       call smsspec.vdp.copyToVram
 
       ; Load tiles
