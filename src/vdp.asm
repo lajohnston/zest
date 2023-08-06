@@ -25,7 +25,10 @@
     _initDataEnd:
 .ends
 
-.section "smsspec.vdp" free
+;====
+; Fills the graphics RAM with zeroes
+;====
+.section "smsspec.vdp.clearVram" free
     smsspec.vdp.clearVram:
         ; Set VRAM write address to $0000
         ld hl, $0000 | smsspec.vdp.VRAMWrite
@@ -43,12 +46,14 @@
             or c
         jp nz,-
         ret
+.ends
 
-    ;====
-    ; Sets the VDP address
-    ;
-    ; @in   hl  address
-    ;====
+;====
+; Sets the VDP address
+;
+; @in   hl  address
+;====
+.section "smsspec.vdp.setAddress" free
     smsspec.vdp.setAddress:
         push af
             ld a, l
@@ -57,14 +62,16 @@
             out (smsspec.vdp.CONTROL_PORT), a
         pop af
         ret
+.ends
 
-    ;====
-    ; Copies data to the VDP
-    ;
-    ; @in   hl  data address
-    ; @in   bc  data length
-    ; @clobs a, hl, bc
-    ;====
+;====
+; Copies data to the VDP
+;
+; @in   hl  data address
+; @in   bc  data length
+; @clobs a, hl, bc
+;====
+.section "smsspec.vdp.copyToVram" free
     smsspec.vdp.copyToVram:
         -:
             ld a, (hl)  ; Get data byte
@@ -76,12 +83,14 @@
         jr nz,-
 
         ret
+.ends
 
-    ;====
-    ; Enables the display
-    ;
-    ; @clobs a
-    ;====
+;====
+; Enables the display
+;
+; @clobs a
+;====
+.section "smsspec.vdp.enableDisplay" free
     smsspec.vdp.enableDisplay:
         ; turn screen on
         ld a, %01000000
@@ -97,12 +106,14 @@
         ld a, $81
         out (smsspec.vdp.CONTROL_PORT), a
         ret
+.ends
 
-    ;====
-    ; Disables the display
-    ;
-    ; @clobs a
-    ;====
+;====
+; Disables the display
+;
+; @clobs a
+;====
+.section "smsspec.vdp.disableDisplay" free
     smsspec.vdp.disableDisplay:
         ; turn screen off
         ld a, %00000000
