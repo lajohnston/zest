@@ -71,13 +71,15 @@
         call smsspec.suite
 
         ; All tests passed. Display message
-        ld hl, smsspec.console.data.heading
-        call smsspec.console.out
-        call smsspec.console.newline
-        call smsspec.console.newline
+        call smsspec.console.prepWrite
+            ld hl, smsspec.console.data.heading
+            call smsspec.console.out
+            call smsspec.console.newline
+            call smsspec.console.newline
 
-        ld hl, smsspec.console.data.allTestsPassed
-        call smsspec.console.out
+            ld hl, smsspec.console.data.allTestsPassed
+            call smsspec.console.out
+        call smsspec.console.finalise
 
         ; End
         -:

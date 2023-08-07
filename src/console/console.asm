@@ -74,21 +74,41 @@
 .endm
 
 ;====
+; Prepares the console for writing text to
+;
+; @out  de      current cursor vram position (with write command)
+; @out  vram    current cursor vram position (with write command)
+;====
+.section "smsspec.console.prepWrite" free
+    smsspec.console.prepWrite:
+        call smsspec.vdp.disableDisplay
+        ld de, (smsspec.console.cursor_vram_address)
+        jp smsspec.vdp.setAddressDE
+.ends
+
+;====
+; Finalises the console and enables the display
+;
+; @in   de      current cursor vram position
+;====
+.section "smsspec.console.finalise" free
+    smsspec.console.finalise:
+        ld (smsspec.console.cursor_vram_address), de
+        jp smsspec.vdp.enableDisplay
+.ends
+
+;====
 ; Write text to the screen
 ;
-; @in   hl  the address of the text to write. The text should be
-;           terminated by an $FF byte
+; @in   hl      the address of the text to write. The text should be
+;               terminated by an $FF byte
+; @in   de      the vram address + write command
+; @in   vram    the vram address + write command
 ;====
 .section "smsspec.console.out" free
     smsspec.console.out:
         ; Preserve registers
         push af
-        push de
-        push hl
-
-        call smsspec.vdp.disableDisplay
-        ld de, (smsspec.console.cursor_vram_address)
-        call smsspec.vdp.setAddressDE
 
         _outputNextCharacter:
             ld a, (hl)
@@ -117,25 +137,19 @@
             jp _outputNextCharacter
 
         _finish:
-            ; Store VRAM address
-            ld (smsspec.console.cursor_vram_address), de
-            call smsspec.vdp.enableDisplay
-
             ; Restore registers
-            pop hl
-            pop de
             pop af
-
             ret
 .ends
 
 ;====
 ; Move the console cursor onto the next line
+;
+; @in   de  VRAM address
 ;====
 .section "smsspec.console.newline" free
     smsspec.console.newline:
         push af
-        push hl
             ;===
             ; VRAM address format
             ; ccbbbyyy yyxxxxx-
@@ -145,24 +159,20 @@
             ; y = row
             ; x = col
             ;===
-            ld hl, (smsspec.console.cursor_vram_address)
 
             ; Set column to zero
-            ld a, l         ; set A to low byte of address
+            ld a, e         ; set A to low byte of address
             and %11000000   ; mask out x bits
-            ld l, a         ; set low byte of address
+            ld e, a         ; set low byte of address
 
             ; Add 1 row
             ld a, 32 * 2
-            add a, l  ; A = A+L
-            ld l, a   ; L = A+L
-            adc a, h  ; A = A+L+H+carry
-            sub l     ; A = H+carry
-            ld h, a   ; H = H+carry
-
-            ld (smsspec.console.cursor_vram_address), hl
-        pop hl
+            add a, e  ; A = A+E
+            ld e, a   ; E = A+E
+            adc a, d  ; A = A+E+D+carry
+            sub e     ; A = D+carry
+            ld d, a   ; D = D+carry
         pop af
 
-        ret
+        jp smsspec.vdp.setAddressDE
 .ends
