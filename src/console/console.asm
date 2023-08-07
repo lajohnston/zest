@@ -52,6 +52,28 @@
 .ends
 
 ;====
+; Outputs a character to the console
+;
+; @in   a       the character to output
+; @in   de      VRAM address
+; @in   vdp     pointing to current vram address with write command
+;
+; @out  de      new vram address
+; @out  vdp     VRAM pointing to next character
+;
+; @clobs a
+;====
+.macro "smsspec.console.outputCharacter"
+    out (smsspec.vdp.DATA_PORT), a      ; output character
+    xor a                               ; set attributes to none
+    out (smsspec.vdp.DATA_PORT), a      ; output attributes
+
+    ; Increment VRAM address in DE by 1 tile (VRAM auto-increments)
+    inc de  ; pattern ref
+    inc de  ; attributes
+.endm
+
+;====
 ; Write text to the screen
 ;
 ; @in   hl  the address of the text to write. The text should be
@@ -68,7 +90,7 @@
         ld de, (smsspec.console.cursor_vram_address)
         call smsspec.vdp.setAddressDE
 
-        _outputCharacter:
+        _outputNextCharacter:
             ld a, (hl)
             cp $ff
             jr z, _finish
@@ -81,33 +103,18 @@
                 ; We're on the last column
                 ; Output dash character. VRAM auto-increments to next line
                 ld a, 13                        ; dash pattern
-                out (smsspec.vdp.DATA_PORT), a  ; output dash
-                xor a                           ; set attributes to 0
-                out (smsspec.vdp.DATA_PORT), a  ; output tile attributes
-
-                ; Increment cursor position
-                inc de  ; pattern
-                inc de  ; tile attributes
-
-                jp _outputCharacter
+                smsspec.console.outputCharacter
+                jp _outputNextCharacter
             +:
 
             ; Output character to VRAM (auto-increments VRAM position)
             ld a, (hl)  ; re-load character
-            out (smsspec.vdp.DATA_PORT), a
-
-            ; Output tile attributes (none)
-            xor a   ; a = 0
-            out (smsspec.vdp.DATA_PORT), a
+            smsspec.console.outputCharacter
 
             ; Point to next character
             inc hl
 
-            ; Increment VRAM address in DE by one tile
-            inc de  ; pattern ref
-            inc de  ; attributes
-
-            jp _outputCharacter
+            jp _outputNextCharacter
 
         _finish:
             ; Store VRAM address
