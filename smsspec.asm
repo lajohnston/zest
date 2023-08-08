@@ -1,9 +1,9 @@
 ;====
 ; SMSSpec - Sega Master System/Z80 Test Runner
 ;
-; Ensure you point to the smspec directory before including this file, i.e,
+; Ensure you point to the smsspec directory before including this file, i.e,
 ;
-; .incdir "../smsspec"          ; point to smspec directory
+; .incdir "../smsspec"          ; point to smsspec directory
 ;   .include "smsspec.asm"      ; include this file
 ; .incdir "."                   ; return to current directory
 ;====
