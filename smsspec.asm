@@ -8,8 +8,9 @@
 ; .incdir "."                   ; return to current directory
 ;====
 
-.include "./src/expect.asm"
 .include "./src/main.asm"
+
+.include "./src/expect.asm"
 .include "./src/mock.asm"
 .include "./src/runner.asm"
 .include "./src/vdp.asm"
