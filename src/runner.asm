@@ -192,7 +192,7 @@
 ; Stores a pointer to the description test which is used to
 ; identify the test to the user if it fails
 ;====
-.macro "describe" args unitName
+.macro "smsspec.runner.describe" args unitName
     smsspec.runner.storeText unitName, smsspec.runner.current_describe_message_addr
 .endm
 
@@ -200,7 +200,7 @@
 ; Initialises a new test.
 ; Resets the Z80 registers and stores the test description in case the test fails
 ;====
-.macro "it" args message
+.macro "smsspec.runner.startTest" args message
     smsspec.runner.storeText message, smsspec.runner.current_test_message_addr
 
     ; Clear system state

@@ -17,3 +17,26 @@
 
 .include "./src/console/console.asm"
 .include "./src/console/data.asm"
+
+;====
+; Global aliases
+;====
+
+;====
+; Can be used to describe the unit being tested
+;
+; @in   message     a description string of the unit
+;====
+.macro "describe" args message
+    smsspec.runner.describe message
+.endm
+
+;====
+; Define a test scenario. Generates the code to reset some of the system state
+; such as register values
+;
+; @in   message     a description string of the test
+;====
+.macro "it" args message
+    smsspec.runner.startTest message
+.endm
