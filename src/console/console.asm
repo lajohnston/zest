@@ -176,3 +176,46 @@
 
         jp smsspec.vdp.setAddressDE
 .ends
+
+;====
+; Prints the value of register A as a hex value onto the screen, e.g $F2
+;
+; @in   af
+;====
+.section "smsspec.console.outputHexA" free
+    smsspec.console.outputHexA:
+        push af ; preserve value
+            ld a, asc('$')
+            smsspec.console.outputCharacter
+        pop af
+
+        push af
+            rra
+            rra
+            rra
+            rra
+            call _printNibble
+        pop af  ; restore value
+
+        push af
+            call _printNibble
+        pop af
+
+        ret
+
+    ; Prints the lowest nibble of A as a hex character (0-F)
+    _printNibble:
+        and %00001111
+        cp 10       ; set C if value is less than 10 (0-9)
+        jp nc, +
+            ; Digit is below 10
+            add asc('0')  ; point to ASCII characters 0-9
+            smsspec.console.outputCharacter
+            ret
+        +:
+
+        ; Value is above 10 (A-F)
+        add asc('A')    ; point to ASCII characters A-F
+        smsspec.console.outputCharacter
+        ret
+.ends
