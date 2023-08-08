@@ -34,7 +34,7 @@
     di              ; disable interrupts
     im 1            ; Interrupt mode 1
     ld sp, $dff0    ; set stack pointer
-    jp smsspec.init
+    jp smsspec.runner.init
 .ends
 
 ;====
@@ -57,37 +57,4 @@
 .orga $0066
 .section "Pause handler" force
     retn
-.ends
-
-;====
-; Initialise the system and run the test suite
-;====
-.section "smsspec.init" free
-    smsspec.init:
-        ; Initialise VDP
-        call smsspec.vdp.init
-        call smsspec.vdp.clearVram
-
-        ; Initialise console
-        call smsspec.console.init
-        call smsspec.vdp.enableDisplay
-
-        ; Run the test suite (label defined by user)
-        call smsspec.suite
-
-        ; All tests passed. Display message
-        call smsspec.console.prepWrite
-            ld hl, smsspec.console.data.heading
-            call smsspec.console.out
-            call smsspec.console.newline
-            call smsspec.console.newline
-
-            ld hl, smsspec.console.data.allTestsPassed
-            call smsspec.console.out
-        call smsspec.console.finalise
-
-        ; End
-        -:
-            halt
-        jr -
 .ends
