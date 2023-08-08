@@ -21,6 +21,11 @@
 ; SDSC tag and SMS rom header
 .sdsctag 1.2, "smsspec", "Sega Master System Unit Test Runner", "lajohnston"
 
+; ASCII table
+.asciitable
+    map " " to "~" = 0
+.enda
+
 ;====
 ; Boot sequence
 ;====

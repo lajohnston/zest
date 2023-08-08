@@ -1,8 +1,4 @@
 .section "smsspec.console.data" free
-    .asciitable
-        map " " to "~" = 0
-    .enda
-
     smsspec.console.data.heading:
         .asc "            SMSSpec"
         .db $ff ; terminator byte
