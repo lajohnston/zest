@@ -36,28 +36,113 @@
         jr -
 .ends
 
+;====
+; Prints the Test Failed heading
+;====
+.macro "smsspec.runner.printTestFailedHeading"
+    ; Write test failed message
+    ld hl, smsspec.console.data.testFailedHeading
+    call smsspec.console.out
+
+    ; Separator
+    call smsspec.console.newline
+    call smsspec.console.newline
+    ld hl, smsspec.console.data.separatorText
+    call smsspec.console.out
+    call smsspec.console.newline
+.endm
+
+;====
+; Prints the current test's 'describe' and 'it' text
+;====
+.macro "smsspec.runner.printTestDescription"
+    ; Write describe block description
+    call smsspec.console.newline
+    ld hl, (smsspec.runner.current_describe_message_addr)
+    call smsspec.console.out
+
+    ; Write failing test
+    call smsspec.console.newline
+    call smsspec.console.newline
+    ld hl, (smsspec.runner.current_test_message_addr)
+    call smsspec.console.out
+.endm
+
+;====
+; Prints the message of the assertion that failed
+; @in   stack{0}    the message
+;====
+.macro "smsspec.runner.printAssertionMessage"
+    ; Write assertion message
+    call smsspec.console.newline
+    call smsspec.console.newline
+    call smsspec.console.newline
+    ld hl, smsspec.console.data.separatorText
+    call smsspec.console.out
+
+    call smsspec.console.newline
+    call smsspec.console.newline
+
+    pop hl  ; restore assertion message
+    call smsspec.console.out
+.endm
+
+;====
+; Prints 'Expected:' and the hex value of the expected value
+; @in   b   the expected value
+;====
+.macro "smsspec.runner.printExpectedValue"
+    ; Print 'Expected:'
+    call smsspec.console.newline
+    call smsspec.console.newline
+    ld hl, smsspec.console.data.expectedValueLabel
+    call smsspec.console.out
+
+    ; Print the expected value
+    ld a, b ; set A to expected value
+    call smsspec.console.outputHexA
+.endm
+
+;====
+; Prints 'Actual:' and the hex value of the actual value
+; @in   a   the expected value
+;====
+.macro "smsspec.runner.printActualValue"
+    push af
+        call smsspec.console.newline
+        ld hl, smsspec.console.data.actualValueLabel
+        call smsspec.console.out
+    pop af
+
+    ; Print actual value in A
+    call smsspec.console.outputHexA
+.endm
+
+;====
+; Prints details about the failing test and stops the program
+;
+; @in   a   the actual value
+; @in   b   the expected value
+; @in   hl  pointer to the assertion message
+;====
 .section "smsspec.runner.expectationFailed" free
     smsspec.runner.expectationFailed:
+        push af ; preserve actual value
+        push hl ; preserve assertion message
+
         ; Set console text color to red
         ld a, %00000011
         call smsspec.console.setTextColor   ; set to a
 
         call smsspec.console.prepWrite
-            ; Write test failed message
-            ld hl, smsspec.console.data.testFailed
-            call smsspec.console.out
+            smsspec.runner.printTestFailedHeading
+            smsspec.runner.printTestDescription
 
-            ; Write describe block description
-            call smsspec.console.newline
-            call smsspec.console.newline
-            ld hl, (smsspec.runner.current_describe_message_addr)
-            call smsspec.console.out
+            smsspec.runner.printAssertionMessage
+            smsspec.runner.printExpectedValue
 
-            ; Write failing test
-            call smsspec.console.newline
-            call smsspec.console.newline
-            ld hl, (smsspec.runner.current_test_message_addr)
-            call smsspec.console.out
+            pop af  ; restore actual value
+            smsspec.runner.printActualValue
         call smsspec.console.finalise
 
         ; Stop program

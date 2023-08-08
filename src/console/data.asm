@@ -7,8 +7,20 @@
         .asc "       All tests passed!"
         .db $ff ; terminator byte
 
-    smsspec.console.data.testFailed:
+    smsspec.console.data.testFailedHeading:
         .asc "     SMSSpec - Test failed"
+        .db $ff ; terminator byte
+
+    smsspec.console.data.actualValueLabel:
+        .asc "Actual:   "
+        .db $ff ; terminator byte
+
+    smsspec.console.data.expectedValueLabel:
+        .asc "Expected: "
+        .db $ff ; terminator byte
+
+    smsspec.console.data.separatorText:
+        .asc "            ~~~~~~~"
         .db $ff ; terminator byte
 
     smsspec.console.data.palette:
