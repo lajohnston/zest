@@ -1,69 +1,100 @@
 # SMSSpec
 
 ## What is it?
-SMSSpec is a unit test/spec runner for use with the Sega Master System/WLA DX assembler. Utilising the WLA DX macro features, it provides a high-level syntax so you can feed routines with fixed inputs and assert their output.
+
+SMSSpec is a unit test runner for use with the Sega Master System and WLA DX assembler. Utilising the WLA DX macro features, it provides a high-level syntax so you can easily feed routines with fixed inputs and assert their output.
+
+```asm
+describe "increment"
+
+it "should increment the value in A"
+    ld a, 0             ; prep test
+    call increment      ; call routine
+    expect.a.toBe 1     ; assert the result
+```
+
+If the above test fails, the tests will stop running and the test description and failure will be printed on the screen.
 
 ## Why?
-Pinpointing bugs in assembly code can be very time consuming, so the TDD mantra 'Debugging sucks. Testing rocks' applies extremely well here.
 
-With a TDD workflow you can define the expected behaviour of a routine before you start work on it, and once the tests pass you can tighten and optimize the code while being informed if you break anything.
+Pinpointing bugs in assembly code can require lots of manual effort to recreate certain scenarios and ensure everything is working, reducing your confidence for making changes and optimisations to your code.
+
+Instead, with a test runner you can define the list of behaviours you intend a routine to have and ensure they pass, then feel confident to change and optimise the code while being informed if you accidentally break anything.
 
 ## How to use it
-There's an example project included in the repo (see /example). Create a blank test suite asm file that will serve as the entry point. In this file, use .include to pull in the SMSSpec library and the code files you want to test.
 
-    ; Within your test suite file
-    .incdir "../smsspec"        ; Point to smsspec directory
-        .include "smsspec.asm"  ; Include the smsspec.asm library
-    .incdir "."                 ; Return to current directory
+Examples are included in the repo (see `/examples`). You can build these in Linux/WSL using `./examples/build.sh`. The binaries will be placed in `./examples/dist` which you can then run in an emulator.
 
-    .include "src/counter.asm"  ; Include the file(s) you want to test
+Create a blank test suite asm file that will serve as the entry point. In this file, use .include to pull in the SMSSpec library and the code files you want to test.
 
-Define an 'smsspec.suite' label that smsspec will call to start the tests, and within it include the tests you wish to include in the suite.
+```asm
+; Include smsspec
+.incdir "../smsspec"        ; point to smsspec directory
+    .include "smsspec.asm"  ; include the smsspec.asm library
+.incdir "."                 ; return to current directory
 
-    ; Within the test suite file
-    .section "smsspec.suite" free
-        smsspec.suite:
-            ; Include each test file you want to run as part of the suite
-            .include "counter.spec.asm"
+; Include the code you want to test
+.include "increment.asm"
 
-            ; End of test suite
-            ret
-    .ends
+; Define an smsspec.suite label, which smsspec will call once it's initialised
+.section "myTestSuite" free
+    smsspec.suite:
+        ; Include each test file you want to run as part of the suite
+        .include "increment.test.asm"
 
-In each test file, you can use the 'describe' macro to define each unit being tested, and the 'it' macro to describe the expected behaviour.
+        ; End of test suite
+        ret
+.ends
+```
 
-    ; Within counter.spec.asm
-    describe "Counter"
-        it "should increment the value in the accumulator"
-            ld a, 1
-            call counter.increment
-            expect.a.toBe 2
+Within the test file (`increment.test.asm`), the 'describe' and 'it' macros let you define the unit being tested and what behaviours it should exhibit:
 
-When you compile the test suite and run it in an emulator (SMSSpec is currently untested on real hardware), you be notified on screen if any tests fail. If the above test failed, you would see the following message in red: 'Counter should increment the value in the accumulator'.
+```asm
+describe "increment"
 
-Each time you call the 'it' macro, some clean-up is performed for you to empty the registers and prevent tests from 'leaking' data and affecting other tests.
+it "should increment the value in A"
+    ld a, 0
+    call increment
+    expect.a.toBe 1
 
-## Mocking
-Mocking allows you to focus tests on specific routines rather than their dependencies, and are also useful for stubbing out difficult to test routines such as one that reads an input port.
+it "should not increment past 255"
+    ld a, 255
+    call increment
+    expect.a.toBe 255
+```
 
-Labels are set in stone at assemble time, so if you mock a label you won't be able to include the actual label within the same test suite. To test them separately you would therefore just need to house them in a separate test suite.
+Each time you call the 'it' macro, some clean-up is performed for you which clears the registers and prevent tests from 'leaking' data and affecting other tests.
 
-The mocking implementation in SMSSpec sets up a proxy routine in RAM, allowing you to define different mocks for each 'it' test. This mock gets reset at the start of each test, with a default handler that will simply return (ret) to the caller.
+If a test fails, the message will be printed on the screen with details of the test and assertion that failed.
 
-    ; In your test suite, define your mocks in RAM (use 'appendto smsspec.mocks')
-    .ramsection "mock instances" appendto smsspec.mocks
-        ; Calls to getPortA will point to this mock in RAM
-        getPortA instanceof smsspec.mock
-    .ends
+## Mocking/stubbing labels
 
-    ; In your test files, mock the routine that fetches input from port A, so it returns a fixed value
-    ; This mock only lasts for the duration of the current 'it' test, so you can define it again in another one
-    smsspec.mock.start getPortA
-        ld a, %00001111 ; Mock routine to return a fixed value rather than reading the actual input port
-        ; ret is added automatically
-    smsspec.mock.end
+Sometimes when testing a routine it's necessary or preferable to mock/stub out routines it calls. One such case is when testing input handling code, whereby you want to ensure the routine is fed certain input values to simulate a given scenario without having to manually press buttons on the joypad.
 
-With the above, when your code calls 'getPortA', it will actually get redirected to the mock you've defined. In the above case, register a would be loaded with a fixed value and would then return.
+It may be necessary to extract some routines into separate files and ensure these files aren't imported into your test suite, then define your own fake versions of the routines instead. If the routine you're testing uses `call readPortA` to read the input value of controller A, it will instead call the fake `readPortA` you've defined in the test suite which can return a set value rather than reading the actual input.
+
+Alternatively, SMSSpec also provides a 'Mock' API that lets you define fake routines in RAM so that you can define different behaviour for different test scenarios.
+
+In your test suite, define your mocks in a ramsection using `appendto smsspec.mocks`:
+
+```asm
+.ramsection "my mock instances" appendto smsspec.mocks
+    ; Calls to readPortA will point to this mock in RAM
+    readPortA instanceof smsspec.mock
+.ends
+```
+
+Mocks gets reset at the start of each 'it' test with a default handler that will simply return (`ret`) to the caller. To override this in a test, wrap some code in `smsspec.mock.start` and `smsspec.mock.end`:
+
+```asm
+smsspec.mock.start readPortA
+    ld a, %11111110 ; simulate up being pressed
+    ; ret is added automatically
+smsspec.mock.end
+```
+
+With the above, when the code you're testing calls `readPortA`, it will actually call the code you've defined between `smsspec.mock.start` and `smsspec.mock.end`. In the above case, register A would be loaded with a fixed value and would then return to the caller, which will continue running unaware.
 
 ## Status
-The project is a fully functioning proof-of-concept that I work on as a hobby. Next steps will include adding more assertions and notifications so it will be ready for real projects.
+
+The project is a fully functioning proof-of-concept that I work on as a hobby. Next steps will include adding more assertions and examples so it will be ready for real projects.
