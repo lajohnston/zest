@@ -215,6 +215,7 @@
         +:
 
         ; Value is above 10 (A-F)
+        sub 10          ; A = 0; B = 1; 15 = F
         add asc('A')    ; point to ASCII characters A-F
         zest.console.outputCharacter
         ret
