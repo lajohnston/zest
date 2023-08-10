@@ -1,34 +1,34 @@
-.section "smsspec.console.data" free
-    smsspec.console.data.heading:
-        .asc "            SMSSpec"
+.section "zest.console.data" free
+    zest.console.data.heading:
+        .asc "             Zest"
         .db $ff ; terminator byte
 
-    smsspec.console.data.allTestsPassed:
-        .asc "       All tests passed!"
+    zest.console.data.allTestsPassed:
+        .asc "       All tests passed"
         .db $ff ; terminator byte
 
-    smsspec.console.data.testFailedHeading:
-        .asc "     SMSSpec - Test failed"
+    zest.console.data.testFailedHeading:
+        .asc "       Zest - Test failed"
         .db $ff ; terminator byte
 
-    smsspec.console.data.actualValueLabel:
+    zest.console.data.actualValueLabel:
         .asc "Actual:   "
         .db $ff ; terminator byte
 
-    smsspec.console.data.expectedValueLabel:
+    zest.console.data.expectedValueLabel:
         .asc "Expected: "
         .db $ff ; terminator byte
 
-    smsspec.console.data.separatorText:
-        .asc "            ~~~~~~~"
+    zest.console.data.separatorText:
+        .asc "            ~~~~~~~~"
         .db $ff ; terminator byte
 
-    smsspec.console.data.palette:
+    zest.console.data.palette:
         .db $00,$0C,$03 ; Black, green, red
-    smsspec.console.data.paletteEnd:
+    zest.console.data.paletteEnd:
 
     ; Console font
-    smsspec.console.data.font:
+    zest.console.data.font:
     .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
     .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
     .db $18,$00,$00,$00,$18,$00,$00,$00,$18,$00,$00,$00,$18,$00,$00,$00
@@ -219,5 +219,5 @@
     .db $18,$00,$00,$00,$18,$00,$00,$00,$30,$00,$00,$00,$00,$00,$00,$00
     .db $31,$00,$00,$00,$6B,$00,$00,$00,$46,$00,$00,$00,$00,$00,$00,$00
     .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
-    smsspec.console.data.font_end:
+    zest.console.data.font_end:
 .ends

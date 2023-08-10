@@ -1,5 +1,5 @@
 ;====
-; SMSSPec - input mocking example
+; Zest - input mocking example
 ;
 ; At times it will be necessary to stub/mock out parts of the code to simulate
 ; particularly scenarios. One such case is with input handling, as we want to
@@ -13,16 +13,16 @@
 ; and return a particular value.
 ;====
 
-; Include smsspec
+; Include Zest
 .incdir "../../"
-    .include "smsspec.asm"
+    .include "zest.asm"
 .incdir "."
 
 ;====
 ; Define mock instances in RAM
 ;====
-.ramsection "mock instances" appendto smsspec.mocks
-    readPlayer1Input instanceof smsspec.mock
+.ramsection "mock instances" appendto zest.mocks
+    readPlayer1Input instanceof zest.mock
 .ends
 
 ;====
@@ -36,9 +36,9 @@
 ; Include the files to test
 .include "player.asm"
 
-; Define an smsspec.suite label, which smsspec will call
-.section "smsspec.suite" free
-    smsspec.suite:
+; Define a zest.suite label, which Zest will call
+.section "zest.suite" free
+    zest.suite:
         ; Include your test suite files
         .include "player.test.asm"
 

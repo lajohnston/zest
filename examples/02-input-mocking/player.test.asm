@@ -5,10 +5,10 @@ describe "player.asm updatePosition"
         ld (playerXPos), a
 
         ; Stub readPlayer1Input to return no input
-        smsspec.mock.start readPlayer1Input
+        zest.mock.start readPlayer1Input
             ; No buttons pressed (0 = pressed, 1 = not pressed)
             ld a, %11111111
-        smsspec.mock.end
+        zest.mock.end
 
         ; Call the function we're testing
         call updatePosition
@@ -23,10 +23,10 @@ describe "player.asm updatePosition"
         ld (playerXPos), a
 
         ; Stub readPlayer1Input to return right input
-        smsspec.mock.start readPlayer1Input
+        zest.mock.start readPlayer1Input
             ; Right button pressed (0 = pressed, 1 = not pressed)
             ld a, %11110111
-        smsspec.mock.end
+        zest.mock.end
 
         ; Call the function we're testing
         call updatePosition
@@ -41,10 +41,10 @@ describe "player.asm updatePosition"
         ld (playerXPos), a
 
         ; Stub readPlayer1Input to return right input
-        smsspec.mock.start readPlayer1Input
+        zest.mock.start readPlayer1Input
             ; Right button pressed (0 = pressed, 1 = not pressed)
             ld a, %11111011
-        smsspec.mock.end
+        zest.mock.end
 
         ; Call the function we're testing
         call updatePosition

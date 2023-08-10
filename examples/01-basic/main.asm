@@ -1,14 +1,14 @@
-; Include the smsspec lib
+; Include the Zest lib
 .incdir "../../"
-    .include "smsspec.asm"
+    .include "zest.asm"
 .incdir "."
 
 ; Include any code you want to test
 .include "increment.asm"
 
-; Define an smsspec.suite label
+; Define a zest.suite label
 .section "suite" free
-    smsspec.suite:
+    zest.suite:
         ; Include the test files
         .include "increment.test.asm"
 

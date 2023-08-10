@@ -1,34 +1,34 @@
-.ramsection "smsspec.runner.current_test_info" slot 2
-    smsspec.runner.current_describe_message_addr: dw
-    smsspec.runner.current_test_message_addr: dw
+.ramsection "zest.runner.current_test_info" slot 2
+    zest.runner.current_describe_message_addr: dw
+    zest.runner.current_test_message_addr: dw
 .ends
 
 ;====
 ; Initialise the system and run the test suite
 ;====
-.section "smsspec.runner.init" free
-    smsspec.runner.init:
+.section "zest.runner.init" free
+    zest.runner.init:
         ; Initialise VDP
-        call smsspec.vdp.init
-        call smsspec.vdp.clearVram
+        call zest.vdp.init
+        call zest.vdp.clearVram
 
         ; Initialise console
-        call smsspec.console.init
-        call smsspec.vdp.enableDisplay
+        call zest.console.init
+        call zest.vdp.enableDisplay
 
         ; Run the test suite (label defined by user)
-        call smsspec.suite
+        call zest.suite
 
         ; All tests passed. Display message
-        call smsspec.console.prepWrite
-            ld hl, smsspec.console.data.heading
-            call smsspec.console.out
-            call smsspec.console.newline
-            call smsspec.console.newline
+        call zest.console.prepWrite
+            ld hl, zest.console.data.heading
+            call zest.console.out
+            call zest.console.newline
+            call zest.console.newline
 
-            ld hl, smsspec.console.data.allTestsPassed
-            call smsspec.console.out
-        call smsspec.console.finalise
+            ld hl, zest.console.data.allTestsPassed
+            call zest.console.out
+        call zest.console.finalise
 
         ; End
         -:
@@ -39,83 +39,83 @@
 ;====
 ; Prints the Test Failed heading
 ;====
-.macro "smsspec.runner.printTestFailedHeading"
+.macro "zest.runner.printTestFailedHeading"
     ; Write test failed message
-    ld hl, smsspec.console.data.testFailedHeading
-    call smsspec.console.out
+    ld hl, zest.console.data.testFailedHeading
+    call zest.console.out
 
     ; Separator
-    call smsspec.console.newline
-    call smsspec.console.newline
-    ld hl, smsspec.console.data.separatorText
-    call smsspec.console.out
-    call smsspec.console.newline
+    call zest.console.newline
+    call zest.console.newline
+    ld hl, zest.console.data.separatorText
+    call zest.console.out
+    call zest.console.newline
 .endm
 
 ;====
 ; Prints the current test's 'describe' and 'it' text
 ;====
-.macro "smsspec.runner.printTestDescription"
+.macro "zest.runner.printTestDescription"
     ; Write describe block description
-    call smsspec.console.newline
-    ld hl, (smsspec.runner.current_describe_message_addr)
-    call smsspec.console.out
+    call zest.console.newline
+    ld hl, (zest.runner.current_describe_message_addr)
+    call zest.console.out
 
     ; Write failing test
-    call smsspec.console.newline
-    call smsspec.console.newline
-    ld hl, (smsspec.runner.current_test_message_addr)
-    call smsspec.console.out
+    call zest.console.newline
+    call zest.console.newline
+    ld hl, (zest.runner.current_test_message_addr)
+    call zest.console.out
 .endm
 
 ;====
 ; Prints the message of the assertion that failed
 ; @in   stack{0}    the message
 ;====
-.macro "smsspec.runner.printAssertionMessage"
+.macro "zest.runner.printAssertionMessage"
     ; Write assertion message
-    call smsspec.console.newline
-    call smsspec.console.newline
-    call smsspec.console.newline
-    ld hl, smsspec.console.data.separatorText
-    call smsspec.console.out
+    call zest.console.newline
+    call zest.console.newline
+    call zest.console.newline
+    ld hl, zest.console.data.separatorText
+    call zest.console.out
 
-    call smsspec.console.newline
-    call smsspec.console.newline
+    call zest.console.newline
+    call zest.console.newline
 
     pop hl  ; restore assertion message
-    call smsspec.console.out
+    call zest.console.out
 .endm
 
 ;====
 ; Prints 'Expected:' and the hex value of the expected value
 ; @in   b   the expected value
 ;====
-.macro "smsspec.runner.printExpectedValue"
+.macro "zest.runner.printExpectedValue"
     ; Print 'Expected:'
-    call smsspec.console.newline
-    call smsspec.console.newline
-    ld hl, smsspec.console.data.expectedValueLabel
-    call smsspec.console.out
+    call zest.console.newline
+    call zest.console.newline
+    ld hl, zest.console.data.expectedValueLabel
+    call zest.console.out
 
     ; Print the expected value
     ld a, b ; set A to expected value
-    call smsspec.console.outputHexA
+    call zest.console.outputHexA
 .endm
 
 ;====
 ; Prints 'Actual:' and the hex value of the actual value
 ; @in   a   the expected value
 ;====
-.macro "smsspec.runner.printActualValue"
+.macro "zest.runner.printActualValue"
     push af
-        call smsspec.console.newline
-        ld hl, smsspec.console.data.actualValueLabel
-        call smsspec.console.out
+        call zest.console.newline
+        ld hl, zest.console.data.actualValueLabel
+        call zest.console.out
     pop af
 
     ; Print actual value in A
-    call smsspec.console.outputHexA
+    call zest.console.outputHexA
 .endm
 
 ;====
@@ -125,25 +125,25 @@
 ; @in   b   the expected value
 ; @in   hl  pointer to the assertion message
 ;====
-.section "smsspec.runner.expectationFailed" free
-    smsspec.runner.expectationFailed:
+.section "zest.runner.expectationFailed" free
+    zest.runner.expectationFailed:
         push af ; preserve actual value
         push hl ; preserve assertion message
 
         ; Set console text color to red
         ld a, %00000011
-        call smsspec.console.setTextColor   ; set to a
+        call zest.console.setTextColor   ; set to a
 
-        call smsspec.console.prepWrite
-            smsspec.runner.printTestFailedHeading
-            smsspec.runner.printTestDescription
+        call zest.console.prepWrite
+            zest.runner.printTestFailedHeading
+            zest.runner.printTestDescription
 
-            smsspec.runner.printAssertionMessage
-            smsspec.runner.printExpectedValue
+            zest.runner.printAssertionMessage
+            zest.runner.printExpectedValue
 
             pop af  ; restore actual value
-            smsspec.runner.printActualValue
-        call smsspec.console.finalise
+            zest.runner.printActualValue
+        call zest.console.finalise
 
         ; Stop program
         -:
@@ -151,11 +151,11 @@
         jp -
 .ends
 
-.macro "smsspec.runner.expectationFailed" args message, actual
-    jp smsspec.runner.expectationFailed
+.macro "zest.runner.expectationFailed" args message, actual
+    jp zest.runner.expectationFailed
 .endm
 
-.macro "smsspec.runner.clearMainRegisters"
+.macro "zest.runner.clearMainRegisters"
     xor a       ; set A to zero
     or 1        ; clear all flags (but sets A to 1)
     ld a, 0     ; set A to zero again (without affecting flags)
@@ -169,15 +169,15 @@
     ld l, a
 .endm
 
-.section "smsspec.runner.clearRegisters" free
-    smsspec.runner.clearRegisters:
+.section "zest.runner.clearRegisters" free
+    zest.runner.clearRegisters:
         ; Clear main registers
-        smsspec.runner.clearMainRegisters
+        zest.runner.clearMainRegisters
 
         ; Clear shadow registers
         ex af, af'
         exx
-        smsspec.runner.clearMainRegisters
+        zest.runner.clearMainRegisters
 
         ; Clear additional registers
         ld ix, 0
@@ -192,22 +192,22 @@
 ; Stores a pointer to the description test which is used to
 ; identify the test to the user if it fails
 ;====
-.macro "smsspec.runner.describe" args unitName
-    smsspec.runner.storeText unitName, smsspec.runner.current_describe_message_addr
+.macro "zest.runner.describe" args unitName
+    zest.runner.storeText unitName, zest.runner.current_describe_message_addr
 .endm
 
 ;====
 ; Initialises a new test.
 ; Resets the Z80 registers and stores the test description in case the test fails
 ;====
-.macro "smsspec.runner.startTest" args message
-    smsspec.runner.storeText message, smsspec.runner.current_test_message_addr
+.macro "zest.runner.startTest" args message
+    zest.runner.storeText message, zest.runner.current_test_message_addr
 
     ; Clear system state
-    call smsspec.mock.initAll
-    call smsspec.runner.clearRegisters
+    call zest.mock.initAll
+    call zest.runner.clearRegisters
 
-    ; Reset stack (base address minus return address from smsspec.suite)
+    ; Reset stack (base address minus return address from zest.suite)
     ld sp, $dfee
 .endm
 
@@ -215,7 +215,7 @@
 ; Stores text in the ROM and adds a pointer to it at the given
 ; RAM location
 ;====
-.macro "smsspec.runner.storeText" args text, ram_pointer
+.macro "zest.runner.storeText" args text, ram_pointer
     jr +
     _text\@:
         .asc text

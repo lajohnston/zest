@@ -19,7 +19,7 @@
 .endro
 
 ; SDSC tag and SMS rom header
-.sdsctag 1.2, "smsspec", "Sega Master System Unit Test Runner", "lajohnston"
+.sdsctag 1.2, "Zest", "Sega Master System Unit Test Runner", "lajohnston"
 
 ; ASCII table
 .asciitable
@@ -30,11 +30,11 @@
 ; Boot sequence
 ;====
 .orga $0000
-.section "smsspec.main" force
+.section "zest.main" force
     di              ; disable interrupts
     im 1            ; Interrupt mode 1
     ld sp, $dff0    ; set stack pointer
-    jp smsspec.runner.init
+    jp zest.runner.init
 .ends
 
 ;====
@@ -43,7 +43,7 @@
 .orga $0038
 .section "Interrupt handler" force
     push af
-        in a, (smsspec.vdp.STATUS_PORT) ; satisfy interrupt
+        in a, (zest.vdp.STATUS_PORT)    ; satisfy interrupt
         ret
     pop af
     ei

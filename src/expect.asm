@@ -10,7 +10,7 @@
         jp z, +
             ld b, expected
             ld hl, expect.a.toBe.defaultMessage
-            jp smsspec.runner.expectationFailed
+            jp zest.runner.expectationFailed
         +:
     pop af
 .endm

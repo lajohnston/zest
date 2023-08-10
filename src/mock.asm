@@ -3,7 +3,7 @@
 ; the mock has been called and the address to jump to to handle the
 ; mock logic
 ;====
-.struct smsspec.mock
+.struct zest.mock
     push_hl             db
     call_instruction    db
     call_address        dw
@@ -13,31 +13,31 @@
 
 ;====
 ; Start of mocks list. Mocks can be added by creating ramsections with
-; "appendto smsspec.mocks", and populating them with smsspec.mock instances
+; "appendto zest.mocks", and populating them with zest.mock instances
 ;====
-.ramsection "smsspec.mocks" slot 2
-    smsspec.mocks.start:    db
+.ramsection "zest.mocks" slot 2
+    zest.mocks.start:    db
 .ends
 
 ;====
 ; Marks the end of the mocks list
 ;====
-.ramsection "smsspec.mocks.end" slot 2 after smsspec.mocks
-    smsspec.mocks.end:      db
+.ramsection "zest.mocks.end" slot 2 after zest.mocks
+    zest.mocks.end:      db
 .ends
 
-.section "smsspec.mock.initAll"
+.section "zest.mock.initAll"
     ;====
     ; Initialises one or more mocks in RAM
     ;====
-    smsspec.mock.initAll:
+    zest.mock.initAll:
         ; Get number of mocks
-        ld a, (smsspec.mocks.end - smsspec.mocks.start - 1) / _sizeof_smsspec.mock
+        ld a, (zest.mocks.end - zest.mocks.start - 1) / _sizeof_zest.mock
         or a    ; update flags
         ret z   ; return if there are no mocks to clear
 
         ; Point to first mock (skip start byte)
-        ld hl, smsspec.mocks.start + 1
+        ld hl, zest.mocks.start + 1
         ld b, a ; set B to number of mocks
 
     _clearMock:
@@ -46,9 +46,9 @@
         inc hl
         ld (hl), $cd  ; write 'call' instruction to RAM
         inc hl
-        ld (hl), < smsspec.mock.call
+        ld (hl), < zest.mock.call
         inc hl
-        ld (hl), > smsspec.mock.call
+        ld (hl), > zest.mock.call
 
         ; Reset 'times called' counter
         inc hl
@@ -56,35 +56,35 @@
 
         ; Set default mock handler
         inc hl
-        ld (hl), < smsspec.mock.defaultHandler
+        ld (hl), < zest.mock.defaultHandler
         inc hl
-        ld (hl), > smsspec.mock.defaultHandler
+        ld (hl), > zest.mock.defaultHandler
 
         djnz _clearMock
         ret
 .ends
 
 ;====
-; Define the start of a mock handler. smsspec.mock.end must be called at the
+; Define the start of a mock handler. zest.mock.end must be called at the
 ; end of the handler
 ;
 ; @in   mockAddress the address of the mock instance to define the handler for
 ;====
-.macro "smsspec.mock.start" args mockAddress
+.macro "zest.mock.start" args mockAddress
     push ix
         ld ix, mockAddress
-        ld (ix + smsspec.mock.address), < _mockHandlerStart\@
-        ld (ix + smsspec.mock.address + 1), > _mockHandlerStart\@
+        ld (ix + zest.mock.address), < _mockHandlerStart\@
+        ld (ix + zest.mock.address + 1), > _mockHandlerStart\@
     pop ix
 
-    jp _mockHandlerEnd\@    ; jump over mock code, end label defined by smsspec.mock.end
+    jp _mockHandlerEnd\@    ; jump over mock code, end label defined by zest.mock.end
     _mockHandlerStart\@:    ; define start of the mock handler
 .endm
 
 ;====
 ; Define the end of a mock handler
 ;====
-.macro "smsspec.mock.end"
+.macro "zest.mock.end"
     ret                 ; return from the handler
     _mockHandlerEnd\@:  ; define end of the mock handler
 .endm
@@ -93,17 +93,17 @@
 ; Reserves space in RAM to store temporary opcodes for use when jumping to a
 ; mock handler without clobbing hl
 ;====
-.ramsection "smsspec.mock.jump" slot 2
-    smsspec.mock.jump.pop:  db
-    smsspec.mock.jump.jp:   db
-    smsspec.mock.jump.jp_address:   dw
+.ramsection "zest.mock.jump" slot 2
+    zest.mock.jump.pop:  db
+    zest.mock.jump.jp:   db
+    zest.mock.jump.jp_address:   dw
 .ends
 
-.section "smsspec.mock" free
+.section "zest.mock" free
     ;====
     ; Defines a procedure that mocks run by default
     ;====
-    smsspec.mock.defaultHandler:
+    zest.mock.defaultHandler:
         ; by default, mocks just return to caller
         ret
 
@@ -114,9 +114,9 @@
     ; this mediator didn't exist, and so there's no need to have a pop hl instruction
     ; in the destination code
     ;
-    ; @in   sp  the start address of the smsspec mock in RAM
+    ; @in   sp  the start address of the Zest mock in RAM
     ;====
-    smsspec.mock.call:
+    zest.mock.call:
         ; pop caller (mock) address from stack
         pop hl
 
@@ -137,8 +137,8 @@
             ; to RAM which will pop hl then jp to the address
 
             ; Write 'pop hl' opcode to RAM
-            ; this value was pushed by the mock, see smsspec.mock.initAll
-            ld hl, smsspec.mock.jump.pop
+            ; this value was pushed by the mock (see zest.mock.initAll)
+            ld hl, zest.mock.jump.pop
             ld (hl), $e1    ; $e1 = pop hl
 
             ; Write jp opcode to RAM
@@ -153,5 +153,5 @@
         pop de
 
         ; Jump to opcodes in RAM
-        jp smsspec.mock.jump.pop
+        jp zest.mock.jump.pop
 .ends

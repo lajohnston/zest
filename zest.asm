@@ -1,10 +1,10 @@
 ;====
-; SMSSpec - Sega Master System/Z80 Test Runner
+; Zest - Sega Master System/Z80 Test Runner
 ;
-; Ensure you point to the smsspec directory before including this file, i.e,
+; Ensure you point to the Zest directory before including this file, i.e,
 ;
-; .incdir "../smsspec"          ; point to smsspec directory
-;   .include "smsspec.asm"      ; include this file
+; .incdir "../zest"             ; point to Zest directory
+;     .include "zest.asm"       ; include this file
 ; .incdir "."                   ; return to current directory
 ;====
 
@@ -28,7 +28,7 @@
 ; @in   message     a description string of the unit
 ;====
 .macro "describe" args message
-    smsspec.runner.describe message
+    zest.runner.describe message
 .endm
 
 ;====
@@ -38,5 +38,5 @@
 ; @in   message     a description string of the test
 ;====
 .macro "it" args message
-    smsspec.runner.startTest message
+    zest.runner.startTest message
 .endm

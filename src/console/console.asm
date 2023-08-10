@@ -2,36 +2,36 @@
 ; Writes text to the screen
 ;====
 
-.ramsection "smsspec.console.variables" slot 2
-    smsspec.console.cursor_vram_address:    dw
+.ramsection "zest.console.variables" slot 2
+    zest.console.cursor_vram_address:    dw
 .ends
 
 ;====
 ; Initialises the console ready for use
 ;====
-.section "smsspec.console.init" free
-    smsspec.console.init:
+.section "zest.console.init" free
+    zest.console.init:
       ; Load palette
-      ld hl, $0000 | smsspec.vdp.CRAMWrite
-      call smsspec.vdp.setAddress
-      ld hl, smsspec.console.data.palette
-      ld bc, smsspec.console.data.paletteEnd - smsspec.console.data.palette
-      call smsspec.vdp.copyToVram
+      ld hl, $0000 | zest.vdp.CRAMWrite
+      call zest.vdp.setAddress
+      ld hl, zest.console.data.palette
+      ld bc, zest.console.data.paletteEnd - zest.console.data.palette
+      call zest.vdp.copyToVram
 
       ; Load tiles
-      ld hl, $0000 | smsspec.vdp.VRAMWrite
-      call smsspec.vdp.setAddress       ; set VRAM write address to tile index 0
+      ld hl, $0000 | zest.vdp.VRAMWrite
+      call zest.vdp.setAddress          ; set VRAM write address to tile index 0
 
       ; Output tile data
-      ld hl, smsspec.console.data.font  ; location of tile data
+      ld hl, zest.console.data.font     ; location of tile data
 
       ; Counter for number of bytes to write
-      ld bc, smsspec.console.data.font_end - smsspec.console.data.font
-      call smsspec.vdp.copyToVram
+      ld bc, zest.console.data.font_end - zest.console.data.font
+      call zest.vdp.copyToVram
 
       ; Initial cursor position
-      ld hl, smsspec.vdp.TILEMAP_BASE | smsspec.vdp.VRAMWrite
-      ld (smsspec.console.cursor_vram_address), hl
+      ld hl, zest.vdp.TILEMAP_BASE | zest.vdp.VRAMWrite
+      ld (zest.console.cursor_vram_address), hl
       ret
 .ends
 
@@ -40,14 +40,14 @@
 ;
 ; @in   a   the color to set (%xxBBGGRR)
 ;====
-.section "smsspec.console.setTextColor" free
-    smsspec.console.setTextColor:
+.section "zest.console.setTextColor" free
+    zest.console.setTextColor:
         push hl
-            ld hl, (smsspec.vdp.CRAMWrite + 1) | smsspec.vdp.VRAMWrite
-            call smsspec.vdp.setAddress
+            ld hl, (zest.vdp.CRAMWrite + 1) | zest.vdp.VRAMWrite
+            call zest.vdp.setAddress
         pop hl
 
-        out (smsspec.vdp.DATA_PORT), a
+        out (zest.vdp.DATA_PORT), a
         ret
 .ends
 
@@ -63,10 +63,10 @@
 ;
 ; @clobs a
 ;====
-.macro "smsspec.console.outputCharacter"
-    out (smsspec.vdp.DATA_PORT), a      ; output character
+.macro "zest.console.outputCharacter"
+    out (zest.vdp.DATA_PORT), a         ; output character
     xor a                               ; set attributes to none
-    out (smsspec.vdp.DATA_PORT), a      ; output attributes
+    out (zest.vdp.DATA_PORT), a         ; output attributes
 
     ; Increment VRAM address in DE by 1 tile (VRAM auto-increments)
     inc de  ; pattern ref
@@ -79,11 +79,11 @@
 ; @out  de      current cursor vram position (with write command)
 ; @out  vram    current cursor vram position (with write command)
 ;====
-.section "smsspec.console.prepWrite" free
-    smsspec.console.prepWrite:
-        call smsspec.vdp.disableDisplay
-        ld de, (smsspec.console.cursor_vram_address)
-        jp smsspec.vdp.setAddressDE
+.section "zest.console.prepWrite" free
+    zest.console.prepWrite:
+        call zest.vdp.disableDisplay
+        ld de, (zest.console.cursor_vram_address)
+        jp zest.vdp.setAddressDE
 .ends
 
 ;====
@@ -91,10 +91,10 @@
 ;
 ; @in   de      current cursor vram position
 ;====
-.section "smsspec.console.finalise" free
-    smsspec.console.finalise:
-        ld (smsspec.console.cursor_vram_address), de
-        jp smsspec.vdp.enableDisplay
+.section "zest.console.finalise" free
+    zest.console.finalise:
+        ld (zest.console.cursor_vram_address), de
+        jp zest.vdp.enableDisplay
 .ends
 
 ;====
@@ -105,8 +105,8 @@
 ; @in   de      the vram address + write command
 ; @in   vram    the vram address + write command
 ;====
-.section "smsspec.console.out" free
-    smsspec.console.out:
+.section "zest.console.out" free
+    zest.console.out:
         ; Preserve registers
         push af
 
@@ -123,13 +123,13 @@
                 ; We're on the last column
                 ; Output dash character. VRAM auto-increments to next line
                 ld a, 13                        ; dash pattern
-                smsspec.console.outputCharacter
+                zest.console.outputCharacter
                 jp _outputNextCharacter
             +:
 
             ; Output character to VRAM (auto-increments VRAM position)
             ld a, (hl)  ; re-load character
-            smsspec.console.outputCharacter
+            zest.console.outputCharacter
 
             ; Point to next character
             inc hl
@@ -147,8 +147,8 @@
 ;
 ; @in   de  VRAM address
 ;====
-.section "smsspec.console.newline" free
-    smsspec.console.newline:
+.section "zest.console.newline" free
+    zest.console.newline:
         push af
             ;===
             ; VRAM address format
@@ -174,7 +174,7 @@
             ld d, a   ; D = D+carry
         pop af
 
-        jp smsspec.vdp.setAddressDE
+        jp zest.vdp.setAddressDE
 .ends
 
 ;====
@@ -182,11 +182,11 @@
 ;
 ; @in   af
 ;====
-.section "smsspec.console.outputHexA" free
-    smsspec.console.outputHexA:
+.section "zest.console.outputHexA" free
+    zest.console.outputHexA:
         push af ; preserve value
             ld a, asc('$')
-            smsspec.console.outputCharacter
+            zest.console.outputCharacter
         pop af
 
         push af
@@ -210,12 +210,12 @@
         jp nc, +
             ; Digit is below 10
             add asc('0')  ; point to ASCII characters 0-9
-            smsspec.console.outputCharacter
+            zest.console.outputCharacter
             ret
         +:
 
         ; Value is above 10 (A-F)
         add asc('A')    ; point to ASCII characters A-F
-        smsspec.console.outputCharacter
+        zest.console.outputCharacter
         ret
 .ends
