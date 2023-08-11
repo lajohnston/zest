@@ -67,6 +67,18 @@ Each time you call the 'it' macro, some clean-up is performed for you which clea
 
 If a test fails, the message will be printed on the screen with details of the test and assertion that failed.
 
+You can also use `test` as an alias for `it` if you prefer:
+
+```asm
+describe "math"
+
+test "add"
+    ...
+
+test "subtract"
+    ...
+```
+
 ## Mocking/stubbing labels
 
 Sometimes when testing a routine it's necessary or preferable to mock/stub out routines it calls. One such case is when testing input handling code, whereby you want to ensure the routine is fed certain input values to simulate a given scenario without having to manually press buttons on the joypad.

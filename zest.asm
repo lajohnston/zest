@@ -40,3 +40,12 @@
 .macro "it" args message
     zest.runner.startTest message
 .endm
+
+;====
+; Alias for 'it'
+;
+; @in   message     a description string of the test
+;====
+.macro "test" args message
+    it message
+.endm
