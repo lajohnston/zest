@@ -107,6 +107,25 @@ zest.mock.end
 
 With the above, when the code you're testing calls `readPortA`, it will actually call the code you've defined between `zest.mock.start` and `zest.mock.end`. In the above case, register A would be loaded with a fixed value and would then return to the caller, which will continue running unaware.
 
+## Expectations
+
+Zest comes with the following expectations out of the box:
+
+```asm
+expect.a.toBe
+expect.b.toBe
+expect.c.toBe
+expect.d.toBe
+expect.e.toBe
+expect.h.toBe
+expect.l.toBe
+expect.ixh.toBe
+expect.ixl.toBe
+expect.iyh.toBe
+expect.iyl.toBe
+expect.i.toBe
+```
+
 ## Status
 
 The project is a fully functioning proof-of-concept that I work on as a hobby. Next steps will include adding more assertions and examples so it will be ready for real projects.

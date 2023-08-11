@@ -10,13 +10,15 @@
 
 .include "./src/main.asm"
 
-.include "./src/expect.asm"
 .include "./src/mock.asm"
 .include "./src/runner.asm"
 .include "./src/vdp.asm"
 
 .include "./src/console/console.asm"
 .include "./src/console/data.asm"
+
+.include "./src/utils/assert.asm"
+.include "./src/expect/r.toBe.asm"
 
 ;====
 ; Global aliases
