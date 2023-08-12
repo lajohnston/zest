@@ -39,84 +39,91 @@
 ;====
 ; Prints the Test Failed heading
 ;====
-.macro "zest.runner.printTestFailedHeading"
-    ; Write test failed message
-    ld hl, zest.console.data.testFailedHeading
-    call zest.console.out
+.section "zest.runner.printTestFailedHeading" free
+    zest.runner.printTestFailedHeading:
+        ; Write test failed message
+        ld hl, zest.console.data.testFailedHeading
+        call zest.console.out
 
-    ; Separator
-    call zest.console.newline
-    call zest.console.newline
-    ld hl, zest.console.data.separatorText
-    call zest.console.out
-    call zest.console.newline
-.endm
+        ; Separator
+        call zest.console.newline
+        call zest.console.newline
+        ld hl, zest.console.data.separatorText
+        call zest.console.out
+        jp zest.console.newline ; jp then ret
+.ends
 
 ;====
 ; Prints the current test's 'describe' and 'it' text
 ;====
-.macro "zest.runner.printTestDescription"
-    ; Write describe block description
-    call zest.console.newline
-    ld hl, (zest.runner.current_describe_message_addr)
-    call zest.console.out
+.section "zest.runner.printTestDescription" free
+    zest.runner.printTestDescription:
+        ; Write describe block description
+        call zest.console.newline
+        ld hl, (zest.runner.current_describe_message_addr)
+        call zest.console.out
 
-    ; Write failing test
-    call zest.console.newline
-    call zest.console.newline
-    ld hl, (zest.runner.current_test_message_addr)
-    call zest.console.out
-.endm
+        ; Write failing test
+        call zest.console.newline
+        call zest.console.newline
+        ld hl, (zest.runner.current_test_message_addr)
+        jp zest.console.out ; jp then ret
+.ends
 
 ;====
 ; Prints the message of the assertion that failed
-; @in   stack{0}    the message
+; @in   hl  pointer to the message
 ;====
-.macro "zest.runner.printAssertionMessage"
-    ; Write assertion message
-    call zest.console.newline
-    call zest.console.newline
-    call zest.console.newline
-    ld hl, zest.console.data.separatorText
-    call zest.console.out
+.section "zest.runner.printAssertionMessage" free
+    zest.runner.printAssertionMessage:
+        ; Write assertion message
+        call zest.console.newline
+        call zest.console.newline
+        call zest.console.newline
 
-    call zest.console.newline
-    call zest.console.newline
+        push hl
+            ld hl, zest.console.data.separatorText
+            call zest.console.out
 
-    pop hl  ; restore assertion message
-    call zest.console.out
-.endm
+            call zest.console.newline
+            call zest.console.newline
+        pop hl
+
+        jp zest.console.out ; jp then ret
+.ends
 
 ;====
 ; Prints 'Expected:' and the hex value of the expected value
 ; @in   b   the expected value
 ;====
-.macro "zest.runner.printExpectedValue"
-    ; Print 'Expected:'
-    call zest.console.newline
-    call zest.console.newline
-    ld hl, zest.console.data.expectedValueLabel
-    call zest.console.out
+.section "zest.runner.printExpectedValue" free
+    zest.runner.printExpectedValue:
+        ; Print 'Expected:'
+        call zest.console.newline
+        call zest.console.newline
+        ld hl, zest.console.data.expectedValueLabel
+        call zest.console.out
 
-    ; Print the expected value
-    ld a, b ; set A to expected value
-    call zest.console.outputHexA
-.endm
+        ; Print the expected value
+        ld a, b ; set A to expected value
+        jp zest.console.outputHexA  ; jp then ret
+.ends
 
 ;====
 ; Prints 'Actual:' and the hex value of the actual value
 ; @in   a   the expected value
 ;====
-.macro "zest.runner.printActualValue"
-    push af
-        call zest.console.newline
-        ld hl, zest.console.data.actualValueLabel
-        call zest.console.out
-    pop af
+.section "zest.runner.printActualValue" free
+    zest.runner.printActualValue:
+        push af
+            call zest.console.newline
+            ld hl, zest.console.data.actualValueLabel
+            call zest.console.out
+        pop af
 
-    ; Print actual value in A
-    call zest.console.outputHexA
-.endm
+        ; Print actual value in A
+        jp zest.console.outputHexA  ; jp then ret
+.ends
 
 ;====
 ; Prints details about the failing test and stops the program
@@ -135,14 +142,18 @@
         call zest.console.setTextColor   ; set to a
 
         call zest.console.prepWrite
-            zest.runner.printTestFailedHeading
-            zest.runner.printTestDescription
+            call zest.runner.printTestFailedHeading
+            call zest.runner.printTestDescription
 
-            zest.runner.printAssertionMessage
-            zest.runner.printExpectedValue
+            pop hl  ; restore assertion message
+            call zest.runner.printAssertionMessage
 
+            ; Print expected value
+            call zest.runner.printExpectedValue
+
+            ; Print actual value
             pop af  ; restore actual value
-            zest.runner.printActualValue
+            call zest.runner.printActualValue
         call zest.console.finalise
 
         ; Stop program
