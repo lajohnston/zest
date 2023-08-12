@@ -37,45 +37,120 @@
 .ends
 
 ;====
-; Prints the Test Failed heading
+; Displays details about a byte/single register assertion that doesn't match
+; the expectation, then stops the program
+;
+; @in   a   the actual value
+; @in   b   the expected value
+; @in   hl  pointer to the assertion message
 ;====
-.section "zest.runner.printTestFailedHeading" free
-    zest.runner.printTestFailedHeading:
-        ; Write test failed message
-        ld hl, zest.console.data.testFailedHeading
-        call zest.console.out
+.section "zest.runner.byteExpectationFailed" free
+    zest.runner.byteExpectationFailed:
+        call zest.runner._printTestFailure
 
-        ; Separator
-        call zest.console.newline
-        call zest.console.newline
-        ld hl, zest.console.data.separatorText
-        call zest.console.out
+        ; Print 'Expected:' label
+        call zest.runner._printExpectedLabel
+
+        ; Print expected value
+        push af
+            ld a, b ; set A to expected value
+            call zest.console.outputHexA
+        pop af
+
+        ; Print 'Actual:' label
+        call zest.runner._printActualLabel
+
+        ; Print actual value
+        call zest.console.outputHexA
+        jp zest.runner._showMessage ; jp (then ret)
+.ends
+
+;====
+; (Private) Prints the test failed heading, test description, and assertion
+; message
+;
+; @in   hl  pointer to the assertion message
+;====
+.section "zest.runner._printTestFailure" free
+    zest.runner._printTestFailure:
+        ; Set console text color to red
+        push af
+            ld a, %00000011 ; red
+            call zest.console.setTextColor
+        pop af
+
+        ; Prep write to console
+        call zest.console.prepWrite
+
+        ; Print test details
+        call zest.runner._printTestFailedHeading
+        call zest.runner._printTestDescription
+
+        ; Print the failed assertion message
+        jp zest.runner._printAssertionMessage   ; jp (then ret)
+.ends
+
+;====
+; (Private) Enables the display to show the message and stops the runner
+;====
+.section "zest.runner._showMessage" free
+    zest.runner._showMessage:
+        call zest.console.finalise
+
+        ; Stop program
+        -:
+            halt
+        jp -
+.ends
+
+;====
+; (Private) Prints the Test Failed heading
+;====
+.section "zest.runner._printTestFailedHeading" free
+    zest.runner._printTestFailedHeading:
+        push hl
+            ; Write test failed message
+            ld hl, zest.console.data.testFailedHeading
+            call zest.console.out
+
+            ; Separator
+            call zest.console.newline
+            call zest.console.newline
+            ld hl, zest.console.data.separatorText
+            call zest.console.out
+        pop hl
+
         jp zest.console.newline ; jp then ret
 .ends
 
 ;====
-; Prints the current test's 'describe' and 'it' text
+; (Private) Prints the current test's 'describe' and 'it' text
 ;====
-.section "zest.runner.printTestDescription" free
-    zest.runner.printTestDescription:
-        ; Write describe block description
-        call zest.console.newline
-        ld hl, (zest.runner.current_describe_message_addr)
-        call zest.console.out
+.section "zest.runner._printTestDescription" free
+    zest.runner._printTestDescription:
+        push hl
+            ; Write describe block description
+            call zest.console.newline
+            ld hl, (zest.runner.current_describe_message_addr)
+            call zest.console.out
 
-        ; Write failing test
-        call zest.console.newline
-        call zest.console.newline
-        ld hl, (zest.runner.current_test_message_addr)
-        jp zest.console.out ; jp then ret
+            ; Write failing test
+            call zest.console.newline
+            call zest.console.newline
+            ld hl, (zest.runner.current_test_message_addr)
+            call zest.console.out
+        pop hl
+
+        ret
 .ends
 
 ;====
-; Prints the message of the assertion that failed
+; (Private) Prints the message of the assertion that failed
+;
 ; @in   hl  pointer to the message
 ;====
-.section "zest.runner.printAssertionMessage" free
-    zest.runner.printAssertionMessage:
+.section "zest.runner._printAssertionMessage" free
+    zest.runner._printAssertionMessage:
         ; Write assertion message
         call zest.console.newline
         call zest.console.newline
@@ -93,75 +168,39 @@
 .ends
 
 ;====
-; Prints 'Expected:' and the hex value of the expected value
-; @in   b   the expected value
+; (Private) Prints the 'Expected:' label
 ;====
-.section "zest.runner.printExpectedValue" free
-    zest.runner.printExpectedValue:
-        ; Print 'Expected:'
+.section "zest.runner._printExpectedLabel" free
+    zest.runner._printExpectedLabel:
         call zest.console.newline
         call zest.console.newline
-        ld hl, zest.console.data.expectedValueLabel
-        call zest.console.out
 
-        ; Print the expected value
-        ld a, b ; set A to expected value
-        jp zest.console.outputHexA  ; jp then ret
+        push hl
+            ld hl, zest.console.data.expectedValueLabel
+            call zest.console.out
+        pop hl
+
+        ret
 .ends
 
 ;====
-; Prints 'Actual:' and the hex value of the actual value
-; @in   a   the expected value
+; (Private) Prints the 'Actual:' label
 ;====
-.section "zest.runner.printActualValue" free
-    zest.runner.printActualValue:
-        push af
-            call zest.console.newline
+.section "zest.runner._printActualLabel" free
+    zest.runner._printActualLabel:
+        call zest.console.newline
+
+        push hl
             ld hl, zest.console.data.actualValueLabel
             call zest.console.out
-        pop af
+        pop hl
 
-        ; Print actual value in A
-        jp zest.console.outputHexA  ; jp then ret
+        ret
 .ends
 
 ;====
-; Prints details about the failing test and stops the program
-;
-; @in   a   the actual value
-; @in   b   the expected value
-; @in   hl  pointer to the assertion message
+; (Private) Sets all the registers to zero
 ;====
-.section "zest.runner.expectationFailed" free
-    zest.runner.expectationFailed:
-        push af ; preserve actual value
-        push hl ; preserve assertion message
-
-        ; Set console text color to red
-        ld a, %00000011
-        call zest.console.setTextColor   ; set to a
-
-        call zest.console.prepWrite
-            call zest.runner.printTestFailedHeading
-            call zest.runner.printTestDescription
-
-            pop hl  ; restore assertion message
-            call zest.runner.printAssertionMessage
-
-            ; Print expected value
-            call zest.runner.printExpectedValue
-
-            ; Print actual value
-            pop af  ; restore actual value
-            call zest.runner.printActualValue
-        call zest.console.finalise
-
-        ; Stop program
-        -:
-            halt
-        jp -
-.ends
-
 .macro "zest.runner.clearMainRegisters"
     xor a       ; set A to zero
     or 1        ; clear all flags (but sets A to 1)
@@ -176,6 +215,9 @@
     ld l, a
 .endm
 
+;====
+; Sets all the current registers and shadow registers to 0
+;====
 .section "zest.runner.clearRegisters" free
     zest.runner.clearRegisters:
         ; Clear main registers

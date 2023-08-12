@@ -4,7 +4,7 @@
 
 ;====
 ; (Private) Asserts the value in register A matches the expected value,
-; otherwise jumps to zest.runner.expectationFailed
+; otherwise jumps to zest.runner.byteExpectationFailed
 ;
 ; @in   a           the actual value
 ; @in   expected    the expected value
@@ -17,7 +17,7 @@
         push hl
             ld b, expected
             ld hl, message
-            call zest.runner.expectationFailed
+            call zest.runner.byteExpectationFailed
         pop hl
         pop bc
     +:
