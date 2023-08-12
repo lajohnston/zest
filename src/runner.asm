@@ -162,10 +162,6 @@
         jp -
 .ends
 
-.macro "zest.runner.expectationFailed" args message, actual
-    jp zest.runner.expectationFailed
-.endm
-
 .macro "zest.runner.clearMainRegisters"
     xor a       ; set A to zero
     or 1        ; clear all flags (but sets A to 1)
