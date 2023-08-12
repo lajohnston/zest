@@ -111,19 +111,22 @@
 ;====
 .section "zest.vdp.enableDisplay" free
     zest.vdp.enableDisplay:
-        ; turn screen on
-        ld a, %01000000
-               ;||||||`- Zoomed sprites -> 16x16 pixels
-               ;|||||`-- Doubled sprites -> 2 tiles per sprite, 8x16
-               ;||||`--- Mega Drive mode 5 enable
-               ;|||`---- 30 row/240 line mode
-               ;||`----- 28 row/224 line mode
-               ;|`------ VBlank interrupts
-               ;`------- Enable display
+        push af
+            ; turn screen on
+            ld a, %01000000
+                ;||||||`- Zoomed sprites -> 16x16 pixels
+                ;|||||`-- Doubled sprites -> 2 tiles per sprite, 8x16
+                ;||||`--- Mega Drive mode 5 enable
+                ;|||`---- 30 row/240 line mode
+                ;||`----- 28 row/224 line mode
+                ;|`------ VBlank interrupts
+                ;`------- Enable display
 
-        out (zest.vdp.CONTROL_PORT), a
-        ld a, $81
-        out (zest.vdp.CONTROL_PORT), a
+            out (zest.vdp.CONTROL_PORT), a
+            ld a, $81
+            out (zest.vdp.CONTROL_PORT), a
+        pop af
+
         ret
 .ends
 
@@ -134,18 +137,21 @@
 ;====
 .section "zest.vdp.disableDisplay" free
     zest.vdp.disableDisplay:
-        ; turn screen off
-        ld a, %00000000
-               ;||||||`- Zoomed sprites -> 16x16 pixels
-               ;|||||`-- Doubled sprites -> 2 tiles per sprite, 8x16
-               ;||||`--- Mega Drive mode 5 enable
-               ;|||`---- 30 row/240 line mode
-               ;||`----- 28 row/224 line mode
-               ;|`------ VBlank interrupts
-               ;`------- Enable display
+        push af
+            ; turn screen off
+            ld a, %00000000
+                ;||||||`- Zoomed sprites -> 16x16 pixels
+                ;|||||`-- Doubled sprites -> 2 tiles per sprite, 8x16
+                ;||||`--- Mega Drive mode 5 enable
+                ;|||`---- 30 row/240 line mode
+                ;||`----- 28 row/224 line mode
+                ;|`------ VBlank interrupts
+                ;`------- Enable display
 
-        out (zest.vdp.CONTROL_PORT), a
-        ld a, $81
-        out (zest.vdp.CONTROL_PORT), a
+            out (zest.vdp.CONTROL_PORT), a
+            ld a, $81
+            out (zest.vdp.CONTROL_PORT), a
+        pop af
+
         ret
 .ends
