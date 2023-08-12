@@ -31,3 +31,12 @@ describe "Assertions"
         expect.iyl.toBe 11
 
         expect.i.toBe 1
+
+    test "expect.carry.toBe 0 passes when carry flag is reset"
+        scf ; set carry flag
+        ccf ; invert carry flag to off
+        expect.carry.toBe 0
+
+    test "expect.carry.toBe 1 passes when carry flag is set"
+        scf ; set carry flag
+        expect.carry.toBe 1

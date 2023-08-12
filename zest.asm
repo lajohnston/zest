@@ -18,6 +18,7 @@
 .include "./src/console/data.asm"
 
 .include "./src/utils/assert.asm"
+.include "./src/expect/flags.asm"
 .include "./src/expect/r.toBe.asm"
 
 ;====

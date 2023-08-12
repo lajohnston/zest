@@ -25,3 +25,22 @@
         zest.utils.assert.fail message
     .endif
 .endm
+
+;====
+; Asserts that the given value is a 1 or a 0
+;
+; @in   value   the value to assert
+;====
+.macro "zest.utils.assert.boolean" args value message
+    .if \?1 != ARG_NUMBER
+        zest.utils.assert.fail message
+    .endif
+
+    .if value > 1
+        zest.utils.assert.fail message
+    .endif
+
+    .if value < 0
+        zest.utils.assert.fail message
+    .endif
+.endm

@@ -66,6 +66,36 @@
 .ends
 
 ;====
+; Displays details about a boolean/flag  assertion that doesn't match
+; the expectation, then stops the program
+;
+; @in   a   the expected value (a 1 or a 0)
+; @in   hl  pointer to the assertion message
+;====
+.section "zest.runner.booleanExpectationFailed" free
+    zest.runner.booleanExpectationFailed:
+        call zest.runner._printTestFailure
+
+        ; Print 'Expected:' label
+        call zest.runner._printExpectedLabel
+
+        ; Print expected value
+        call zest.console.outputBoolean
+
+        ; Print 'Actual:' label
+        call zest.runner._printActualLabel
+
+        ; Print actual value
+        push af
+            inc a           ; invert bit 0
+            and %00000001   ; mask out other bits
+            call zest.console.outputBoolean
+        pop af
+
+        jp zest.runner._showMessage ; jp (then ret)
+.ends
+
+;====
 ; (Private) Prints the test failed heading, test description, and assertion
 ; message
 ;

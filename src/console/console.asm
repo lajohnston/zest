@@ -220,3 +220,18 @@
         zest.console.outputCharacter
         ret
 .ends
+
+;====
+; Prints the boolean value of bit 0 of a (an ascii 1 or a 0)
+;
+; @in   a   the value (bit 0)
+;====
+.section "zest.console.outputBoolean" free
+    zest.console.outputBoolean:
+        push af
+            add asc('0')
+            zest.console.outputCharacter
+        pop af
+
+        ret
+.ends
