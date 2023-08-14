@@ -70,3 +70,12 @@ describe "Assertions"
         ld a, %10000000 ; 7th bit set
         or a            ; update flags
         expect.sign.toBe 1
+
+    test "expect.zeroFlag.toBe 0 passes when the zero flag is reset"
+        ld a, 1
+        or a    ; update flags
+        expect.zeroFlag.toBe 0
+
+    test "expect.zeroFlag.toBe 1 passes when the zero flag is set"
+        xor a   ; set A to zero and update flags
+        expect.zeroFlag.toBe 1

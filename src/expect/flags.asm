@@ -79,6 +79,26 @@
 .endm
 
 ;====
+; Asserts that the zero flag matches the expected state
+;
+; @in   f               flags
+; @in   expectedValue   either a 1 or a 0
+;====
+.macro "expect.zeroFlag.toBe" args expectedValue
+    zest.utils.assert.boolean expectedValue "\. expects a boolean (0 or 1) value"
+
+    .if expectedValue == 1
+        jp z, +     ; jp/pass if zero flag is set
+            expect.flags._fail expectedValue expect.flags.defaultMessages.zeroFlag
+        +:
+    .else
+        jp nz, +     ; jp/pass if zero flag is reset
+            expect.flags._fail expectedValue expect.flags.defaultMessages.zeroFlag
+        +:
+    .endif
+.endm
+
+;====
 ; Assertion messages
 ;====
 .section "expect.flags.defaultMessages" free
@@ -92,5 +112,9 @@
 
     expect.flags.defaultMessages.sign:
         .asc "Unexpected sign flag state"
+        .db $ff
+
+    expect.flags.defaultMessages.zeroFlag:
+        .asc "Unexpected zero flag state"
         .db $ff
 .ends
