@@ -133,6 +133,9 @@ expect.i.toBe
 ```asm
 expect.carry.toBe 0
 expect.carry.toBe 1
+
+expect.parityOverflow.toBe 0
+expect.parityOverflow.toBe 1
 ```
 
 ## Status
