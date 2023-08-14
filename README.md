@@ -136,6 +136,9 @@ expect.carry.toBe 1
 
 expect.parityOverflow.toBe 0
 expect.parityOverflow.toBe 1
+
+expect.sign.toBe 0
+expect.sign.toBe 1
 ```
 
 ## Status

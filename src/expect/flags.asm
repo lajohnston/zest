@@ -59,6 +59,26 @@
 .endm
 
 ;====
+; Asserts that the sign flag matches the expected state
+;
+; @in   f               flags
+; @in   expectedValue   either a 1 or a 0
+;====
+.macro "expect.sign.toBe" args expectedValue
+    zest.utils.assert.boolean expectedValue "\. expects a boolean (0 or 1) value"
+
+    .if expectedValue == 1
+        jp m, +     ; jp/pass if sign flag is set
+            expect.flags._fail expectedValue expect.flags.defaultMessages.sign
+        +:
+    .else
+        jp p, +     ; jp/pass if sign flag is reset
+            expect.flags._fail expectedValue expect.flags.defaultMessages.sign
+        +:
+    .endif
+.endm
+
+;====
 ; Assertion messages
 ;====
 .section "expect.flags.defaultMessages" free
@@ -68,5 +88,9 @@
 
     expect.flags.defaultMessages.parityOverflow:
         .asc "Unexpected parity/overflow"
+        .db $ff
+
+    expect.flags.defaultMessages.sign:
+        .asc "Unexpected sign flag state"
         .db $ff
 .ends

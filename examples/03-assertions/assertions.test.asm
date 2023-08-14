@@ -60,3 +60,13 @@ describe "Assertions"
         ld a, 128
         add 128     ; 256 - overflow
         expect.parityOverflow.toBe 1
+
+    test "expect.sign.toBe 0 passes when the sign flag is reset"
+        ld a, %01111111 ; 7th bit reset
+        or a            ; update flags
+        expect.sign.toBe 0
+
+    test "expect.sign.toBe 1 passes when the sign flag is reset"
+        ld a, %10000000 ; 7th bit set
+        or a            ; update flags
+        expect.sign.toBe 1
