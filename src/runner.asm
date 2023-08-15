@@ -21,14 +21,15 @@
 
         ; All tests passed. Display message
         call zest.console.prepWrite
-            ld hl, zest.console.data.heading
-            call zest.console.out
-            call zest.console.newline
-            call zest.console.newline
+        ld hl, zest.console.data.heading
+        call zest.console.out
+        call zest.console.newline
+        call zest.console.newline
 
-            ld hl, zest.console.data.allTestsPassed
-            call zest.console.out
-        call zest.console.finalise
+        ld hl, zest.console.data.allTestsPassed
+        call zest.console.out
+
+        call zest.vdp.enableDisplay
 
         ; End
         -:
@@ -125,7 +126,7 @@
 ;====
 .section "zest.runner._showMessage" free
     zest.runner._showMessage:
-        call zest.console.finalise
+        call zest.vdp.enableDisplay
 
         ; Stop program
         -:

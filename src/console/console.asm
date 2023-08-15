@@ -52,7 +52,7 @@
 .ends
 
 ;====
-; Outputs a character to the console
+; (Private) Outputs a character to the console
 ;
 ; @in   a       the character to output
 ; @in   de      VRAM address
@@ -63,7 +63,7 @@
 ;
 ; @clobs a
 ;====
-.macro "zest.console.outputCharacter"
+.macro "zest.console._outputCharacter"
     out (zest.vdp.DATA_PORT), a         ; output character
     xor a                               ; set attributes to none
     out (zest.vdp.DATA_PORT), a         ; output attributes
@@ -76,25 +76,18 @@
 ;====
 ; Prepares the console for writing text to
 ;
-; @out  de      current cursor vram position (with write command)
 ; @out  vram    current cursor vram position (with write command)
 ;====
 .section "zest.console.prepWrite" free
     zest.console.prepWrite:
         call zest.vdp.disableDisplay
-        ld de, (zest.console.cursor_vram_address)
-        jp zest.vdp.setAddressDE
-.ends
 
-;====
-; Finalises the console and enables the display
-;
-; @in   de      current cursor vram position
-;====
-.section "zest.console.finalise" free
-    zest.console.finalise:
-        ld (zest.console.cursor_vram_address), de
-        jp zest.vdp.enableDisplay
+        push de
+            ld de, (zest.console.cursor_vram_address)
+            call zest.vdp.setAddressDE
+        pop de
+
+        ret
 .ends
 
 ;====
@@ -102,13 +95,16 @@
 ;
 ; @in   hl      the address of the text to write. The text should be
 ;               terminated by an $FF byte
-; @in   de      the vram address + write command
 ; @in   vram    the vram address + write command
 ;====
 .section "zest.console.out" free
     zest.console.out:
         ; Preserve registers
         push af
+        push de
+
+        ; Load VRAM address + write command into DE
+        ld de, (zest.console.cursor_vram_address)
 
         _outputNextCharacter:
             ld a, (hl)
@@ -123,13 +119,13 @@
                 ; We're on the last column
                 ; Output dash character. VRAM auto-increments to next line
                 ld a, 13                        ; dash pattern
-                zest.console.outputCharacter
+                zest.console._outputCharacter
                 jp _outputNextCharacter
             +:
 
             ; Output character to VRAM (auto-increments VRAM position)
             ld a, (hl)  ; re-load character
-            zest.console.outputCharacter
+            zest.console._outputCharacter
 
             ; Point to next character
             inc hl
@@ -137,44 +133,52 @@
             jp _outputNextCharacter
 
         _finish:
+            ; Store position
+            ld (zest.console.cursor_vram_address), de
+
             ; Restore registers
+            pop de
             pop af
             ret
 .ends
 
 ;====
 ; Move the console cursor onto the next line
-;
-; @in   de  VRAM address
 ;====
 .section "zest.console.newline" free
     zest.console.newline:
-        push af
-            ;===
-            ; VRAM address format
-            ; ccbbbyyy yyxxxxx-
-            ;
-            ; c = command
-            ; b = base address
-            ; y = row
-            ; x = col
-            ;===
+        push de
+            ld de, (zest.console.cursor_vram_address)
+            push af
+                ;===
+                ; VRAM address format
+                ; ccbbbyyy yyxxxxx-
+                ;
+                ; c = command
+                ; b = base address
+                ; y = row
+                ; x = col
+                ;===
 
-            ; Set column to zero
-            ld a, e         ; set A to low byte of address
-            and %11000000   ; mask out x bits
-            ld e, a         ; set low byte of address
+                ; Set column to zero
+                ld a, e         ; set A to low byte of address
+                and %11000000   ; mask out x bits
+                ld e, a         ; set low byte of address
 
-            ; Add 1 row
-            ld a, 32 * 2
-            add a, e  ; A = A+E
-            ld e, a   ; E = A+E
-            adc a, d  ; A = A+E+D+carry
-            sub e     ; A = D+carry
-            ld d, a   ; D = D+carry
-        pop af
+                ; Add 1 row
+                ld a, 32 * 2
+                add a, e  ; A = A+E
+                ld e, a   ; E = A+E
+                adc a, d  ; A = A+E+D+carry
+                sub e     ; A = D+carry
+                ld d, a   ; D = D+carry
+            pop af
 
-        jp zest.vdp.setAddressDE
+            ; Set and store cursor VRAM position
+            ld (zest.console.cursor_vram_address), de
+            call zest.vdp.setAddressDE
+        pop de
+        ret
 .ends
 
 ;====
@@ -184,11 +188,25 @@
 ;====
 .section "zest.console.outputHexA" free
     zest.console.outputHexA:
+        push de ; preserve DE
+        ld de, (zest.console.cursor_vram_address)
+
         push af ; preserve value
             ld a, asc('$')
-            zest.console.outputCharacter
+            zest.console._outputCharacter
         pop af
 
+        call _outputAHex
+        pop de  ; restore de
+        ret
+
+    ;===
+    ; Output the value in A as 2 hex characters
+    ;
+    ; @in   a   the value to output
+    ; @in   de  the cursor VRAM address
+    ;===
+    _outputAHex:
         push af
             rra
             rra
@@ -203,21 +221,27 @@
 
         ret
 
+
+    ;===
     ; Prints the lowest nibble of A as a hex character (0-F)
+    ;
+    ; @in   a   the value to output (----xxxx)
+    ; @in   de  the cursor VRAM address
+    ;===
     _printNibble:
         and %00001111
         cp 10       ; set C if value is less than 10 (0-9)
         jp nc, +
             ; Digit is below 10
             add asc('0')  ; point to ASCII characters 0-9
-            zest.console.outputCharacter
+            zest.console._outputCharacter
             ret
         +:
 
         ; Value is above 10 (A-F)
         sub 10          ; A = 0; B = 1; 15 = F
         add asc('A')    ; point to ASCII characters A-F
-        zest.console.outputCharacter
+        zest.console._outputCharacter
         ret
 .ends
 
@@ -230,7 +254,7 @@
     zest.console.outputBoolean:
         push af
             add asc('0')
-            zest.console.outputCharacter
+            zest.console._outputCharacter
         pop af
 
         ret
