@@ -127,6 +127,7 @@ expect.iyh.toBe
 expect.iyl.toBe
 expect.i.toBe
 
+expect.bc.toBe
 expect.hl.toBe
 ```
 
