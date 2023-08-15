@@ -36,6 +36,10 @@ describe "Assertions"
         ld bc, $1234
         expect.bc.toBe $1234
 
+    test "expect.de.toBe passes when DE matches the expected value"
+        ld de, $1234
+        expect.de.toBe $1234
+
     test "expect.hl.toBe passes when HL matches the expected value"
         ld hl, $1234
         expect.hl.toBe $1234

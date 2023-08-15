@@ -128,6 +128,7 @@ expect.iyl.toBe
 expect.i.toBe
 
 expect.bc.toBe
+expect.de.toBe
 expect.hl.toBe
 ```
 

@@ -40,6 +40,37 @@
 .endm
 
 ;====
+; Asserts the value in DE matches the expected value
+;
+; @in   de              value
+; @in   expectedValue   the expected value
+;====
+.macro "expect.de.toBe" isolated args expectedValue
+    zest.utils.assert.word expectedValue "\. expects a 16-bit value"
+
+    push af
+    push hl
+        ld hl, expectedValue    ; set HL to expected value
+        or a                    ; clear carry flag
+        sbc hl, de              ; set z flag if DE equals expected value
+
+        jp z, +                 ; jp if zero/pass
+            push bc
+                ; Load BC with expected value
+                ld bc, expectedValue
+
+                ; Load HL with assertion message
+                ld hl, expect.rr.toBe.defaultMessages.de
+
+                ; Print test failure
+                call zest.runner.wordExpectationFailed
+            pop bc
+        +:
+    pop hl
+    pop af
+.endm
+
+;====
 ; Asserts the value in HL matches the expected value
 ;
 ; @in   hl              value
@@ -74,6 +105,10 @@
 .section "expect.rr.toBe.defaultMessages" free
     expect.rr.toBe.defaultMessages.bc:
         .asc "Unexpected value in BC"
+        .db $ff ; terminator byte
+
+    expect.rr.toBe.defaultMessages.de:
+        .asc "Unexpected value in DE"
         .db $ff ; terminator byte
 
     expect.rr.toBe.defaultMessages.hl:
