@@ -126,6 +126,8 @@ expect.ixl.toBe
 expect.iyh.toBe
 expect.iyl.toBe
 expect.i.toBe
+
+expect.hl.toBe
 ```
 
 ### Flags
