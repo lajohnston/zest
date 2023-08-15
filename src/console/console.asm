@@ -182,11 +182,13 @@
 .ends
 
 ;====
-; Prints the value of register A as a hex value onto the screen, e.g $F2
-;
-; @in   af
+; Outputs the value of register sas a hex value onto the screen, e.g $F2 of $F12A
 ;====
 .section "zest.console.outputHexA" free
+    ;====
+    ; Outputs the value of register A as a hex value onto the screen, e.g $F2
+    ; @in   af
+    ;====
     zest.console.outputHexA:
         push de ; preserve DE
         ld de, (zest.console.cursor_vram_address)
@@ -197,7 +199,65 @@
         pop af
 
         call _outputAHex
+
+        ; Store cursor position
+        ld (zest.console.cursor_vram_address), de
         pop de  ; restore de
+        ret
+
+    ;===
+    ; Outputs the value in BC as a hex number ($ followed by 4 hex digits)
+    ; @in   bc  the value to output
+    ;===
+    zest.console.outputHexBC:
+        push de
+            ld de, (zest.console.cursor_vram_address)
+
+            push af
+                ld a, asc('$')
+                zest.console._outputCharacter
+
+                ld a, b
+                call _outputAHex
+                ld a, c
+                call _outputAHex
+            pop af
+
+            ; Store cursor position
+            ld (zest.console.cursor_vram_address), de
+        pop de
+        ret
+
+    ;===
+    ; Outputs the value in DE as a hex number ($ followed by 4 hex digits)
+    ; @in   de  the value to output
+    ;===
+    zest.console.outputHexDE:
+        ex de, hl   ; swap HL and DE
+            call zest.console.outputHexHL
+        ex de, hl   ; swap HL and DE back
+
+        ret
+
+    ;===
+    ; Outputs the value in HL as a hex number ($ followed by 4 hex digits)
+    ; @in   hl  the value to output
+    ;===
+    zest.console.outputHexHL:
+        push de
+            ld de, (zest.console.cursor_vram_address)
+
+            push af
+                ld a, asc('$')
+                zest.console._outputCharacter
+
+                ld a, h
+                call _outputAHex
+                ld a, l
+                call _outputAHex
+            pop af
+        pop de
+
         ret
 
     ;===
