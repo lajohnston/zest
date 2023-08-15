@@ -44,6 +44,10 @@ describe "Assertions"
         ld hl, $1234
         expect.hl.toBe $1234
 
+    test "expect.ix.toBe passes when IX matches the expected value"
+        ld ix, $1234
+        expect.ix.toBe $1234
+
     test "expect.carry.toBe 0 passes when carry flag is reset"
         scf ; set carry flag
         ccf ; invert carry flag to off

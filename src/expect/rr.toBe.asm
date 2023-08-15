@@ -101,6 +101,45 @@
     pop af
 .endm
 
+;====
+; Asserts the value in IX matches the expected value
+;
+; @in   ix              value
+; @in   expectedValue   the expected value
+;====
+.macro "expect.ix.toBe" isolated args expectedValue
+    zest.utils.assert.word expectedValue "\. expects a 16-bit value"
+
+    push af
+    push hl
+    push de
+        ; Set HL to expected value
+        ld hl, expectedValue
+
+        ; Set DE to actual value
+        ld d, ixh
+        ld e, ixl
+
+        or a                    ; clear carry flag
+        sbc hl, de              ; set z flag if DE equals expected value
+
+        jp z, +                 ; jp if zero/pass
+            push bc
+                ; Load BC with expected value
+                ld bc, expectedValue
+
+                ; Load HL with assertion message
+                ld hl, expect.rr.toBe.defaultMessages.ix
+
+                ; Print test failure
+                call zest.runner.wordExpectationFailed
+            pop bc
+        +:
+    pop de
+    pop hl
+    pop af
+.endm
+
 ; Default error messages for expectations
 .section "expect.rr.toBe.defaultMessages" free
     expect.rr.toBe.defaultMessages.bc:
@@ -113,5 +152,9 @@
 
     expect.rr.toBe.defaultMessages.hl:
         .asc "Unexpected value in HL"
+        .db $ff ; terminator byte
+
+    expect.rr.toBe.defaultMessages.ix:
+        .asc "Unexpected value in IX"
         .db $ff ; terminator byte
 .ends
