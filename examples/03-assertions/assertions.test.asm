@@ -1,3 +1,8 @@
+;====
+; This demonstrates Zest's various assertions, but also acts as a test for the
+; library itself :)
+;====
+
 describe "Assertions"
     test "expect.r.toBe"
         ld a, 1
@@ -47,6 +52,10 @@ describe "Assertions"
     test "expect.ix.toBe passes when IX matches the expected value"
         ld ix, $1234
         expect.ix.toBe $1234
+
+    test "expect.iy.toBe passes when IY matches the expected value"
+        ld iy, $1234
+        expect.iy.toBe $1234
 
     test "expect.carry.toBe 0 passes when carry flag is reset"
         scf ; set carry flag

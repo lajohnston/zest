@@ -111,7 +111,9 @@ With the above, when the code you're testing calls `readPortA`, it will actually
 
 Zest comes with the following expectations out of the box:
 
-### Single registers
+### Registers
+
+Example usage: `expect.a.toBe 123`
 
 ```asm
 expect.a.toBe
@@ -131,6 +133,7 @@ expect.bc.toBe
 expect.de.toBe
 expect.hl.toBe
 expect.ix.toBe
+expect.iy.toBe
 ```
 
 ### Flags
