@@ -14,7 +14,6 @@
 
         ; Initialise console
         call zest.console.init
-        call zest.vdp.enableDisplay
 
         ; Run the test suite (label defined by user)
         call zest.suite

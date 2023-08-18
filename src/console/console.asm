@@ -80,8 +80,6 @@
 ;====
 .section "zest.console.prepWrite" free
     zest.console.prepWrite:
-        call zest.vdp.disableDisplay
-
         push de
             ld de, (zest.console.cursor_vram_address)
             call zest.vdp.setAddressDE
