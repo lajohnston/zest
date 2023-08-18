@@ -320,16 +320,17 @@
 ;====
 ; Stores text in the ROM and adds a pointer to it at the given
 ; RAM location
+;
+; @in   text        the string to store
+; @in   ramPointer  the pointer in RAM to store the text in
 ;====
-.macro "zest.runner.storeText" args text, ram_pointer
+.macro "zest.runner.storeText" args text, ramPointer
     jr +
     _text\@:
         .asc text
         .db $ff    ; terminator byte
     +:
 
-    ld hl, ram_pointer
-    ld (hl), <_text\@
-    inc hl
-    ld (hl), >_text\@
+    ld hl, _text\@
+    ld (ramPointer), hl
 .endm
