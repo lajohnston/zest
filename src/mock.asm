@@ -15,14 +15,14 @@
 ; Start of mocks list. Mocks can be added by creating ramsections with
 ; "appendto zest.mocks", and populating them with zest.mock instances
 ;====
-.ramsection "zest.mocks" slot 2
+.ramsection "zest.mocks" slot zest.mapper.RAM_SLOT
     zest.mocks.start:    db
 .ends
 
 ;====
 ; Marks the end of the mocks list
 ;====
-.ramsection "zest.mocks.end" slot 2 after zest.mocks
+.ramsection "zest.mocks.end" after zest.mocks
     zest.mocks.end:      db
 .ends
 
@@ -93,7 +93,7 @@
 ; Reserves space in RAM to store temporary opcodes for use when jumping to a
 ; mock handler without clobbing hl
 ;====
-.ramsection "zest.mock.jump" slot 2
+.ramsection "zest.mock.jump" slot zest.mapper.RAM_SLOT
     zest.mock.jump.pop:  db
     zest.mock.jump.jp:   db
     zest.mock.jump.jp_address:   dw

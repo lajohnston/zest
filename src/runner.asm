@@ -1,4 +1,4 @@
-.ramsection "zest.runner.current_test_info" slot 2
+.ramsection "zest.runner.current_test_info" slot zest.mapper.RAM_SLOT
     zest.runner.current_describe_message_addr: dw
     zest.runner.current_test_message_addr: dw
 .ends

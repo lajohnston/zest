@@ -1,23 +1,3 @@
-;====
-; WLA-DX banking setup
-;====
-.memorymap
-    defaultslot 0
-    slotsize $4000
-    slot 0 $0000
-    slot 1 $4000
-
-    slotsize $2000      ; 8KB RAM
-    slot 2 $C000
-.endme
-
-; ROM - 2 x 16KB ROM Slots
-.rombankmap
-    bankstotal 2
-    banksize $4000
-    banks 2
-.endro
-
 ; SDSC tag and SMS rom header
 .sdsctag 1.2, "Zest", "Sega Master System Unit Test Runner", "lajohnston"
 
@@ -53,7 +33,6 @@
 ;====
 ; Pause handler
 ;====
-.bank 0 slot 0
 .orga $0066
 .section "Pause handler" force
     retn

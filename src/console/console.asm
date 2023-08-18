@@ -2,7 +2,7 @@
 ; Writes text to the screen
 ;====
 
-.ramsection "zest.console.variables" slot 2
+.ramsection "zest.console.variables" slot zest.mapper.RAM_SLOT
     zest.console.cursor_vram_address:    dw
 .ends
 

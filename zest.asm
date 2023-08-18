@@ -8,6 +8,10 @@
 ; .incdir "."                   ; return to current directory
 ;====
 
+.include "./src/mapper.asm"
+
+.bank zest.mapper.ZEST_BANK slot zest.mapper.ZEST_SLOT
+
 .include "./src/main.asm"
 
 .include "./src/mock.asm"
@@ -21,6 +25,8 @@
 .include "./src/expect/flags.asm"
 .include "./src/expect/r.toBe.asm"
 .include "./src/expect/rr.toBe.asm"
+
+.bank zest.mapper.SUITE_BANK_1 slot zest.mapper.SUITE_SLOT
 
 ;====
 ; Global aliases
