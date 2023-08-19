@@ -13,10 +13,10 @@
 .bank zest.mapper.ZEST_BANK slot zest.mapper.ZEST_SLOT
 
 .include "./src/main.asm"
+.include "./src/vdp.asm"
 
 .include "./src/mock.asm"
 .include "./src/runner.asm"
-.include "./src/vdp.asm"
 
 .include "./src/console/console.asm"
 .include "./src/console/data.asm"

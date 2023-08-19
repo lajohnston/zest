@@ -27,8 +27,7 @@
 
         ld hl, zest.console.data.allTestsPassed
         call zest.console.out
-
-        call zest.vdp.enableDisplay
+        call zest.console.displayMessage
 
         ; End
         -:
@@ -62,7 +61,7 @@
 
         ; Print actual value
         call zest.console.outputHexA
-        jp zest.runner._showMessage ; jp (then ret)
+        jp zest.console.displayMessage  ; jp (then ret)
 .ends
 
 ;====
@@ -89,7 +88,7 @@
 
         ; Print actual value
         call zest.console.outputHexDE
-        jp zest.runner._showMessage ; jp (then ret)
+        jp zest.console.displayMessage  ; jp (then ret)
 .ends
 
 ;====
@@ -119,7 +118,7 @@
             call zest.console.outputBoolean
         pop af
 
-        jp zest.runner._showMessage ; jp (then ret)
+        jp zest.console.displayMessage  ; jp (then ret)
 .ends
 
 ;====
@@ -145,19 +144,6 @@
 
         ; Print the failed assertion message
         jp zest.runner._printAssertionMessage   ; jp (then ret)
-.ends
-
-;====
-; (Private) Enables the display to show the message and stops the runner
-;====
-.section "zest.runner._showMessage" free
-    zest.runner._showMessage:
-        call zest.vdp.enableDisplay
-
-        ; Stop program
-        -:
-            halt
-        jp -
 .ends
 
 ;====

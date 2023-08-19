@@ -141,6 +141,19 @@
 .ends
 
 ;====
+; Enables the display to show the message and stops the runner
+;====
+.section "zest.console.displayMessage" free
+    zest.console.displayMessage:
+        zest.vdp.setRegister1 %11000000
+
+        ; Stop program
+        -:
+            halt
+        jp -
+.ends
+
+;====
 ; Move the console cursor onto the next line
 ;====
 .section "zest.console.newline" free
