@@ -152,6 +152,32 @@ expect.zeroFlag.toBe 0
 expect.zeroFlag.toBe 1
 ```
 
+## Timeout detection
+
+By default, Zest will timeout and fail a test if it takes more than 10 full frames/VBlanks to complete, in case the code has got itself into an infinite loop, forgotten to return, or jumped to an invalid location. It does this by decrementing a counter at each VBlank and timing out when it reaches zero. Note: this timeout detection relies on the code not disabling interrupts.
+
+As the test won't necessarily begin at the start of a full frame, an additional frame is added to this number to represent the current partial frame.
+
+The default timeout can be overridden for all tests by defining the `zest.defaultTimeout` value before importing Zest.
+
+```
+; Timeout tests if they take more than 1 full frame
+.define zest.defaultTimeout 1
+
+.incdir "../zest"
+    .include "zest.asm"
+.incdir "."
+```
+
+To override this default timeout for individual tests, use `zest.setTimeout` within the test. You could use this to increase the timeout for tests you expect to take a longer amount of time:
+
+```
+it "should not timeout"
+    ; Only timeout this test if it takes more than 20 full frames
+    zest.setTimeout 20
+    call mySlowRoutine
+```
+
 ## Status
 
 The project is a fully functioning proof-of-concept that I work on as a hobby. Next steps will include adding more assertions and examples so it will be ready for real projects.

@@ -24,6 +24,7 @@
 .section "Interrupt handler" force
     push af
         in a, (zest.vdp.STATUS_PORT)    ; satisfy interrupt
+        call zest.runner.updateTimeoutCounter
     pop af
 
     ei      ; re-enable interrupts

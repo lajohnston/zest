@@ -1,6 +1,7 @@
 .ramsection "zest.runner.current_test_info" slot zest.mapper.RAM_SLOT
     zest.runner.current_describe_message_addr: dw
     zest.runner.current_test_message_addr: dw
+    zest.runner.timeout_frames: db
 .ends
 
 ;====
@@ -296,14 +297,17 @@
         ; Reset mocks
         call zest.mock.initAll
 
+        ; Set timeout (default + 1 frame for the frame we're on)
+        ld a, <(zest.defaultTimeout + 1)    ; wrap to 0 for 256 frames
+        ld (zest.runner.timeout_frames), a
+
         ; Disable display and enable VBlank interrupts
         in a, (zest.vdp.STATUS_PORT)    ; clear pending interrupts
         zest.vdp.setRegister1 %10100000 ; enable VBlank interrupts
         ei                              ; enable CPU interrupts
 
         ; Clear registers
-        call zest.runner.clearRegisters
-        ret
+        jp zest.runner.clearRegisters   ; jp/ret
 .ends
 
 ;====
@@ -335,3 +339,42 @@
     ld hl, _text\@
     ld (ramPointer), hl
 .endm
+
+;====
+; Set the timeout for the current test
+;
+; @in frames    the number of full frames to time out after
+;====
+.macro "zest.runner.setTestTimeout" args frames
+    push af
+        ld a, <(frames + 1) ; frames + current frame (wrap to 0 for 256)
+        ld (zest.runner.timeout_frames), a
+    pop af
+.endm
+
+;====
+; Decrement the frame counter for the current test and timeout the test with a
+; message if the counter reaches zero
+;
+; @clobs a
+;====
+.section "zest.runner.updateTimeoutCounter" free
+    zest.runner.updateTimeoutCounter:
+        ld a, (zest.runner.timeout_frames)
+        dec a
+        ld (zest.runner.timeout_frames), a
+        ret nz  ; return if test hasn't timed out yet
+
+        ; Timeout
+        push hl
+            ld hl, _timeoutMessage
+            call zest.runner._printTestFailure
+            call zest.console.displayMessage
+        pop hl
+
+        ret
+
+    _timeoutMessage:
+        .asc "Test timed out"
+        .db $ff
+.ends

@@ -8,6 +8,23 @@
 ; .incdir "."                   ; return to current directory
 ;====
 
+;====
+; Process options
+;====
+.include "./src/utils/assert.asm"
+
+; Default timeout (in full frames) for tests. Should be between 1 and 255
+.ifndef zest.defaultTimeout
+    ; Timeout tests if they take more than 10 full frames to complete
+    .define zest.defaultTimeout 10
+.else
+    zest.utils.assert.range zest.defaultTimeout, 1, 255, "zest.defaultTimeout should be between 1 and 255"
+.endif
+
+;====
+; Include library
+;====
+
 .include "./src/mapper.asm"
 
 .bank zest.mapper.ZEST_BANK slot zest.mapper.ZEST_SLOT
@@ -21,7 +38,6 @@
 .include "./src/console/console.asm"
 .include "./src/console/data.asm"
 
-.include "./src/utils/assert.asm"
 .include "./src/expect/flags.asm"
 .include "./src/expect/r.toBe.asm"
 .include "./src/expect/rr.toBe.asm"
@@ -58,4 +74,14 @@
 ;====
 .macro "test" args message
     it message
+.endm
+
+;====
+; Sets the expected number of full frames a test should pass within, otherwise
+; timeout and fail the test.
+;
+; @in   frames  the number of full frames (1-255)
+;====
+.macro "zest.setTimeout" args frames
+    zest.runner.setTestTimeout frames
 .endm
