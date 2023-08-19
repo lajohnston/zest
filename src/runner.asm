@@ -293,8 +293,15 @@
 ;====
 .section "zest.runner.preTest" free
     zest.runner.preTest:
-        ; Clear system state
+        ; Reset mocks
         call zest.mock.initAll
+
+        ; Disable display and enable VBlank interrupts
+        in a, (zest.vdp.STATUS_PORT)    ; clear pending interrupts
+        zest.vdp.setRegister1 %10100000 ; enable VBlank interrupts
+        ei                              ; enable CPU interrupts
+
+        ; Clear registers
         call zest.runner.clearRegisters
         ret
 .ends

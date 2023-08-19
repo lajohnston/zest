@@ -24,10 +24,10 @@
 .section "Interrupt handler" force
     push af
         in a, (zest.vdp.STATUS_PORT)    ; satisfy interrupt
-        ret
     pop af
-    ei
-    reti
+
+    ei      ; re-enable interrupts
+    reti    ; return
 .ends
 
 ;====

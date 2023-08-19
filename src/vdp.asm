@@ -7,8 +7,8 @@
 .define zest.vdp.TILEMAP_BASE    $3800
 
 .define zest.vdp.CONTROL_PORT    $bf
-.define zest.vdp.DATA_PORT       $be    ; same as status port (write-only)
-.define zest.vdp.STATUS_PORT     $be    ; same as data port (read-only)
+.define zest.vdp.STATUS_PORT     $bf    ; same as control port (read-only)
+.define zest.vdp.DATA_PORT       $be
 
 ;====
 ; Initialises the VDP's registers to sensible defaults
