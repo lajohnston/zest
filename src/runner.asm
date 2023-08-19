@@ -303,15 +303,23 @@
 .endm
 
 ;====
+; Prepares the start of a new test
+;====
+.section "zest.runner.preTest" free
+    zest.runner.preTest:
+        ; Clear system state
+        call zest.mock.initAll
+        call zest.runner.clearRegisters
+        ret
+.ends
+
+;====
 ; Initialises a new test.
 ; Resets the Z80 registers and stores the test description in case the test fails
 ;====
 .macro "zest.runner.startTest" args message
     zest.runner.storeText message, zest.runner.current_test_message_addr
-
-    ; Clear system state
-    call zest.mock.initAll
-    call zest.runner.clearRegisters
+    call zest.runner.preTest
 
     ; Reset stack (base address minus return address from zest.suite)
     ld sp, $dfee
