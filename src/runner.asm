@@ -13,14 +13,11 @@
         call zest.vdp.init
         call zest.vdp.clearVram
 
-        ; Initialise console
-        call zest.console.init
-
         ; Run the test suite (label defined by user)
         call zest.suite
 
         ; All tests passed. Display message
-        call zest.console.prepWrite
+        zest.console.initSuccess
         ld hl, zest.console.data.heading
         call zest.console.out
         call zest.console.newline
@@ -130,14 +127,8 @@
 ;====
 .section "zest.runner._printTestFailure" free
     zest.runner._printTestFailure:
-        ; Set console text color to red
-        push af
-            ld a, %00000011 ; red
-            call zest.console.setTextColor
-        pop af
-
-        ; Prep write to console
-        call zest.console.prepWrite
+        ; Initialise the console
+        zest.console.initFailure
 
         ; Print test details
         call zest.runner._printTestFailedHeading

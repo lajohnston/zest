@@ -8,48 +8,69 @@
 
 ;====
 ; Initialises the console ready for use
+;
+; @in   a   the text color (--bbggrr)
 ;====
 .section "zest.console.init" free
     zest.console.init:
-      ; Load palette
-      ld hl, $0000 | zest.vdp.CRAMWrite
-      call zest.vdp.setAddress
-      ld hl, zest.console.data.palette
-      ld bc, zest.console.data.paletteEnd - zest.console.data.palette
-      call zest.vdp.copyToVram
-
-      ; Load tiles
-      ld hl, $0000 | zest.vdp.VRAMWrite
-      call zest.vdp.setAddress          ; set VRAM write address to tile index 0
-
-      ; Output tile data
-      ld hl, zest.console.data.font     ; location of tile data
-
-      ; Counter for number of bytes to write
-      ld bc, zest.console.data.font_end - zest.console.data.font
-      call zest.vdp.copyToVram
-
-      ; Initial cursor position
-      ld hl, zest.vdp.TILEMAP_BASE | zest.vdp.VRAMWrite
-      ld (zest.console.cursor_vram_address), hl
-      ret
-.ends
-
-;====
-; Set the console text color
-;
-; @in   a   the color to set (%xxBBGGRR)
-;====
-.section "zest.console.setTextColor" free
-    zest.console.setTextColor:
         push hl
-            ld hl, (zest.vdp.CRAMWrite + 1) | zest.vdp.VRAMWrite
+        push bc
+            ; Ensure the display is off
+            push af
+                zest.vdp.setRegister1 %10000000
+            pop af
+
+            ; Set palette index 0 write address
+            ld hl, zest.vdp.CRAMWrite   ; palette index 0
             call zest.vdp.setAddress
+
+            ; Set background color
+            ld b, a                     ; preserve font color in B
+            xor a   ; 0 = black
+            out (zest.vdp.DATA_PORT), a
+
+            ; Set font color
+            ld a, b                     ; restore font color
+            out (zest.vdp.DATA_PORT), a
+
+            ; Set pattern address in VRAM
+            ld hl, $0000 | zest.vdp.VRAMWrite
+            call zest.vdp.setAddress          ; set VRAM write address to tile index 0
+
+            ; Load pattern data (font) into VRAM
+            ld hl, zest.console.data.font
+            ld bc, zest.console.data.font_end - zest.console.data.font
+            call zest.vdp.copyToVram
+
+            ; Initial cursor position in tilemap
+            ld hl, zest.vdp.TILEMAP_BASE | zest.vdp.VRAMWrite
+            ld (zest.console.cursor_vram_address), hl
+            call zest.vdp.setAddress
+        pop bc
         pop hl
 
-        out (zest.vdp.DATA_PORT), a
         ret
 .ends
+
+;====
+; Initialises the console with green/success font color
+;====
+.macro "zest.console.initSuccess"
+    push af
+        ld a, %00001100 ; green
+        call zest.console.init
+    pop af
+.endm
+
+;====
+; Initialises the console with a red/failure font color
+;====
+.macro "zest.console.initFailure"
+    push af
+        ld a, %00000011 ; red
+        call zest.console.init
+    pop af
+.endm
 
 ;====
 ; (Private) Outputs a character to the console
@@ -72,21 +93,6 @@
     inc de  ; pattern ref
     inc de  ; attributes
 .endm
-
-;====
-; Prepares the console for writing text to
-;
-; @out  vram    current cursor vram position (with write command)
-;====
-.section "zest.console.prepWrite" free
-    zest.console.prepWrite:
-        push de
-            ld de, (zest.console.cursor_vram_address)
-            call zest.vdp.setAddressDE
-        pop de
-
-        ret
-.ends
 
 ;====
 ; Write text to the screen

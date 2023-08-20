@@ -23,10 +23,6 @@
         .asc "            ~~~~~~~~"
         .db $ff ; terminator byte
 
-    zest.console.data.palette:
-        .db $00,$0C,$03 ; Black, green, red
-    zest.console.data.paletteEnd:
-
     ; Console font
     zest.console.data.font:
     .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00

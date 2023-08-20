@@ -32,11 +32,12 @@
 .include "./src/main.asm"
 .include "./src/vdp.asm"
 
-.include "./src/mock.asm"
-.include "./src/runner.asm"
 
 .include "./src/console/console.asm"
 .include "./src/console/data.asm"
+
+.include "./src/mock.asm"
+.include "./src/runner.asm"
 
 .include "./src/expect/flags.asm"
 .include "./src/expect/r.toBe.asm"
