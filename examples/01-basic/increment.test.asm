@@ -1,5 +1,5 @@
 describe "increment.asm increment"
-    it "should increment that value in register A"
+    it "should increment the value in register A"
         ; Set A to 1
         ld a, 1
 
