@@ -43,7 +43,7 @@
 .include "./src/expect/r.toBe.asm"
 .include "./src/expect/rr.toBe.asm"
 
-.bank zest.mapper.SUITE_BANK_1 slot zest.mapper.SUITE_SLOT
+.include "./src/suites.asm"
 
 ;====
 ; Global aliases

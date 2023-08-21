@@ -10,12 +10,7 @@
     .include "zest.asm"
 .incdir "."
 
-; Define a zest.suite label
-.section "suite" free
-    zest.suite:
-        ; Include the test files
-        .include "assertions.test.asm"
-
-        ; Remember to return afterwards
-        ret
+; Append your test files to zest.suite
+.section "suite" appendto zest.suite
+    .include "assertions.test.asm"
 .ends

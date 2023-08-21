@@ -10,12 +10,7 @@
 ; Include any code you want to test
 .include "slowRoutine.asm"
 
-; Define a zest.suite label
-.section "suite" free
-    zest.suite:
-        ; Include the test files
-        .include "slowRoutine.test.asm"
-
-        ; Remember to return afterwards
-        ret
+; Append your test files to zest.suite
+.section "suite" appendto zest.suite
+    .include "slowRoutine.test.asm"
 .ends

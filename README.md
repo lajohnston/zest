@@ -36,14 +36,9 @@ Create a blank test suite asm file that will serve as the entry point. In this f
 ; Include the code you want to test
 .include "increment.asm"
 
-; Define a zest.suite label, which zest will call once it's initialised
-.section "myTestSuite" free
-    zest.suite:
-        ; Include each test file you want to run as part of the suite
-        .include "increment.test.asm"
-
-        ; End of test suite
-        ret
+; Append your test files to zest.suite
+.section "suite" appendto zest.suite
+    .include "increment.test.asm"
 .ends
 ```
 

@@ -36,12 +36,7 @@
 ; Include the files to test
 .include "player.asm"
 
-; Define a zest.suite label, which Zest will call
-.section "zest.suite" free
-    zest.suite:
-        ; Include your test suite files
-        .include "player.test.asm"
-
-        ; End of test suite
-        ret
+; Append your test files to zest.suite
+.section "suite" appendto zest.suite
+    .include "player.test.asm"
 .ends
