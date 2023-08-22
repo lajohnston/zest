@@ -1,6 +1,14 @@
+.define zest.runner.CHECKSUM_BASE %01001101
+
 .ramsection "zest.runner.current_test_info" slot zest.mapper.RAM_SLOT
+    ; A checksum of the describe and test message pointers, to detect tampering
+    zest.runner.description_checksum: db
+
+    ; The current test description message pointers
     zest.runner.current_describe_message_addr: dw
     zest.runner.current_test_message_addr: dw
+
+    ; The number of frames the current test has until it times out
     zest.runner.timeout_frames: db
 .ends
 
@@ -155,6 +163,7 @@
             call zest.console.out
         pop hl
 
+        call zest.console.newline
         jp zest.console.newline ; jp then ret
 .ends
 
@@ -165,7 +174,6 @@
     zest.runner._printTestDescription:
         push hl
             ; Write describe block description
-            call zest.console.newline
             ld hl, (zest.runner.current_describe_message_addr)
             call zest.console.out
 
@@ -281,10 +289,90 @@
 .endm
 
 ;====
+; Calculates a 1-byte checksum value from the current describe and test text
+; pointers in RAM
+;
+; @out  a   the checksum
+; @clobs    f, hl
+;====
+.section "zest.runner.calculateChecksum" free
+    zest.runner.calculateChecksum:
+        ld a, zest.runner.CHECKSUM_BASE
+
+        ; Include describe text pointer in checksum
+        ld hl, (zest.runner.current_describe_message_addr)
+        add l
+        rrca
+        add h
+
+        ; Include test text pointer in checksum
+        ld hl, (zest.runner.current_test_message_addr)
+        xor l
+        rrca
+        add h
+
+        ret
+.ends
+
+;====
+; Validates the stored checksum value and jumps to the memory corruption
+; recovery routine if it's found to be invalid, otherwise returns
+;====
+.section "zest.runner.validateChecksum" free
+    zest.runner.validateChecksum:
+        push af
+        push hl
+            ; Calculate checksum from the values in RAM
+            call zest.runner.calculateChecksum
+
+            ; Compare the checksum with the one stored in RAM
+            ld hl, zest.runner.description_checksum
+            cp (hl)
+
+            ; Jump if the checksums don't match
+            jp nz, zest.runner.memoryOverwriteDetected
+        pop hl
+        pop af
+
+        ret
+.ends
+
+;====
+; Recovers from a memory corruption and displays a test failure message
+;====
+.section "zest.runner.memoryOverwriteDetected" free
+    zest.runner.memoryOverwriteDetected:
+        ; Reset stack pointer, in case it's invalid
+        ld sp, $dff0
+
+        ; Initialise failure heading
+        zest.console.initFailure
+        call zest.runner._printTestFailedHeading
+
+        ; Display memory corruption message
+        ld hl, _memoryCorruptionMessage
+        call zest.console.out
+        call zest.console.displayMessage
+
+        ; Stop the program
+        -:
+            halt
+        jp -
+
+    _memoryCorruptionMessage:
+        .asc "   Zest RAM state overwritten"
+        .db $ff
+.ends
+
+;====
 ; Prepares the start of a new test
 ;====
 .section "zest.runner.preTest" free
     zest.runner.preTest:
+        ; Set checksum of current test description
+        call zest.runner.calculateChecksum
+        ld (zest.runner.description_checksum), a
+
         ; Reset mocks
         call zest.mock.initAll
 

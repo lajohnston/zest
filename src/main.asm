@@ -19,11 +19,20 @@
 
 ;====
 ; VBlank handler
+;
+; Detects if the Zest state has been overwritten or if the current test has
+; reached its timeout limit
 ;====
 .orga $0038
-.section "Interrupt handler" force
+.section "main.interruptHandler" force
     push af
-        in a, (zest.vdp.STATUS_PORT)    ; satisfy interrupt
+        ; Satisfy interrupt
+        in a, (zest.vdp.STATUS_PORT)
+
+        ; Ensure Zest state hasn't been overwritten
+        call zest.runner.validateChecksum
+
+        ; Ensure timeout limit hasn't been reached
         call zest.runner.updateTimeoutCounter
     pop af
 
@@ -35,6 +44,6 @@
 ; Pause handler
 ;====
 .orga $0066
-.section "Pause handler" force
+.section "main.pauseHandler" force
     retn
 .ends
