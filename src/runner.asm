@@ -1,5 +1,13 @@
 .define zest.runner.CHECKSUM_BASE %01001101
 
+;===
+; Test description backup location in VRAM, to recover from RAM overwrites
+; This location resides in the gap in the sprite attribute table after the
+; 64 bytes of Y coordinates
+;===
+.define zest.runner.VRAM_BACKUP_READ_ADDRESS $3f00 + 64
+.define zest.runner.VRAM_BACKUP_WRITE_ADDRESS zest.runner.VRAM_BACKUP_READ_ADDRESS | zest.vdp.VRAMWrite
+
 .ramsection "zest.runner.current_test_info" slot zest.mapper.RAM_SLOT
     ; A checksum of the describe and test message pointers, to detect tampering
     zest.runner.description_checksum: db
@@ -365,6 +373,30 @@
 .ends
 
 ;====
+; Backs up the test text description pointers to VRAM, incase of RAM overwrite
+; @clobs hl, bc
+;====
+.section "zest.runner.backupStateToVram" free
+    zest.runner.backupStateToVram:
+        ; Set VRAM write address
+        ld hl, zest.runner.VRAM_BACKUP_WRITE_ADDRESS
+        call zest.vdp.setAddress
+
+        ; Set pointer to start of test description block
+        ld hl, zest.runner.description_checksum
+        ld c, (zest.vdp.DATA_PORT)
+
+        ; Copy data from RAM to VRAM
+        outi    ; write checksum
+        outi    ; describe text high
+        outi    ; describe text low
+        outi    ; test text high
+        outi    ; test text low
+
+        ret
+.ends
+
+;====
 ; Prepares the start of a new test
 ;====
 .section "zest.runner.preTest" free
@@ -372,6 +404,9 @@
         ; Set checksum of current test description
         call zest.runner.calculateChecksum
         ld (zest.runner.description_checksum), a
+
+        ; Backup test descriptions to VRAM
+        call zest.runner.backupStateToVram
 
         ; Reset mocks
         call zest.mock.initAll
