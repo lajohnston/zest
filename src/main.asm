@@ -30,7 +30,7 @@
         in a, (zest.vdp.STATUS_PORT)
 
         ; Ensure Zest state hasn't been overwritten
-        call zest.runner.validateChecksum
+        call zest.runner.assertChecksum
 
         ; Ensure timeout limit hasn't been reached
         call zest.runner.updateTimeoutCounter

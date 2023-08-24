@@ -173,6 +173,10 @@ it "should not timeout"
     call mySlowRoutine
 ```
 
+## Memory overwrite detection
+
+Zest will attempt to detect if its RAM state has been overwritten by a test, and if so will stop the program with an error message. A backup of the test description pointers is kept in VRAM (within the sprite attribute table gap) and Zest will attempt to restore these so it can recover and display the test that exhibits the issue.
+
 ## Status
 
 The project is a fully functioning proof-of-concept that I work on as a hobby. Next steps will include adding more assertions and examples so it will be ready for real projects.

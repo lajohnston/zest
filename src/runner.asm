@@ -323,19 +323,29 @@
 .ends
 
 ;====
+; Checks if the memory checksum is valid
+;
+; @out  z   1 if checksum is valid, otherwise 0
+;====
+.macro "zest.runner._validateChecksum"
+    ; Calculate checksum from the values in RAM
+    call zest.runner.calculateChecksum
+
+    ; Compare the checksum with the one stored in RAM
+    ld hl, zest.runner.description_checksum
+    cp (hl)
+.endm
+
+;====
 ; Validates the stored checksum value and jumps to the memory corruption
 ; recovery routine if it's found to be invalid, otherwise returns
 ;====
-.section "zest.runner.validateChecksum" free
-    zest.runner.validateChecksum:
+.section "zest.runner.assertChecksum" free
+    zest.runner.assertChecksum:
         push af
         push hl
-            ; Calculate checksum from the values in RAM
-            call zest.runner.calculateChecksum
-
-            ; Compare the checksum with the one stored in RAM
-            ld hl, zest.runner.description_checksum
-            cp (hl)
+            ; Set Z if checksum is valid
+            zest.runner._validateChecksum
 
             ; Jump if the checksums don't match
             jp nz, zest.runner.memoryOverwriteDetected
@@ -353,15 +363,36 @@
         ; Reset stack pointer, in case it's invalid
         ld sp, $dff0
 
+        ; Restore test description from VRAM backup
+        call zest.runner.restoreStateFromVram
+
+        ; Validate backup data
+        zest.runner._validateChecksum
+        jp z, +
+            ; Backup data also invalid - display generic message
+            zest.console.initFailure
+            call zest.runner._printTestFailedHeading
+
+            ; Display RAM overwritten error
+            ld hl, _memoryCorruptionMessage
+            call zest.console.out
+            call zest.console.displayMessage
+            jp _stopProgram
+        +:
+
         ; Initialise failure heading
         zest.console.initFailure
         call zest.runner._printTestFailedHeading
 
-        ; Display memory corruption message
+        ; Print the test description
+        call zest.runner._printTestDescription
+
+        ; Print the RAM overwritten message
         ld hl, _memoryCorruptionMessage
-        call zest.console.out
+        call zest.runner._printAssertionMessage
         call zest.console.displayMessage
 
+    _stopProgram:
         ; Stop the program
         -:
             halt
