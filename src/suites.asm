@@ -14,5 +14,6 @@
 ; The end of the default suite
 ;====
 .section "zest.suite.end" after zest.suite keep
-    ret
+    ; Perform postTest checks for the last test
+    jp zest.runner.postTest ; jp/ret
 .ends

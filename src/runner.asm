@@ -18,6 +18,9 @@
 
     ; The number of frames the current test has until it times out
     zest.runner.timeout_frames: db
+
+    ; The number of tests that have passed
+    zest.runner.tests_passed: dw
 .ends
 
 ;====
@@ -28,6 +31,11 @@
         ; Initialise VDP
         call zest.vdp.init
         call zest.vdp.clearVram
+
+        ; Start tests passed counter to $ffff. This will be incremented to 0
+        ; when the first test runs
+        ld hl, $ffff
+        ld (zest.runner.tests_passed), hl
 
         ; Run the test suite (label defined by user)
         call zest.suite
@@ -419,10 +427,35 @@
 
         ; Copy data from RAM to VRAM
         outi    ; write checksum
-        outi    ; describe text high
         outi    ; describe text low
-        outi    ; test text high
+        outi    ; describe text high
         outi    ; test text low
+        outi    ; test text high
+
+        ret
+.ends
+
+;====
+; Restores the test data from the VRAM backup
+;
+; @clobs af, bc, hl
+;====
+.section "zest.runner.restoreStateFromVram" free
+    zest.runner.restoreStateFromVram:
+        ; Set VRAM read address
+        ld hl, zest.runner.VRAM_BACKUP_READ_ADDRESS
+        call zest.vdp.setAddress
+
+        ; Set pointer to start of test description block
+        ld hl, zest.runner.description_checksum
+        ld c, (zest.vdp.DATA_PORT)
+
+        ; Copy data from VRAM to RAM
+        ini     ; checksum
+        ini     ; describe text low
+        ini     ; describe text high
+        ini     ; test text low
+        ini     ; test text high
 
         ret
 .ends
@@ -456,10 +489,31 @@
 .ends
 
 ;====
+; Performs check and cleanup operations to be run after each test
+;====
+.section "zest.runner.postTest" free
+    zest.runner.postTest:
+        ; Increment tests passed. Counter starts at $FFFF, so this will
+        ; initialise it to $0 on the first run
+        ld hl, (zest.runner.tests_passed)
+        inc hl
+        ld (zest.runner.tests_passed), hl
+
+        ; Return if no tests have run yet
+        ld a, h
+        or l
+        ret z
+
+        ; Ensure the RAM state is still valid
+        jp zest.runner.assertChecksum   ; jp/ret
+.ends
+
+;====
 ; Initialises a new test.
 ; Resets the Z80 registers and stores the test description in case the test fails
 ;====
 .macro "zest.runner.startTest" args message
+    call zest.runner.postTest
     zest.runner.storeText message, zest.runner.current_test_message_addr
     call zest.runner.preTest
 
