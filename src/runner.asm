@@ -349,23 +349,28 @@
         ; Reset stack pointer, in case it's invalid
         ld sp, $dff0
 
-        ; Restore test description from VRAM backup
+        ; Check if the test description is valid
+        zest.runner._validateChecksum
+        jp z, _printTestDescription     ; print if valid
+
+        ; Checksum invalid - restore test description from VRAM backup
         call zest.runner.restoreStateFromVram
 
         ; Validate backup data
         zest.runner._validateChecksum
-        jp z, +
-            ; Backup data also invalid - display generic message
-            zest.console.initFailure
-            call zest.runner._printTestFailedHeading
+        jp z, _printTestDescription     ; print if valid
 
-            ; Display RAM overwritten error
-            ld hl, _memoryCorruptionMessage
-            call zest.console.out
-            call zest.console.displayMessage
-            jp _stopProgram
-        +:
+        ; Backup data also invalid - display generic message
+        zest.console.initFailure
+        call zest.runner._printTestFailedHeading
 
+        ; Display RAM overwritten error
+        ld hl, _memoryCorruptionMessage
+        call zest.console.out
+        call zest.console.displayMessage
+        jp _stopProgram
+
+    _printTestDescription:
         ; Initialise failure heading
         zest.console.initFailure
         call zest.runner._printTestFailedHeading
