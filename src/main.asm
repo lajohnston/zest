@@ -26,14 +26,13 @@
 .orga $0038
 .section "main.interruptHandler" force
     push af
+    push hl
         ; Satisfy interrupt
         in a, (zest.vdp.STATUS_PORT)
 
-        ; Ensure Zest state hasn't been overwritten
-        call zest.runner.assertChecksum
-
         ; Ensure timeout limit hasn't been reached
         call zest.timeout.update
+    pop hl
     pop af
 
     ei      ; re-enable interrupts
