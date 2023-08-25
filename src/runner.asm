@@ -342,25 +342,6 @@
 .endm
 
 ;====
-; Validates the stored checksum value and jumps to the memory corruption
-; recovery routine if it's found to be invalid, otherwise returns
-;====
-.section "zest.runner.assertChecksum" free
-    zest.runner.assertChecksum:
-        push af
-        push hl
-            ; Set Z if checksum is valid
-            zest.runner._validateChecksum
-
-            ; Jump if the checksums don't match
-            jp nz, zest.runner.memoryOverwriteDetected
-        pop hl
-        pop af
-
-        ret
-.ends
-
-;====
 ; Recovers from a memory corruption and displays a test failure message
 ;====
 .section "zest.runner.memoryOverwriteDetected" free
@@ -500,8 +481,16 @@
         or l
         ret z
 
-        ; Ensure the RAM state is still valid
-        jp zest.runner.assertChecksum   ; jp/ret
+        ; Set Z if checksum is valid
+        zest.runner._validateChecksum
+
+        ; Jump if the checksums don't match
+        jr nz, _checksumInvalid
+
+        ret
+
+    _checksumInvalid:
+        jp zest.runner.memoryOverwriteDetected
 .ends
 
 ;====
