@@ -13,14 +13,6 @@
 ;====
 .include "./src/utils/assert.asm"
 
-; Default timeout (in full frames) for tests. Should be between 1 and 255
-.ifndef zest.defaultTimeout
-    ; Timeout tests if they take more than 10 full frames to complete
-    .define zest.defaultTimeout 10
-.else
-    zest.utils.assert.range zest.defaultTimeout, 1, 255, "zest.defaultTimeout should be between 1 and 255"
-.endif
-
 ;====
 ; Include library
 ;====
@@ -35,6 +27,8 @@
 
 .include "./src/console/console.asm"
 .include "./src/console/data.asm"
+
+.include "./src/timeout.asm"
 
 .include "./src/mock.asm"
 .include "./src/runner.asm"
@@ -84,5 +78,5 @@
 ; @in   frames  the number of full frames (1-255)
 ;====
 .macro "zest.setTimeout" args frames
-    zest.runner.setTestTimeout frames
+    zest.timeout.setCurrent frames
 .endm

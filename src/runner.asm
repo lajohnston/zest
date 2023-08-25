@@ -16,9 +16,6 @@
     zest.runner.current_describe_message_addr: dw
     zest.runner.current_test_message_addr: dw
 
-    ; The number of frames the current test has until it times out
-    zest.runner.timeout_frames: db
-
     ; The number of tests that have passed
     zest.runner.tests_passed: dw
 .ends
@@ -475,9 +472,8 @@
         ; Reset mocks
         call zest.mock.initAll
 
-        ; Set timeout (default + 1 frame for the frame we're on)
-        ld a, <(zest.defaultTimeout + 1)    ; wrap to 0 for 256 frames
-        ld (zest.runner.timeout_frames), a
+        ; Reset timeout counter
+        zest.timeout.reset
 
         ; Disable display and enable VBlank interrupts
         in a, (zest.vdp.STATUS_PORT)    ; clear pending interrupts
@@ -538,42 +534,3 @@
     ld hl, _text\@
     ld (ramPointer), hl
 .endm
-
-;====
-; Set the timeout for the current test
-;
-; @in frames    the number of full frames to time out after
-;====
-.macro "zest.runner.setTestTimeout" args frames
-    push af
-        ld a, <(frames + 1) ; frames + current frame (wrap to 0 for 256)
-        ld (zest.runner.timeout_frames), a
-    pop af
-.endm
-
-;====
-; Decrement the frame counter for the current test and timeout the test with a
-; message if the counter reaches zero
-;
-; @clobs a
-;====
-.section "zest.runner.updateTimeoutCounter" free
-    zest.runner.updateTimeoutCounter:
-        ld a, (zest.runner.timeout_frames)
-        dec a
-        ld (zest.runner.timeout_frames), a
-        ret nz  ; return if test hasn't timed out yet
-
-        ; Timeout
-        push hl
-            ld hl, _timeoutMessage
-            call zest.runner._printTestFailure
-            call zest.console.displayMessage
-        pop hl
-
-        ret
-
-    _timeoutMessage:
-        .asc "Test timed out"
-        .db $ff
-.ends

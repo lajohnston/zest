@@ -33,7 +33,7 @@
         call zest.runner.assertChecksum
 
         ; Ensure timeout limit hasn't been reached
-        call zest.runner.updateTimeoutCounter
+        call zest.timeout.update
     pop af
 
     ei      ; re-enable interrupts
