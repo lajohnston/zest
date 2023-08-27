@@ -7,6 +7,10 @@
         .asc "       All tests passed"
         .db $ff ; terminator byte
 
+    zest.console.data.noTestsFound:
+        .asc "       No tests in suite"
+        .db $ff ; terminator byte
+
     zest.console.data.testFailedHeading:
         .asc "       Zest - Test failed"
         .db $ff ; terminator byte

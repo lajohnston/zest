@@ -27,9 +27,21 @@
         call zest.console.newline
         call zest.console.newline
 
+        ; Check how many tests were run
+        ld hl, (zest.runner.tests_passed)
+        ld a, h
+        or l
+        jp nz, +
+            ; No tests were run
+            ld hl, zest.console.data.noTestsFound
+            jp _output
+        +:
+
         ld hl, zest.console.data.allTestsPassed
-        call zest.console.out
-        call zest.console.displayMessage
+
+        _output:
+            call zest.console.out
+            call zest.console.displayMessage
 
         ; End
         -:
