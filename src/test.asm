@@ -63,13 +63,36 @@
 .endm
 
 ;====
+; (Private) Calculates a 1-byte checksum value from the current describe and test text
+; pointers in RAM
+;
+; @out  a   the checksum
+; @clobs    f, hl
+;====
+.macro "zest.test._calculateChecksum"
+    ld a, zest.test.CHECKSUM_BASE
+
+    ; Include describe text pointer in checksum
+    ld hl, (zest.test.unit_text_addr)
+    add l
+    rrca
+    add h
+
+    ; Include test text pointer in checksum
+    ld hl, (zest.test.test_text_addr)
+    xor l
+    rrca
+    add h
+.endm
+
+;====
 ; Checks if the RAM data is valid
 ;
 ; @out  z   1 if the checksum is valid, otherwise 0
 ;====
 .macro "zest.test.validateChecksum"
     ; Calculate checksum from the values in RAM
-    call zest.test._calculateChecksum
+    zest.test._calculateChecksum
 
     ; Compare the checksum with the one stored in RAM
     ld hl, zest.test.checksum
@@ -102,8 +125,8 @@
 ;====
 .macro "zest.test.preTest"
     ; Set checksum of current test description
-    call zest.test._calculateChecksum
-    ld (zest.test.checksum), a
+    zest.test._calculateChecksum
+    ld (zest.test.checksum), a  ; store checksum
 
     ; Backup test descriptions to VRAM
     zest.test._backupStateToVram
@@ -147,32 +170,6 @@
             ld hl, (zest.test.test_text_addr)
             call zest.console.out
         pop hl
-
-        ret
-.ends
-
-;====
-; (Private) Calculates a 1-byte checksum value from the current describe and test text
-; pointers in RAM
-;
-; @out  a   the checksum
-; @clobs    f, hl
-;====
-.section "zest.test._calculateChecksum" free
-    zest.test._calculateChecksum:
-        ld a, zest.test.CHECKSUM_BASE
-
-        ; Include describe text pointer in checksum
-        ld hl, (zest.test.unit_text_addr)
-        add l
-        rrca
-        add h
-
-        ; Include test text pointer in checksum
-        ld hl, (zest.test.test_text_addr)
-        xor l
-        rrca
-        add h
 
         ret
 .ends
