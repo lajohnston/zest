@@ -77,6 +77,26 @@
 .endm
 
 ;====
+; (Private) Backs up the test text description pointers to VRAM, incase of RAM overwrite
+; @clobs af, hl, bc
+;====
+.macro "zest.test._backupStateToVram"
+    ; Set VRAM write address
+    zest.vdp.setAddress zest.test.VRAM_BACKUP_WRITE_ADDRESS
+
+    ; Set pointer to start of test description block
+    ld hl, zest.test.checksum
+    ld c, (zest.vdp.DATA_PORT)
+
+    ; Copy data from RAM to VRAM
+    outi    ; write checksum
+    outi    ; describe text low
+    outi    ; describe text high
+    outi    ; test text low
+    outi    ; test text high
+.endm
+
+;====
 ; Should be called when the test is about to run. This updates the checksum
 ; and backs up the state to VRAM in case the code overwrites it
 ;====
@@ -86,7 +106,7 @@
     ld (zest.test.checksum), a
 
     ; Backup test descriptions to VRAM
-    call zest.test._backupStateToVram
+    zest.test._backupStateToVram
 .endm
 
 ;====
@@ -153,30 +173,6 @@
         xor l
         rrca
         add h
-
-        ret
-.ends
-
-;====
-; (Private) Backs up the test text description pointers to VRAM, incase of RAM overwrite
-; @clobs hl, bc
-;====
-.section "zest.test._backupStateToVram" free
-    zest.test._backupStateToVram:
-        ; Set VRAM write address
-        ld hl, zest.test.VRAM_BACKUP_WRITE_ADDRESS
-        call zest.vdp.setAddress
-
-        ; Set pointer to start of test description block
-        ld hl, zest.test.checksum
-        ld c, (zest.vdp.DATA_PORT)
-
-        ; Copy data from RAM to VRAM
-        outi    ; write checksum
-        outi    ; describe text low
-        outi    ; describe text high
-        outi    ; test text low
-        outi    ; test text high
 
         ret
 .ends

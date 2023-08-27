@@ -54,7 +54,21 @@
 ;====
 ; Sets the VDP address
 ;
-; @in   hl  address
+; @in       address VRAM address + command
+; @clobs    a
+;====
+.macro "zest.vdp.setAddress" args address
+    ld a, <(address)
+    out (zest.vdp.CONTROL_PORT), a
+
+    ld a, >(address)
+    out (zest.vdp.CONTROL_PORT), a
+.endm
+
+;====
+; Sets the VDP address + command
+;
+; @in       hl VRAM address + command
 ;====
 .section "zest.vdp.setAddress" free
     zest.vdp.setAddress:
@@ -68,9 +82,9 @@
 .ends
 
 ;====
-; Sets the VDP address
+; Sets the VDP address + command
 ;
-; @in   de  address
+; @in   de  address + command
 ;====
 .section "zest.vdp.setAddressDE" free
     zest.vdp.setAddressDE:
