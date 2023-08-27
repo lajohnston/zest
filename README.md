@@ -85,7 +85,7 @@ In your test suite, define your mocks in a ramsection using `appendto zest.mocks
 ```asm
 .ramsection "my mock instances" appendto zest.mocks
     ; Calls to readPortA will point to this mock in RAM
-    readPortA instanceof zest.mock
+    readPortA instanceof zest.Mock
 .ends
 ```
 

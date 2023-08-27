@@ -3,7 +3,7 @@
 ; the mock has been called and the address to jump to to handle the
 ; mock logic
 ;====
-.struct zest.mock
+.struct zest.Mock
     push_hl             db
     call_instruction    db
     call_address        dw
@@ -32,7 +32,7 @@
     ;====
     zest.mock.initAll:
         ; Get number of mocks
-        ld a, (zest.mocks.end - zest.mocks.start - 1) / _sizeof_zest.mock
+        ld a, (zest.mocks.end - zest.mocks.start - 1) / _sizeof_zest.Mock
         or a    ; update flags
         ret z   ; return if there are no mocks to clear
 
@@ -73,8 +73,8 @@
 .macro "zest.mock.start" args mockAddress
     push ix
         ld ix, mockAddress
-        ld (ix + zest.mock.address), < _mockHandlerStart\@
-        ld (ix + zest.mock.address + 1), > _mockHandlerStart\@
+        ld (ix + zest.Mock.address), < _mockHandlerStart\@
+        ld (ix + zest.Mock.address + 1), > _mockHandlerStart\@
     pop ix
 
     jp _mockHandlerEnd\@    ; jump over mock code, end label defined by zest.mock.end

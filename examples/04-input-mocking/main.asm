@@ -22,7 +22,7 @@
 ; Define mock instances in RAM
 ;====
 .ramsection "mock instances" appendto zest.mocks
-    readPlayer1Input instanceof zest.mock
+    readPlayer1Input instanceof zest.Mock
 .ends
 
 ;====
