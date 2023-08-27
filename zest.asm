@@ -24,12 +24,12 @@
 .include "./src/main.asm"
 .include "./src/vdp.asm"
 
-
 .include "./src/console/console.asm"
 .include "./src/console/data.asm"
 
 .include "./src/timeout.asm"
 
+.include "./src/test.asm"
 .include "./src/mock.asm"
 .include "./src/runner.asm"
 
@@ -44,17 +44,16 @@
 ;====
 
 ;====
-; Can be used to describe the unit being tested
+; Describes the unit being tested
 ;
 ; @in   message     a description string of the unit
 ;====
 .macro "describe" args message
-    zest.runner.describe message
+    zest.test.setUnitDescription message
 .endm
 
 ;====
-; Define a test scenario. Generates the code to reset some of the system state
-; such as register values
+; Describes a test scenario and generates prep code to run it
 ;
 ; @in   message     a description string of the test
 ;====

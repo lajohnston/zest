@@ -1,21 +1,4 @@
-.define zest.runner.CHECKSUM_BASE %01001101
-
-;===
-; Test description backup location in VRAM, to recover from RAM overwrites
-; This location resides in the gap in the sprite attribute table after the
-; 64 bytes of Y coordinates
-;===
-.define zest.runner.VRAM_BACKUP_READ_ADDRESS $3f00 + 64
-.define zest.runner.VRAM_BACKUP_WRITE_ADDRESS zest.runner.VRAM_BACKUP_READ_ADDRESS | zest.vdp.VRAMWrite
-
-.ramsection "zest.runner.current_test_info" slot zest.mapper.RAM_SLOT
-    ; A checksum of the describe and test message pointers, to detect tampering
-    zest.runner.description_checksum: db
-
-    ; The current test description message pointers
-    zest.runner.current_describe_message_addr: dw
-    zest.runner.current_test_message_addr: dw
-
+.ramsection "zest.runner" slot zest.mapper.RAM_SLOT
     ; The number of tests that have passed
     zest.runner.tests_passed: dw
 .ends
@@ -153,7 +136,7 @@
 
         ; Print test details
         call zest.runner._printTestFailedHeading
-        call zest.runner._printTestDescription
+        call zest.test.printTestDescription
 
         ; Print the failed assertion message
         jp zest.runner._printAssertionMessage   ; jp (then ret)
@@ -178,26 +161,6 @@
 
         call zest.console.newline
         jp zest.console.newline ; jp then ret
-.ends
-
-;====
-; (Private) Prints the current test's 'describe' and 'it' text
-;====
-.section "zest.runner._printTestDescription" free
-    zest.runner._printTestDescription:
-        push hl
-            ; Write describe block description
-            ld hl, (zest.runner.current_describe_message_addr)
-            call zest.console.out
-
-            ; Write failing test
-            call zest.console.newline
-            call zest.console.newline
-            ld hl, (zest.runner.current_test_message_addr)
-            call zest.console.out
-        pop hl
-
-        ret
 .ends
 
 ;====
@@ -293,55 +256,6 @@
 .ends
 
 ;====
-; Can be used to describe the unit being tested
-; Stores a pointer to the description test which is used to
-; identify the test to the user if it fails
-;====
-.macro "zest.runner.describe" args unitName
-    zest.runner.storeText unitName, zest.runner.current_describe_message_addr
-.endm
-
-;====
-; Calculates a 1-byte checksum value from the current describe and test text
-; pointers in RAM
-;
-; @out  a   the checksum
-; @clobs    f, hl
-;====
-.section "zest.runner.calculateChecksum" free
-    zest.runner.calculateChecksum:
-        ld a, zest.runner.CHECKSUM_BASE
-
-        ; Include describe text pointer in checksum
-        ld hl, (zest.runner.current_describe_message_addr)
-        add l
-        rrca
-        add h
-
-        ; Include test text pointer in checksum
-        ld hl, (zest.runner.current_test_message_addr)
-        xor l
-        rrca
-        add h
-
-        ret
-.ends
-
-;====
-; Checks if the memory checksum is valid
-;
-; @out  z   1 if checksum is valid, otherwise 0
-;====
-.macro "zest.runner._validateChecksum"
-    ; Calculate checksum from the values in RAM
-    call zest.runner.calculateChecksum
-
-    ; Compare the checksum with the one stored in RAM
-    ld hl, zest.runner.description_checksum
-    cp (hl)
-.endm
-
-;====
 ; Recovers from a memory corruption and displays a test failure message
 ;====
 .section "zest.runner.memoryOverwriteDetected" free
@@ -349,18 +263,11 @@
         ; Reset stack pointer, in case it's invalid
         ld sp, $dff0
 
-        ; Check if the test description is valid
-        zest.runner._validateChecksum
+        ; Ensure the test description data hasn't been overwritten
+        call zest.test.ensureDescriptionIsValid
         jp z, _printTestDescription     ; print if valid
 
-        ; Checksum invalid - restore test description from VRAM backup
-        call zest.runner.restoreStateFromVram
-
-        ; Validate backup data
-        zest.runner._validateChecksum
-        jp z, _printTestDescription     ; print if valid
-
-        ; Backup data also invalid - display generic message
+        ; Description has been overwritten - display generic message
         zest.console.initFailure
         call zest.runner._printTestFailedHeading
 
@@ -376,7 +283,7 @@
         call zest.runner._printTestFailedHeading
 
         ; Print the test description
-        call zest.runner._printTestDescription
+        call zest.test.printTestDescription
 
         ; Print the RAM overwritten message
         ld hl, _memoryCorruptionMessage
@@ -395,65 +302,15 @@
 .ends
 
 ;====
-; Backs up the test text description pointers to VRAM, incase of RAM overwrite
-; @clobs hl, bc
-;====
-.section "zest.runner.backupStateToVram" free
-    zest.runner.backupStateToVram:
-        ; Set VRAM write address
-        ld hl, zest.runner.VRAM_BACKUP_WRITE_ADDRESS
-        call zest.vdp.setAddress
-
-        ; Set pointer to start of test description block
-        ld hl, zest.runner.description_checksum
-        ld c, (zest.vdp.DATA_PORT)
-
-        ; Copy data from RAM to VRAM
-        outi    ; write checksum
-        outi    ; describe text low
-        outi    ; describe text high
-        outi    ; test text low
-        outi    ; test text high
-
-        ret
-.ends
-
-;====
-; Restores the test data from the VRAM backup
-;
-; @clobs af, bc, hl
-;====
-.section "zest.runner.restoreStateFromVram" free
-    zest.runner.restoreStateFromVram:
-        ; Set VRAM read address
-        ld hl, zest.runner.VRAM_BACKUP_READ_ADDRESS
-        call zest.vdp.setAddress
-
-        ; Set pointer to start of test description block
-        ld hl, zest.runner.description_checksum
-        ld c, (zest.vdp.DATA_PORT)
-
-        ; Copy data from VRAM to RAM
-        ini     ; checksum
-        ini     ; describe text low
-        ini     ; describe text high
-        ini     ; test text low
-        ini     ; test text high
-
-        ret
-.ends
-
-;====
 ; Prepares the start of a new test
 ;====
 .section "zest.runner.preTest" free
     zest.runner.preTest:
-        ; Set checksum of current test description
-        call zest.runner.calculateChecksum
-        ld (zest.runner.description_checksum), a
+        ; Ensure interrupts are disabled
+        di
 
-        ; Backup test descriptions to VRAM
-        call zest.runner.backupStateToVram
+        ; Update checksum + VRAM backup
+        zest.test.preTest
 
         ; Reset mocks
         call zest.mock.initAll
@@ -487,7 +344,7 @@
         ret z
 
         ; Set Z if checksum is valid
-        zest.runner._validateChecksum
+        zest.test.validateChecksum
 
         ; Jump if the checksums don't match
         jr nz, _checksumInvalid
@@ -504,27 +361,9 @@
 ;====
 .macro "zest.runner.startTest" args message
     call zest.runner.postTest
-    zest.runner.storeText message, zest.runner.current_test_message_addr
+    zest.test.setTestDescription message
     call zest.runner.preTest
 
     ; Reset stack (base address minus return address from zest.suite)
     ld sp, $dfee
-.endm
-
-;====
-; Stores text in the ROM and adds a pointer to it at the given
-; RAM location
-;
-; @in   text        the string to store
-; @in   ramPointer  the pointer in RAM to store the text in
-;====
-.macro "zest.runner.storeText" args text, ramPointer
-    jr +
-    _text\@:
-        .asc text
-        .db $ff    ; terminator byte
-    +:
-
-    ld hl, _text\@
-    ld (ramPointer), hl
 .endm
