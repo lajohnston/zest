@@ -306,13 +306,9 @@
 
         ; Set Z if checksum is valid
         zest.test.validateChecksum
+        ret z   ; return if the checksum is valid
 
-        ; Jump if the checksums don't match
-        jr nz, _checksumInvalid
-
-        ret
-
-    _checksumInvalid:
+        ; Checksum is invalid
         jp zest.runner.memoryOverwriteDetected
 .ends
 
