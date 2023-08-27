@@ -218,44 +218,6 @@
 .ends
 
 ;====
-; (Private) Sets all the registers to zero
-;====
-.macro "zest.runner.clearMainRegisters"
-    xor a       ; set A to zero
-    or 1        ; clear all flags (but sets A to 1)
-    ld a, 0     ; set A to zero again (without affecting flags)
-
-    ; Set remaining register to A (zero)
-    ld b, a
-    ld c, a
-    ld d, a
-    ld e, a
-    ld h, a
-    ld l, a
-.endm
-
-;====
-; Sets all the current registers and shadow registers to 0
-;====
-.section "zest.runner.clearRegisters" free
-    zest.runner.clearRegisters:
-        ; Clear main registers
-        zest.runner.clearMainRegisters
-
-        ; Clear shadow registers
-        ex af, af'
-        exx
-        zest.runner.clearMainRegisters
-
-        ; Clear additional registers
-        ld ix, 0
-        ld iy, 0
-        ld i, a
-
-        ret
-.ends
-
-;====
 ; Recovers from a memory corruption and displays a test failure message
 ;====
 .section "zest.runner.memoryOverwriteDetected" free
@@ -323,8 +285,7 @@
         zest.vdp.setRegister1 %10100000 ; enable VBlank interrupts
         ei                              ; enable CPU interrupts
 
-        ; Clear registers
-        jp zest.runner.clearRegisters   ; jp/ret
+        ret
 .ends
 
 ;====

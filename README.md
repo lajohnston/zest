@@ -58,8 +58,6 @@ it "should not increment past 255"
     expect.a.toBe 255
 ```
 
-Each time you call the 'it' macro, some clean-up is performed for you which clears the registers and prevent tests from 'leaking' data and affecting other tests.
-
 If a test fails, the message will be printed on the screen with details of the test and assertion that failed.
 
 You can also use `test` as an alias for `it` if you prefer:
