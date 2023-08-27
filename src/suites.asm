@@ -1,12 +1,11 @@
 ;====
 ; Main suite
 ;====
-.bank zest.mapper.SUITE_BANK_1 slot zest.mapper.SUITE_SLOT
 
 ;====
 ; The start of the default suite
 ;====
-.section "zest.suite" free keep
+.section "zest.suite" free bank zest.mapper.SUITE_BANK_1 slot zest.mapper.SUITE_SLOT keep
     zest.suite:
 .ends
 

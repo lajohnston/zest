@@ -2,7 +2,7 @@
 .define LEFT_BIT      2
 .define RIGHT_BIT     3
 
-.ramsection "Player variables" slot 2
+.ramsection "Player variables" slot 3
     playerXPos: dw
 .ends
 
