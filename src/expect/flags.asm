@@ -103,18 +103,14 @@
 ;====
 .section "expect.flags.defaultMessages" free
     expect.flags.defaultMessages.carry:
-        .asc "Unexpected carry flag state"
-        .db $ff
+        zest.console.defineString "Unexpected carry flag state"
 
     expect.flags.defaultMessages.parityOverflow:
-        .asc "Unexpected parity/overflow"
-        .db $ff
+        zest.console.defineString "Unexpected parity/overflow"
 
     expect.flags.defaultMessages.sign:
-        .asc "Unexpected sign flag state"
-        .db $ff
+        zest.console.defineString "Unexpected sign flag state"
 
     expect.flags.defaultMessages.zeroFlag:
-        .asc "Unexpected zero flag state"
-        .db $ff
+        zest.console.defineString "Unexpected zero flag state"
 .ends

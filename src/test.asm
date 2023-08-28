@@ -39,8 +39,7 @@
 .macro "zest.test._storeText" args text, ramPointer
     jp +
         _text\@:
-            .asc text
-            .db $ff    ; terminator byte
+            zest.console.defineString text
     +:
 
     ld hl, _text\@

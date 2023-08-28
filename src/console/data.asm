@@ -1,31 +1,24 @@
 .section "zest.console.data" free
     zest.console.data.heading:
-        .asc "             Zest"
-        .db $ff ; terminator byte
+        zest.console.defineString "             Zest"
 
     zest.console.data.allTestsPassed:
-        .asc "       All tests passed"
-        .db $ff ; terminator byte
+        zest.console.defineString "       All tests passed"
 
     zest.console.data.noTestsFound:
-        .asc "       No tests in suite"
-        .db $ff ; terminator byte
+        zest.console.defineString "       No tests in suite"
 
     zest.console.data.testFailedHeading:
-        .asc "       Zest - Test failed"
-        .db $ff ; terminator byte
+        zest.console.defineString "       Zest - Test failed"
 
     zest.console.data.actualValueLabel:
-        .asc "Actual:   "
-        .db $ff ; terminator byte
+        zest.console.defineString "Actual:   "
 
     zest.console.data.expectedValueLabel:
-        .asc "Expected: "
-        .db $ff ; terminator byte
+        zest.console.defineString "Expected: "
 
     zest.console.data.separatorText:
-        .asc "            ~~~~~~~~"
-        .db $ff ; terminator byte
+        zest.console.defineString "            ~~~~~~~~"
 
     ; Console font
     zest.console.data.font:

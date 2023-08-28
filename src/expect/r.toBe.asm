@@ -205,50 +205,38 @@
 ; Default error messages for expectations
 .section "expect.defaultMessages" free
     expect.a.toBe.defaultMessage:
-        .asc "Unexpected value in register A"
-        .db $ff ; terminator byte
+        zest.console.defineString "Unexpected value in register A"
 
     expect.b.toBe.defaultMessage:
-        .asc "Unexpected value in register B"
-        .db $ff ; terminator byte
+        zest.console.defineString "Unexpected value in register B"
 
     expect.c.toBe.defaultMessage:
-        .asc "Unexpected value in register C"
-        .db $ff ; terminator byte
+        zest.console.defineString "Unexpected value in register C"
 
     expect.d.toBe.defaultMessage:
-        .asc "Unexpected value in register D"
-        .db $ff ; terminator byte
+        zest.console.defineString "Unexpected value in register D"
 
     expect.e.toBe.defaultMessage:
-        .asc "Unexpected value in register E"
-        .db $ff ; terminator byte
+        zest.console.defineString "Unexpected value in register E"
 
     expect.h.toBe.defaultMessage:
-        .asc "Unexpected value in register H"
-        .db $ff ; terminator byte
+        zest.console.defineString "Unexpected value in register H"
 
     expect.l.toBe.defaultMessage:
-        .asc "Unexpected value in register L"
-        .db $ff ; terminator byte
+        zest.console.defineString "Unexpected value in register L"
 
     expect.ixh.toBe.defaultMessage:
-        .asc "Unexpected value in IXH"
-        .db $ff ; terminator byte
+        zest.console.defineString "Unexpected value in IXH"
 
     expect.ixl.toBe.defaultMessage:
-        .asc "Unexpected value in IXL"
-        .db $ff ; terminator byte
+        zest.console.defineString "Unexpected value in IXL"
 
     expect.iyh.toBe.defaultMessage:
-        .asc "Unexpected value in IYH"
-        .db $ff ; terminator byte
+        zest.console.defineString "Unexpected value in IYH"
 
     expect.iyl.toBe.defaultMessage:
-        .asc "Unexpected value in IYL"
-        .db $ff ; terminator byte
+        zest.console.defineString "Unexpected value in IYL"
 
     expect.i.toBe.defaultMessage:
-        .asc "Unexpected value in I"
-        .db $ff ; terminator byte
+        zest.console.defineString "Unexpected value in I"
 .ends

@@ -105,6 +105,5 @@
         jp zest.console.displayMessage
 
     _timeoutMessage:
-        .asc "Test timed out"
-        .db $ff
+        zest.console.defineString "Test timed out"
 .ends

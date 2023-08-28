@@ -2,6 +2,14 @@
 ; Writes text to the screen
 ;====
 
+;====
+; Constants
+;====
+.define zest.console.TERMINATOR $ff
+
+;====
+; RAM
+;====
 .ramsection "zest.console.variables" slot zest.mapper.RAM_SLOT
     zest.console.cursor_vram_address:    dw
 .ends
@@ -70,6 +78,16 @@
         ld a, %00000011 ; red
         call zest.console.init
     pop af
+.endm
+
+;====
+; Defines an ascii string in bytes
+;
+; @in   string
+;====
+.macro "zest.console.defineString" args string
+    .asc string
+    .db zest.console.TERMINATOR
 .endm
 
 ;====

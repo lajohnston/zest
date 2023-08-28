@@ -271,8 +271,7 @@
         jp -
 
     _memoryCorruptionMessage:
-        .asc "   Zest RAM state overwritten"
-        .db $ff
+        zest.console.defineString "   Zest RAM state overwritten"
 .ends
 
 ;====
