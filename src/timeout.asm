@@ -102,7 +102,7 @@
     _timeout:
         ld hl, _timeoutMessage
         call zest.runner._printTestFailure
-        jp zest.console.displayMessage
+        jp zest.console.displayAndStop
 
     _timeoutMessage:
         zest.console.defineString "Test timed out"

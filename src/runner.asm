@@ -20,33 +20,39 @@
         ; Run the test suite (label defined by user)
         call zest.suite
 
-        ; All tests passed. Display message
+        ; All tests passed - check how many were run
+        ld hl, (zest.runner.tests_passed)
+        ld a, h
+        or l
+        jr z, _noTestsFound ; jp if no tests were run
+
+        ; Otherwise display success message
         zest.console.initSuccess
         ld hl, zest.console.data.heading
         call zest.console.out
         call zest.console.newline
         call zest.console.newline
 
-        ; Check how many tests were run
-        ld hl, (zest.runner.tests_passed)
-        ld a, h
-        or l
-        jp nz, +
-            ; No tests were run
-            ld hl, zest.console.data.noTestsFound
-            jp _output
-        +:
-
         ld hl, zest.console.data.allTestsPassed
+        call zest.console.out
+        jp zest.console.displayAndStop
 
-        _output:
-            call zest.console.out
-            call zest.console.displayMessage
+    _noTestsFound:
+        zest.console.initWarning
 
-        ; End
-        -:
-            halt
-        jr -
+        ld hl, zest.console.data.heading
+        call zest.console.out
+        call zest.console.newline
+        call zest.console.newline
+
+        ld hl, zest.console.data.noTestsFound
+        call zest.console.out
+        jp zest.console.displayAndStop
+.ends
+
+.section "zest.runner.noTestsFound"
+    zest.runner.noTestsFound:
+
 .ends
 
 ;====
@@ -75,7 +81,7 @@
 
         ; Print actual value
         call zest.console.outputHexA
-        jp zest.console.displayMessage  ; jp (then ret)
+        jp zest.console.displayAndStop
 .ends
 
 ;====
@@ -102,7 +108,7 @@
 
         ; Print actual value
         call zest.console.outputHexDE
-        jp zest.console.displayMessage  ; jp (then ret)
+        jp zest.console.displayAndStop
 .ends
 
 ;====
@@ -132,7 +138,7 @@
             call zest.console.outputBoolean
         pop af
 
-        jp zest.console.displayMessage  ; jp (then ret)
+        jp zest.console.displayAndStop
 .ends
 
 ;====
@@ -248,8 +254,7 @@
         ; Display RAM overwritten error
         ld hl, _memoryCorruptionMessage
         call zest.console.out
-        call zest.console.displayMessage
-        jp _stopProgram
+        jp zest.console.displayAndStop
 
     _printTestDescription:
         ; Initialise failure heading
@@ -262,13 +267,7 @@
         ; Print the RAM overwritten message
         ld hl, _memoryCorruptionMessage
         call zest.runner._printAssertionMessage
-        call zest.console.displayMessage
-
-    _stopProgram:
-        ; Stop the program
-        -:
-            halt
-        jp -
+        jp zest.console.displayAndStop
 
     _memoryCorruptionMessage:
         zest.console.defineString "   Zest RAM state overwritten"

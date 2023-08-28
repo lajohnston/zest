@@ -81,6 +81,16 @@
 .endm
 
 ;====
+; Initialises the console with an orange/warning font color
+;====
+.macro "zest.console.initWarning"
+    push af
+        ld a, %00000111 ; orange
+        call zest.console.init
+    pop af
+.endm
+
+;====
 ; Defines an ascii string in bytes
 ;
 ; @in   string
@@ -167,14 +177,15 @@
 ;====
 ; Enables the display to show the message and stops the runner
 ;====
-.section "zest.console.displayMessage" free
-    zest.console.displayMessage:
+.section "zest.console.displayAndStop" free
+    zest.console.displayAndStop:
+        ; Enable the display
         zest.vdp.setRegister1 %11000000
 
         ; Stop program
         -:
             halt
-        jp -
+        jr -
 .ends
 
 ;====
