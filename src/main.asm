@@ -1,5 +1,5 @@
-; SDSC tag and SMS rom header
-.sdsctag 1.2, "Zest", "Sega Master System Unit Test Runner", "lajohnston"
+; Ensure SMS header and checksum is added
+.smstag
 
 ; ASCII table
 .asciitable
