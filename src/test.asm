@@ -164,8 +164,7 @@
             call zest.console.out
 
             ; Write failing test
-            call zest.console.newline
-            call zest.console.newline
+            zest.console.newlines 2
             ld hl, (zest.test.test_text_addr)
             call zest.console.out
         pop hl

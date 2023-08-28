@@ -30,8 +30,7 @@
         zest.console.initSuccess
         ld hl, zest.console.data.heading
         call zest.console.out
-        call zest.console.newline
-        call zest.console.newline
+        zest.console.newlines 2
 
         ld hl, zest.console.data.allTestsPassed
         call zest.console.out
@@ -42,8 +41,7 @@
 
         ld hl, zest.console.data.heading
         call zest.console.out
-        call zest.console.newline
-        call zest.console.newline
+        zest.console.newlines 2
 
         ld hl, zest.console.data.noTestsFound
         call zest.console.out
@@ -171,14 +169,13 @@
             call zest.console.out
 
             ; Separator
-            call zest.console.newline
-            call zest.console.newline
+            zest.console.newlines 2
             ld hl, zest.console.data.separatorText
             call zest.console.out
+            zest.console.newlines 2
         pop hl
 
-        call zest.console.newline
-        jp zest.console.newline ; jp then ret
+        ret
 .ends
 
 ;====
@@ -188,17 +185,14 @@
 ;====
 .section "zest.runner._printAssertionMessage" free
     zest.runner._printAssertionMessage:
-        ; Write assertion message
-        call zest.console.newline
-        call zest.console.newline
-        call zest.console.newline
-
         push hl
+            zest.console.newlines 3
+
+            ; Write assertion message
             ld hl, zest.console.data.separatorText
             call zest.console.out
 
-            call zest.console.newline
-            call zest.console.newline
+            zest.console.newlines 2
         pop hl
 
         jp zest.console.out ; jp then ret
@@ -209,10 +203,8 @@
 ;====
 .section "zest.runner._printExpectedLabel" free
     zest.runner._printExpectedLabel:
-        call zest.console.newline
-        call zest.console.newline
-
         push hl
+            zest.console.newlines 2
             ld hl, zest.console.data.expectedValueLabel
             call zest.console.out
         pop hl
@@ -225,9 +217,8 @@
 ;====
 .section "zest.runner._printActualLabel" free
     zest.runner._printActualLabel:
-        call zest.console.newline
-
         push hl
+            zest.console.newlines 1
             ld hl, zest.console.data.actualValueLabel
             call zest.console.out
         pop hl

@@ -189,43 +189,44 @@
 .ends
 
 ;====
-; Move the console cursor onto the next line
+; Add the given number of rows to the cursor and set the column to 0
+;
+; @in       hl  the number of rows to add * 64
+; @clobs    hl
 ;====
-.section "zest.console.newline" free
-    zest.console.newline:
+.section "zest.console._newlines" free
+    zest.console._newlines:
+        push af
         push de
             ld de, (zest.console.cursor_vram_address)
-            push af
-                ;===
-                ; VRAM address format
-                ; ccbbbyyy yyxxxxx-
-                ;
-                ; c = command
-                ; b = base address
-                ; y = row
-                ; x = col
-                ;===
+            add hl, de
 
-                ; Set column to zero
-                ld a, e         ; set A to low byte of address
-                and %11000000   ; mask out x bits
-                ld e, a         ; set low byte of address
-
-                ; Add 1 row
-                ld a, 32 * 2
-                add a, e  ; A = A+E
-                ld e, a   ; E = A+E
-                adc a, d  ; A = A+E+D+carry
-                sub e     ; A = D+carry
-                ld d, a   ; D = D+carry
-            pop af
+            ; Set column to zero
+            ld a, l         ; set A to low byte of address
+            and %11000000   ; mask out x bits
+            ld l, a         ; set low byte of address
 
             ; Set and store cursor VRAM position
-            ld (zest.console.cursor_vram_address), de
-            call zest.vdp.setAddressDE
+            ld (zest.console.cursor_vram_address), hl
+
+            out (zest.vdp.CONTROL_PORT), a
+            ld a, h
+            out (zest.vdp.CONTROL_PORT), a
         pop de
+        pop af
         ret
 .ends
+
+;====
+; Moves the cursor down the given number of rows and sets the column to 0
+;
+; @in   rows    the number of rows to add
+; @clobs hl
+;====
+.macro "zest.console.newlines" args rows
+    ld hl, 64 * rows
+    call zest.console._newlines
+.endm
 
 ;====
 ; Outputs the value of register sas a hex value onto the screen, e.g $F2 of $F12A
