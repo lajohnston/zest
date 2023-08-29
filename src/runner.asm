@@ -271,11 +271,12 @@
 
 ;====
 ; Prepares the start of a new test
+;
+; @in   hl  pointer to the test description
 ;====
 .section "zest.runner.preTest" free
     zest.runner.preTest:
-        ; Ensure interrupts are disabled
-        di
+        zest.test.setTestDescription
 
         ; Update checksum + VRAM backup
         zest.test.preTest
@@ -299,6 +300,9 @@
 ;====
 .section "zest.runner.postTest" free
     zest.runner.postTest:
+        ; Ensure interrupts are disabled
+        di
+
         ; Increment tests passed. Counter starts at $FFFF, so this will
         ; initialise it to $0 on the first run
         ld hl, (zest.runner.tests_passed)
@@ -323,8 +327,11 @@
 ; Resets the Z80 registers and stores the test description in case the test fails
 ;====
 .macro "zest.runner.startTest" args message
+    ; Run postTest checks for previous test (if any)
     call zest.runner.postTest
-    zest.test.setTestDescription message
+
+    ; Define test description in ROM
+    zest.test.defineTestDescription message
     call zest.runner.preTest
 
     ; Reset stack

@@ -30,35 +30,41 @@
 .ends
 
 ;====
-; (Private) Stores text in the ROM and adds a pointer to it at the given
-; RAM location
-;
-; @in   text        the string to store
-; @in   ramPointer  the pointer in RAM to store the text in
-;====
-.macro "zest.test._storeText" args text, ramPointer
-    jp +
-        _text\@:
-            zest.console.defineString text
-    +:
-
-    ld hl, _text\@
-    ld (ramPointer), hl
-.endm
-
-;====
 ; Describe the unit being tested. Stores a pointer to the description test
 ; which is used to identify the test to the user if it fails
 ;====
 .macro "zest.test.setUnitDescription" args unitName
-    zest.test._storeText unitName, zest.test.unit_text_addr
+    jr +
+        describe_\@:
+            zest.console.defineString unitName
+    +:
+
+    ld hl, describe_\@
+    ld (zest.test.unit_text_addr), hl
 .endm
 
 ;====
+; Defines the test description in ROM
 ;
+; @in  description  description the text string
+; @out hl           pointer to the description in ROM
 ;====
-.macro "zest.test.setTestDescription" args message
-    zest.test._storeText message, zest.test.test_text_addr
+.macro "zest.test.defineTestDescription" args description
+    jr +
+        test_\@:
+            zest.console.defineString description
+    +:
+
+    ld hl, test_\@              ; load HL with pointer to text
+.endm
+
+;====
+; Defines the given piece of text and loads a pointer of it into HL
+;
+; @in   hl  pointer to the test description
+;====
+.macro "zest.test.setTestDescription"
+    ld (zest.test.test_text_addr), hl
 .endm
 
 ;====
