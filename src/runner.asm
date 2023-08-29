@@ -4,7 +4,7 @@
 .ends
 
 ;====
-; Initialise the system and run the test suite
+; Initialises the system and runs the test suite
 ;====
 .section "zest.runner.init" free
     zest.runner.init:
@@ -17,10 +17,20 @@
         ld hl, $ffff
         ld (zest.runner.tests_passed), hl
 
-        ; Run the test suite (label defined by user)
-        call zest.suite
+        ; Run the test suite
+        jp zest.suite
+.ends
 
-        ; All tests passed - check how many were run
+;====
+; Finishes the test run. Displays either a success message, or a warning
+; message if no tests were run
+;====
+.section "zest.runner.finish" free
+    zest.runner.finish:
+        ; Perform postTest checks for the last test
+        call zest.runner.postTest
+
+        ; Check how many tests ran
         ld hl, (zest.runner.tests_passed)
         ld a, h
         or l
@@ -46,11 +56,6 @@
         ld hl, zest.console.data.noTestsFound
         call zest.console.out
         jp zest.console.displayAndStop
-.ends
-
-.section "zest.runner.noTestsFound"
-    zest.runner.noTestsFound:
-
 .ends
 
 ;====
@@ -322,6 +327,6 @@
     zest.test.setTestDescription message
     call zest.runner.preTest
 
-    ; Reset stack (base address minus return address from zest.suite)
-    ld sp, $dfee
+    ; Reset stack
+    ld sp, $dff0
 .endm
