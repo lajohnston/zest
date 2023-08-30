@@ -92,12 +92,12 @@
     .redefine zest.mock._mockStarted 1
 
     push hl
-        ld hl, _mockHandlerStart\@
+        ld hl, \.\@
         ld (mockAddress + zest.Mock.address), hl
     pop hl
 
-    jp _mockHandlerEnd\@    ; jump over mock code, end label defined by zest.mock.end
-    _mockHandlerStart\@:    ; define start of the mock handler
+    jp zest.mock.end\@  ; jump over mock code, end label defined by zest.mock.end
+    \.\@:               ; define start of the mock handler
 .endm
 
 ;====
@@ -107,7 +107,7 @@
     .redefine zest.mock._mockStarted 0
 
     ret                 ; return from the handler
-    _mockHandlerEnd\@:  ; define end of the mock handler
+    zest.mock.end\@:    ; define end of the mock handler
 .endm
 
 ;====
