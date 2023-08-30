@@ -71,11 +71,10 @@
 ; @in   mockAddress the address of the mock instance to define the handler for
 ;====
 .macro "zest.mock.start" args mockAddress
-    push ix
-        ld ix, mockAddress
-        ld (ix + zest.Mock.address), < _mockHandlerStart\@
-        ld (ix + zest.Mock.address + 1), > _mockHandlerStart\@
-    pop ix
+    push hl
+        ld hl, _mockHandlerStart\@
+        ld (mockAddress + zest.Mock.address), hl
+    pop hl
 
     jp _mockHandlerEnd\@    ; jump over mock code, end label defined by zest.mock.end
     _mockHandlerStart\@:    ; define start of the mock handler
