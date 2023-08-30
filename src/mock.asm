@@ -16,14 +16,24 @@
 ; "appendto zest.mocks", and populating them with zest.mock instances
 ;====
 .ramsection "zest.mocks" slot zest.mapper.RAM_SLOT
-    zest.mocks.start:    db
+    zest.mocks.startByte:   db
 .ends
 
 ;====
 ; Marks the end of the mocks list
 ;====
-.ramsection "zest.mocks.end" after zest.mocks
-    zest.mocks.end:      db
+.ramsection "zest.mocks.endByte" after zest.mocks
+    zest.mocks.endByte:     db
+.ends
+
+;====
+; Reserves space in RAM to store temporary opcodes for use when jumping to a
+; mock handler without clobbing hl
+;====
+.ramsection "zest.mock.jump" slot zest.mapper.RAM_SLOT
+    zest.mock.jump.pop:         db
+    zest.mock.jump.jp:          db
+    zest.mock.jump.jp_address:  dw
 .ends
 
 ;====
@@ -34,29 +44,32 @@
 ;====
 ; Initialises all mocks
 ;====
-.section "zest.mock.initAll"
-    ;====
-    ; Initialises one or more mocks in RAM
-    ;====
-    zest.mock.initAll:
+.section "zest.mock.init"
+    zest.mock.init:
         ; Get number of mocks
-        ld a, (zest.mocks.end - zest.mocks.start - 1) / _sizeof_zest.Mock
+        ld a, (zest.mocks.endByte - zest.mocks.startByte - 1) / _sizeof_zest.Mock
         or a    ; update flags
         ret z   ; return if there are no mocks to clear
 
-        ; Point to first mock (skip start byte)
-        ld hl, zest.mocks.start + 1
-        ld b, a ; set B to number of mocks
+        ; Set B to number of mocks
+        ld b, a
+
+        ; Point to first mock (skipping start byte)
+        ld hl, zest.mocks.startByte + 1
 
     _clearMock:
-        ; Add call mediator instructions to the mock instance
-        ld (hl), $e5    ; write push hl to RAM
+        ; Write 'push hl' instruction to Mock instance in RAM
+        ld (hl), $e5
+
+        ; Write 'call' instruction to Mock instance in RAM
         inc hl
-        ld (hl), $cd  ; write 'call' instruction to RAM
+        ld (hl), $cd
+
+        ; Write mediator to Mock instance in RAM
         inc hl
-        ld (hl), < zest.mock.call
+        ld (hl), < zest.mock.mediator
         inc hl
-        ld (hl), > zest.mock.call
+        ld (hl), > zest.mock.mediator
 
         ; Reset 'times called' counter
         inc hl
@@ -111,37 +124,28 @@
 .endm
 
 ;====
-; Reserves space in RAM to store temporary opcodes for use when jumping to a
-; mock handler without clobbing hl
+; A default mock handler that mocks run by default
 ;====
-.ramsection "zest.mock.jump" slot zest.mapper.RAM_SLOT
-    zest.mock.jump.pop:  db
-    zest.mock.jump.jp:   db
-    zest.mock.jump.jp_address:   dw
+.section "zest.mock.defaultHandler" free
+    zest.mock.defaultHandler:
+        ret ; return to caller
 .ends
 
-.section "zest.mock" free
-    ;====
-    ; Defines a procedure that mocks run by default
-    ;====
-    zest.mock.defaultHandler:
-        ; by default, mocks just return to caller
-        ret
-
-    ;====
-    ; Jumps to an address defined in RAM at runtime without clobbing hl.
-    ; It does this by writing 'pop hl' and 'jp, n' opcodes to RAM and executing
-    ; them from there so that control is passed to the destination code as if
-    ; this mediator didn't exist, and so there's no need to have a pop hl instruction
-    ; in the destination code
-    ;
-    ; @in   sp  the start address of the Zest mock in RAM
-    ;====
-    zest.mock.call:
-        ; pop caller (mock) address from stack
+;====
+; Jumps to an address defined in RAM at runtime without clobbing hl.
+; It does this by writing 'pop hl' and 'jp, n' opcodes to RAM and executing
+; them from there so that control is passed to the destination code as if
+; this mediator didn't exist, and so there's no need to have a pop hl instruction
+; in the destination code
+;
+; @in   sp  the start address of the Zest mock in RAM
+;====
+.section "zest.mock.mediator" free
+    zest.mock.mediator:
+        ; Pop caller (mock) address from stack
         pop hl
 
-        ; Increment mock's times_called counter in RAM
+        ; Increment mock's times_called counter
         push af
             inc (hl)
             ; TODO - add overflow logic
@@ -158,7 +162,7 @@
             ; to RAM which will pop hl then jp to the address
 
             ; Write 'pop hl' opcode to RAM
-            ; this value was pushed by the mock (see zest.mock.initAll)
+            ; this value was pushed by the mock (see zest.mock.init)
             ld hl, zest.mock.jump.pop
             ld (hl), $e1    ; $e1 = pop hl
 
