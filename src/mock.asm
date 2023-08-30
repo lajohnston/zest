@@ -26,6 +26,14 @@
     zest.mocks.end:      db
 .ends
 
+;====
+; Variables
+;====
+.define zest.mock._mockStarted 0
+
+;====
+; Initialises all mocks
+;====
 .section "zest.mock.initAll"
     ;====
     ; Initialises one or more mocks in RAM
@@ -71,6 +79,18 @@
 ; @in   mockAddress the address of the mock instance to define the handler for
 ;====
 .macro "zest.mock.start" args mockAddress
+    .ifndef mockAddress
+        zest.utils.assert.fail "zest.mock.start expects a label argument that points to the mock"
+    .endif
+
+    zest.utils.assert.label mockAddress "zest.mock.start expects a label argument that points to the mock"
+
+    .if zest.mock._mockStarted == 1
+        zest.utils.assert.fail "Please ensure you've called the zest.mock.end macro at the end of your mock routines"
+    .endif
+
+    .redefine zest.mock._mockStarted 1
+
     push hl
         ld hl, _mockHandlerStart\@
         ld (mockAddress + zest.Mock.address), hl
@@ -84,6 +104,8 @@
 ; Define the end of a mock handler
 ;====
 .macro "zest.mock.end"
+    .redefine zest.mock._mockStarted 0
+
     ret                 ; return from the handler
     _mockHandlerEnd\@:  ; define end of the mock handler
 .endm

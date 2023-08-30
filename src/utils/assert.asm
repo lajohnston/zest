@@ -2,7 +2,7 @@
 ; Prints an error message and stops the assembler
 ;====
 .macro "zest.utils.assert.fail" args message
-    .print "\n", message, "\n\n"
+    .print "\nZest error:\n  ", message, "\n\n"
     .fail
 .endm
 
@@ -57,4 +57,15 @@
 ;====
 .macro "zest.utils.assert.boolean" args value message
     zest.utils.assert.range value 0, 1, message
+.endm
+
+;====
+; Asserts that the given value is a label
+;
+; @in   value   the value to assert
+;====
+.macro "zest.utils.assert.label" args value message
+    .if \?1 != ARG_LABEL
+        zest.utils.assert.fail message
+    .endif
 .endm
