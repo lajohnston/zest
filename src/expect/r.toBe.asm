@@ -32,6 +32,8 @@
 .macro "expect.a.toBe" args expected
     zest.utils.assert.byte expected "\. expects a numeric byte value"
 
+    \@_\..{expected}:
+
     push af
         expect._assertAEquals expected expect.a.toBe.defaultMessage
     pop af
@@ -45,6 +47,8 @@
 ;====
 .macro "expect.b.toBe" args expected
     zest.utils.assert.byte expected "\. expects a numeric byte value"
+
+    \@_\..{expected}:
 
     push af
         ld a, b
@@ -61,6 +65,8 @@
 .macro "expect.c.toBe" args expected
     zest.utils.assert.byte expected "\. expects a numeric byte value"
 
+    \@_\..{expected}:
+
     push af
         ld a, c
         expect._assertAEquals expected expect.c.toBe.defaultMessage
@@ -75,6 +81,8 @@
 ;====
 .macro "expect.d.toBe" args expected
     zest.utils.assert.byte expected "\. expects a numeric byte value"
+
+    \@_\..{expected}:
 
     push af
         ld a, d
@@ -91,6 +99,8 @@
 .macro "expect.e.toBe" args expected
     zest.utils.assert.byte expected "\. expects a numeric byte value"
 
+    \@_\..{expected}:
+
     push af
         ld a, e
         expect._assertAEquals expected expect.e.toBe.defaultMessage
@@ -105,6 +115,8 @@
 ;====
 .macro "expect.h.toBe" args expected
     zest.utils.assert.byte expected "\. expects a numeric byte value"
+
+    \@_\..{expected}:
 
     push af
         ld a, h
@@ -121,6 +133,8 @@
 .macro "expect.l.toBe" args expected
     zest.utils.assert.byte expected "\. expects a numeric byte value"
 
+    \@_\..{expected}:
+
     push af
         ld a, l
         expect._assertAEquals expected expect.l.toBe.defaultMessage
@@ -135,6 +149,8 @@
 ;====
 .macro "expect.ixh.toBe" args expected
     zest.utils.assert.byte expected "\. expects a numeric byte value"
+
+    \@_\..{expected}:
 
     push af
         ld a, ixh
@@ -151,6 +167,8 @@
 .macro "expect.ixl.toBe" args expected
     zest.utils.assert.byte expected "\. expects a numeric byte value"
 
+    \@_\..{expected}:
+
     push af
         ld a, ixl
         expect._assertAEquals expected expect.ixl.toBe.defaultMessage
@@ -165,6 +183,8 @@
 ;====
 .macro "expect.iyh.toBe" args expected
     zest.utils.assert.byte expected "\. expects a numeric byte value"
+
+    \@_\..{expected}:
 
     push af
         ld a, iyh
@@ -181,6 +201,8 @@
 .macro "expect.iyl.toBe" args expected
     zest.utils.assert.byte expected "\. expects a numeric byte value"
 
+    \@_\..{expected}:
+
     push af
         ld a, iyl
         expect._assertAEquals expected expect.iyl.toBe.defaultMessage
@@ -195,6 +217,8 @@
 ;====
 .macro "expect.i.toBe" args expected
     zest.utils.assert.byte expected "\. expects a numeric byte value"
+
+    \@_\..{expected}:
 
     push af
         ld a, i

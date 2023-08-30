@@ -11,6 +11,8 @@
 .macro "expect.bc.toBe" isolated args expectedValue
     zest.utils.assert.word expectedValue "\. expects a 16-bit value"
 
+    \@_\..{expectedValue}:
+
     push af
     push hl
         ld hl, expectedValue    ; set HL to expected value
@@ -48,6 +50,8 @@
 .macro "expect.de.toBe" isolated args expectedValue
     zest.utils.assert.word expectedValue "\. expects a 16-bit value"
 
+    \@_\..{expectedValue}:
+
     push af
     push hl
         ld hl, expectedValue    ; set HL to expected value
@@ -79,6 +83,8 @@
 .macro "expect.hl.toBe" isolated args expectedValue
     zest.utils.assert.word expectedValue "\. expects a 16-bit value"
 
+    \@_\..{expectedValue}:
+
     push af
     push bc
         ld bc, expectedValue
@@ -109,6 +115,8 @@
 ;====
 .macro "expect.ix.toBe" isolated args expectedValue
     zest.utils.assert.word expectedValue "\. expects a 16-bit value"
+
+    \@_\..{expectedValue}:
 
     push af
     push hl
@@ -148,6 +156,8 @@
 ;====
 .macro "expect.iy.toBe" isolated args expectedValue
     zest.utils.assert.word expectedValue "\. expects a 16-bit value"
+
+    \@_\..{expectedValue}:
 
     push af
     push hl

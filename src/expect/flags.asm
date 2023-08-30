@@ -27,6 +27,8 @@
 .macro "expect.carry.toBe" args expectedValue
     zest.utils.assert.boolean expectedValue "\. expects a boolean (0 or 1) value"
 
+    \@_\..{expectedValue}:
+
     .if expectedValue == 1
         jp c, +     ; jp/pass if carry set
             expect.flags._fail expectedValue expect.flags.defaultMessages.carry
@@ -46,6 +48,8 @@
 ;====
 .macro "expect.parityOverflow.toBe" args expectedValue
     zest.utils.assert.boolean expectedValue "\. expects a boolean (0 or 1) value"
+
+    \@_\..{expectedValue}:
 
     .if expectedValue == 1
         jp pe, +     ; jp/pass if parity/overflow is set
@@ -67,6 +71,8 @@
 .macro "expect.sign.toBe" args expectedValue
     zest.utils.assert.boolean expectedValue "\. expects a boolean (0 or 1) value"
 
+    \@_\..{expectedValue}:
+
     .if expectedValue == 1
         jp m, +     ; jp/pass if sign flag is set
             expect.flags._fail expectedValue expect.flags.defaultMessages.sign
@@ -86,6 +92,8 @@
 ;====
 .macro "expect.zeroFlag.toBe" args expectedValue
     zest.utils.assert.boolean expectedValue "\. expects a boolean (0 or 1) value"
+
+    \@_\..{expectedValue}:
 
     .if expectedValue == 1
         jp z, +     ; jp/pass if zero flag is set
