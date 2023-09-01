@@ -137,31 +137,85 @@
 
         ; Load VRAM address + write command into DE
         ld de, (zest.console.cursor_vram_address)
+        jp _outputCharacter
 
         _outputNextCharacter:
-            ld a, (hl)
-            cp $ff
-            jr z, _finish
-
-            ; Check if we're on the last column
-            ld a, e
-            and %00111110   ; mask X bits
-            cp %00111110    ; if X bits are all 1, we're on the last column (31)
-            jp nz, +
-                ; We're on the last column
-                ; Output dash character. VRAM auto-increments to next line
-                ld a, 13                        ; dash pattern
-                zest.console._outputCharacter
-                jp _outputNextCharacter
-            +:
-
-            ; Output character to VRAM (auto-increments VRAM position)
-            ld a, (hl)  ; re-load character
-            zest.console._outputCharacter
-
-            ; Point to next character
             inc hl
 
+        _outputCharacter:
+            ; Check if we've reached the end of the string
+            ld a, (hl)
+            cp zest.console.TERMINATOR
+            jr z, _finish
+
+            ; Check if we're on the last column (all X bits as 1)
+            ld a, e
+            and %00111110       ; mask X bits
+            cp %00111110        ; set Z if all X bits are all 1
+            jr z, _wordBreak    ; jp if we need to wrap onto the next line
+
+            _loadAndOutputCharacter:
+                ld a, (hl)  ; load current character
+                zest.console._outputCharacter
+                jp _outputNextCharacter
+
+        ;===
+        ; Outputs a character onto the last column. If a word is in progress,
+        ; it outputs a dash in the last column and continues the word on the
+        ; next line
+        ;===
+        _wordBreak:
+            ;===
+            ; If this character is a space, just output it onto the last column
+            ; and go to the new line
+            ;===
+            ld a, asc(' ')  ; load A with the space character
+            cp (hl)
+            jr z, _loadAndOutputCharacter   ; jp if it's a space
+
+            ;===
+            ; If the character after this is a space, just output the current
+            ; character onto the last column
+            ;===
+            inc hl                          ; point to character after this one
+            cp (hl)
+            jp nz, ++
+                dec hl                      ; point to current char
+                jp _loadAndOutputCharacter  ; output
+            ++:
+
+            ;===
+            ; If the character after this is the end of the string, just output the
+            ; current character onto the last column
+            ;===
+            ld a, zest.console.TERMINATOR
+            cp (hl)
+            dec hl                          ; point to current char
+                                            ; (doesn't affect flags)
+            jr z, _loadAndOutputCharacter
+
+            ;===
+            ; If previous character was a space there's no word to break. Just
+            ; output another space and go to a new line
+            ;===
+            dec hl                          ; point to previous character
+            ld a, asc(' ')
+            cp (hl)                         ; compare
+            jr z, _loadAndOutputCharacter   ; jp if it's a space
+
+            inc hl  ; point back to current character
+
+            ;===
+            ; Otherwise, output a dash character and break the word onto a
+            ; new line
+            ;===
+            ; Output dash character. VRAM auto-increments to next line
+            ld a, asc('-')
+            zest.console._outputCharacter
+
+            ; Output the character on the next line instead
+            ld a, (hl)  ; re-load character
+            zest.console._outputCharacter
             jp _outputNextCharacter
 
         _finish:
