@@ -29,10 +29,47 @@
 .ends
 
 ;====
+; Sets the VDP address
+;
+; @in       address VRAM address + command
+; @clobs    a
+;====
+.macro "zest.vdp.setAddress" args address
+    .if <(address) == 0
+        xor a
+    .else
+        ld a, <(address)
+    .endif
+
+    out (zest.vdp.CONTROL_PORT), a
+
+    .if >(address) == 0
+        xor a
+    .else
+        ld a, >(address)
+    .endif
+
+    out (zest.vdp.CONTROL_PORT), a
+.endm
+
+;====
 ; Fills the graphics RAM with zeroes
 ;====
 .section "zest.vdp.clearVram" free
     zest.vdp.clearVram:
+        ; Clear color RAM
+        zest.vdp.setAddress $0000 | zest.vdp.CRAMWrite
+
+        xor a   ; black
+        ld b, 8 ; 8 * 4 = 32
+        -:
+            ; Set next four palette entries to black
+            out (zest.vdp.DATA_PORT), a
+            out (zest.vdp.DATA_PORT), a
+            out (zest.vdp.DATA_PORT), a
+            out (zest.vdp.DATA_PORT), a
+        djnz -
+
         ; Set VRAM write address to $0000
         ld hl, $0000 | zest.vdp.VRAMWrite
         call zest.vdp.setAddress
@@ -43,27 +80,13 @@
             xor a       ; set A to 0
 
             ; Output to VRAM address, which is auto-incremented after each write
-            out (zest.vdp.DATA_PORT),a
+            out (zest.vdp.DATA_PORT), a
             dec bc
             ld a, b
             or c
         jp nz,-
         ret
 .ends
-
-;====
-; Sets the VDP address
-;
-; @in       address VRAM address + command
-; @clobs    a
-;====
-.macro "zest.vdp.setAddress" args address
-    ld a, <(address)
-    out (zest.vdp.CONTROL_PORT), a
-
-    ld a, >(address)
-    out (zest.vdp.CONTROL_PORT), a
-.endm
 
 ;====
 ; Sets the VDP address + command
