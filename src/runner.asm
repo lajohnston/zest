@@ -282,7 +282,7 @@
         zest.test.preTest
 
         ; Reset mocks
-        call zest.mock.init
+        zest.mock.initAll
 
         ; Reset timeout counter
         zest.timeout.reset

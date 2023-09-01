@@ -39,14 +39,27 @@
 
 ;====
 ; Initialises all mocks
+;
+; @clobs af
 ;====
-.section "zest.mock.init"
-    zest.mock.init:
-        ; Get number of mocks
-        ld a, (zest.mocks.endByte - zest.mocks.startByte - 1) / _sizeof_zest.Mock
-        or a    ; update flags
-        ret z   ; return if there are no mocks to clear
+.macro "zest.mock.initAll"
+    ; Calculate number of mocks
+    ld a, (zest.mocks.endByte - zest.mocks.startByte - 1) / _sizeof_zest.Mock
 
+    ; Update flags
+    or a
+
+    ; Call initAll if there are more than 0 mocks
+    call nz, zest.mock._initAll
+.endm
+
+;====
+; (Private) Initialises/resets all the mock instances
+;
+; @in   a   the number of mock instances
+;====
+.section "zest.mock._initAll"
+    zest.mock._initAll:
         ; Set B to number of mocks
         ld b, a
 
