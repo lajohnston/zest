@@ -85,6 +85,7 @@
         ld (hl), < zest.mock.defaultHandler
         inc hl
         ld (hl), > zest.mock.defaultHandler
+        inc hl  ; point to next mock
 
         djnz _clearMock
         ret
