@@ -50,7 +50,7 @@
 ; @in   message     a description string of the unit
 ;====
 .macro "describe" args message
-    zest.test.setUnitDescription message
+    zest.runner.startDescribeBlock message
 .endm
 
 ;====

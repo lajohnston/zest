@@ -30,13 +30,13 @@
 .ends
 
 ;====
-; Describe the unit being tested. Stores a pointer to the description test
+; Describe a block of tests. Stores a pointer to the description test
 ; which is used to identify the test to the user if it fails
 ;====
-.macro "zest.test.setUnitDescription" args unitName
+.macro "zest.test.setBlockDescription" args blockDescription
     jr +
         describe_\@:
-            zest.console.defineString unitName
+            zest.console.defineString blockDescription
     +:
 
     ld hl, describe_\@

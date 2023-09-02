@@ -1,6 +1,19 @@
+;====
+; Constants
+;====
+.define zest.runner.TEST_IN_PROGRESS_BIT 0
+.define zest.runner.TEST_IN_PROGRESS_MASK %00000001
+
+;====
+; RAM
+;====
 .ramsection "zest.runner" slot zest.mapper.RAM_SLOT
     ; The number of tests that have passed
     zest.runner.tests_passed: dw
+
+    ; Flags
+    ; Bit 0 = set if a test is in progress
+    zest.runner.flags:  db
 .ends
 
 ;====
@@ -12,10 +25,13 @@
         call zest.vdp.init
         call zest.vdp.clearVram
 
-        ; Start tests passed counter to $ffff. This will be incremented to 0
-        ; when the first test runs
-        ld hl, $ffff
-        ld (zest.runner.tests_passed), hl
+        ; Reset test counter
+        xor a
+        ld (zest.runner.tests_passed), a
+        ld (zest.runner.tests_passed + 1), a
+
+        ; Reset flags
+        ld (zest.runner.flags), a
 
         ; Run the test suite
         jp zest.suite
@@ -298,6 +314,11 @@
         ; Reset timeout counter
         zest.timeout.reset
 
+        ; Set test in progress flag
+        ld a, (zest.runner.flags)
+        or zest.runner.TEST_IN_PROGRESS_MASK
+        ld (zest.runner.flags), a
+
         ; Disable display and enable VBlank interrupts
         in a, (zest.vdp.STATUS_PORT)    ; clear pending interrupts
         zest.vdp.setRegister1 %10100000 ; enable VBlank interrupts
@@ -314,8 +335,16 @@
         ; Ensure interrupts are disabled
         di
 
-        ; Increment tests passed. Counter starts at $FFFF, so this will
-        ; initialise it to $0 on the first run
+        ; If no test is in progress, return
+        ld a, (zest.runner.flags)
+        bit zest.runner.TEST_IN_PROGRESS_BIT, a
+        ret z   ; return if a test isn't in progress
+
+        ; Reset the test in progress flag
+        and (zest.runner.TEST_IN_PROGRESS_MASK ~ $ff)   ; reset the bit
+        ld (zest.runner.flags), a                       ; store
+
+        ; Increment tests passed
         ld hl, (zest.runner.tests_passed)
         inc hl
         ld (zest.runner.tests_passed), hl
@@ -334,8 +363,19 @@
 .ends
 
 ;====
-; Initialises a new test.
-; Resets the Z80 registers and stores the test description in case the test fails
+; Starts a new block of tests
+;
+; @in   message     pointer to the message string
+;====
+.macro "zest.runner.startDescribeBlock" args message
+    call zest.runner.postTest
+    zest.test.setBlockDescription message
+.endm
+
+;====
+; Initialises a new test
+;
+; @in   message     pointer to the message string
 ;====
 .macro "zest.runner.startTest" args message
     ; Run postTest checks for previous test (if any)
