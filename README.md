@@ -23,7 +23,7 @@ Instead, with a test runner you can define the list of behaviours you intend a r
 
 ## How to use it
 
-Examples are included in the repo (see `/examples`). You can build these in Linux/WSL using `./examples/build.sh`. The binaries will be placed in `./examples/dist` which you can then run in an emulator.
+Examples are included in the repo (see `/examples`). You can build these in Linux/WSL using `./examples/build.sh`. The ROM will be placed in `./examples/dist` which you can then run in an emulator or on an actual system.
 
 Create a blank test suite asm file that will serve as the entry point. In this file, use .include to pull in the Zest library and the code files you want to test.
 
