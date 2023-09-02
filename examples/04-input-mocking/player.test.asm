@@ -12,6 +12,9 @@ describe "player.asm updatePosition"
         ; Call the function we're testing
         call updatePosition
 
+        ; You can check the mock was actually called if needed
+        expect.mock.toHaveBeenCalled readPlayer1Input
+
         ; Assert playerXPos is still 100
         ld a, (playerXPos)
         expect.a.toBe 100

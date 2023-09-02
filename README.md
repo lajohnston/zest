@@ -147,6 +147,12 @@ expect.zeroFlag.toBe 0
 expect.zeroFlag.toBe 1
 ```
 
+### Mocks
+
+```
+expect.mock.toHaveBeenCalled myMock
+```
+
 ## Timeout detection
 
 By default, Zest will timeout and fail a test if it takes more than 10 full frames/VBlanks to complete, in case the code has got itself into an infinite loop, forgotten to return, or jumped to an invalid location. It does this by decrementing a counter at each VBlank and timing out when it reaches zero. Note: this timeout detection relies on the code not disabling interrupts.

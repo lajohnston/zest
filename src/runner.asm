@@ -115,7 +115,7 @@
 .ends
 
 ;====
-; Displays details about a boolean/flag  assertion that doesn't match
+; Displays details about a boolean/flag assertion that doesn't match
 ; the expectation, then stops the program
 ;
 ; @in   a   the expected value (a 1 or a 0)
@@ -141,6 +141,17 @@
             call zest.console.outputBoolean
         pop af
 
+        jp zest.console.displayAndStop
+.ends
+
+;====
+; Displays details about a general expectation that hasn't been met
+;
+; @in   hl  pointer to the assertion message
+;====
+.section "zest.runner.expectationFailed" free
+    zest.runner.expectationFailed:
+        call zest.runner._printTestFailure
         jp zest.console.displayAndStop
 .ends
 

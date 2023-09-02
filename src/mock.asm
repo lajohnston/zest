@@ -177,3 +177,13 @@
         ld hl, (zest.mock.hlTemp)   ; restore HL
         ret                         ; 'return' to the handler
 .ends
+
+;====
+; Returns the number of times the given mock was called
+;
+; @in   mock    address of the mock instance
+; @out  a       the number of times the mock was called
+;====
+.macro "zest.mock.getTimesCalled" args mock
+    ld a, (mock + zest.Mock.times_called)
+.endm
