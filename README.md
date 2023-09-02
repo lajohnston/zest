@@ -92,11 +92,13 @@ In your test suite, define your mocks in a ramsection using `appendto zest.mocks
 Mocks get reset at the start of each test with a default handler that will simply return (`ret`) to the caller. To override this in a test, wrap some code in `zest.mock.start` and `zest.mock.end`:
 
 ```asm
+; Define a custom handler for this label
 zest.mock.start someLabel
     ld a, 123
+    ; ret is added automatically
 zest.mock.end
 
-call someLabel
+call someLabel      ; this will call our handler
 expect.a.toBe 123
 ```
 
@@ -104,13 +106,13 @@ With the above, when we call `someLabel`, we actually call the code defined betw
 
 ## Expectations
 
-Zest comes with the following expectations out of the box:
+Zest comes with the following expectations out of the box.
 
 ### Registers
 
 Example usage:
-    - `expect.a.toBe 255`
-    - `expect.b.toBe -128`
+* `expect.a.toBe 255`
+* `expect.b.toBe -128`
 
 ```asm
 expect.a.toBe -128
