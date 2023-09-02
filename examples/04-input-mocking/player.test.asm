@@ -6,8 +6,7 @@ describe "player.asm updatePosition"
 
         ; Stub readPlayer1Input to return no input
         zest.mock.start readPlayer1Input
-            ; No buttons pressed (0 = pressed, 1 = not pressed)
-            ld a, %11111111
+            ld a, %11111111 ; no buttons pressed (1 = not pressed)
         zest.mock.end
 
         ; Call the function we're testing
@@ -24,8 +23,7 @@ describe "player.asm updatePosition"
 
         ; Stub readPlayer1Input to return right input
         zest.mock.start readPlayer1Input
-            ; Right button pressed (0 = pressed, 1 = not pressed)
-            ld a, %11110111
+            ld a, %11110111 ; right button pressed
         zest.mock.end
 
         ; Call the function we're testing
@@ -40,10 +38,9 @@ describe "player.asm updatePosition"
         ld a, 100
         ld (playerXPos), a
 
-        ; Stub readPlayer1Input to return right input
+        ; Stub readPlayer1Input to return left input
         zest.mock.start readPlayer1Input
-            ; Right button pressed (0 = pressed, 1 = not pressed)
-            ld a, %11111011
+            ld a, %11111011 ; left button pressed
         zest.mock.end
 
         ; Call the function we're testing
