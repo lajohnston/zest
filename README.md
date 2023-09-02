@@ -106,27 +106,29 @@ Zest comes with the following expectations out of the box:
 
 ### Registers
 
-Example usage: `expect.a.toBe 123`
+Example usage:
+    - `expect.a.toBe 255`
+    - `expect.b.toBe -128`
 
 ```asm
-expect.a.toBe
-expect.b.toBe
-expect.c.toBe
-expect.d.toBe
-expect.e.toBe
-expect.h.toBe
-expect.l.toBe
-expect.ixh.toBe
-expect.ixl.toBe
-expect.iyh.toBe
-expect.iyl.toBe
-expect.i.toBe
+expect.a.toBe -128
+expect.b.toBe 255
+expect.c.toBe 255
+expect.d.toBe 255
+expect.e.toBe 255
+expect.h.toBe 255
+expect.l.toBe 255
+expect.i.toBe 255
+expect.ixh.toBe 255
+expect.ixl.toBe 255
+expect.iyh.toBe 255
+expect.iyl.toBe 255
 
-expect.bc.toBe
-expect.de.toBe
-expect.hl.toBe
-expect.ix.toBe
-expect.iy.toBe
+expect.bc.toBe -32768
+expect.de.toBe 65535
+expect.hl.toBe 65535
+expect.ix.toBe 65535
+expect.iy.toBe 65535
 ```
 
 ### Flags
