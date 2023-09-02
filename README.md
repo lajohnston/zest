@@ -84,21 +84,23 @@ In your test suite, define your mocks in a ramsection using `appendto zest.mocks
 
 ```asm
 .ramsection "my mock instances" appendto zest.mocks
-    ; Calls to readPortA will point to this mock in RAM
-    readPortA instanceof zest.Mock
+    ; Calls to someLabel will point to this mock in RAM
+    someLabel instanceof zest.Mock
 .ends
 ```
 
-Mocks gets reset at the start of each 'it' test with a default handler that will simply return (`ret`) to the caller. To override this in a test, wrap some code in `zest.mock.start` and `zest.mock.end`:
+Mocks get reset at the start of each test with a default handler that will simply return (`ret`) to the caller. To override this in a test, wrap some code in `zest.mock.start` and `zest.mock.end`:
 
 ```asm
-zest.mock.start readPortA
-    ld a, %11111110 ; simulate up being pressed
-    ; ret is added automatically
+zest.mock.start someLabel
+    ld a, 123
 zest.mock.end
+
+call someLabel
+expect.a.toBe 123
 ```
 
-With the above, when the code you're testing calls `readPortA`, it will actually call the code you've defined between `zest.mock.start` and `zest.mock.end`. In the above case, register A would be loaded with a fixed value and would then return to the caller, which will continue running unaware.
+With the above, when we call `someLabel`, we actually call the code defined between `zest.mock.start` and `zest.mock.end`. In the above case, register A would be loaded with a fixed value and would then return to the caller, which will continue running unaware.
 
 ## Expectations
 
@@ -149,8 +151,15 @@ expect.zeroFlag.toBe 1
 
 ### Mocks
 
-```
+```asm
 expect.mock.toHaveBeenCalled myMock
+```
+
+You can use the `zest.mocks.getTimesCalled` macro to load A with the number of times a given mock was called.
+
+```asm
+zest.mock.getTimesCalled
+expect.a.toBe 2
 ```
 
 ## Timeout detection
@@ -161,7 +170,7 @@ As the test won't necessarily begin at the start of a full frame, an additional 
 
 The default timeout can be overridden for all tests by defining the `zest.defaultTimeout` value before importing Zest.
 
-```
+```asm
 ; Timeout tests if they take more than 1 full frame
 .define zest.defaultTimeout 1
 
@@ -172,7 +181,7 @@ The default timeout can be overridden for all tests by defining the `zest.defaul
 
 To override this default timeout for individual tests, use `zest.setTimeout` within the test. You could use this to increase the timeout for tests you expect to take a longer amount of time:
 
-```
+```asm
 it "should not timeout"
     ; Only timeout this test if it takes more than 20 full frames
     zest.setTimeout 20
@@ -182,7 +191,3 @@ it "should not timeout"
 ## Memory overwrite detection
 
 Zest will attempt to detect if its RAM state has been overwritten by a test, and if so will stop the program with an error message. A backup of the test description pointers is kept in VRAM (within the sprite attribute table gap) and Zest will attempt to restore these so it can recover and display the test that exhibits the issue.
-
-## Status
-
-The project is a fully functioning proof-of-concept that I work on as a hobby. Next steps will include adding more assertions and examples so it will be ready for real projects.
