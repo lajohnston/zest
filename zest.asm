@@ -44,6 +44,8 @@
 ; Global aliases
 ;====
 
+.define zest.RAM_SLOT zest.mapper.RAM_SLOT
+
 ;====
 ; Describes the unit being tested
 ;
