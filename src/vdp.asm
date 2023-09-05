@@ -1,14 +1,19 @@
 ;====
 ; Constants
 ;====
-.define zest.vdp.VRAMWrite       $4000
-.define zest.vdp.CRAMWrite       $c000
+.define zest.vdp.VRAMWrite      $4000
+.define zest.vdp.CRAMWrite      $c000
 
-.define zest.vdp.TILEMAP_BASE    $3800
+.define zest.vdp.TILEMAP_BASE   $3800
 
-.define zest.vdp.CONTROL_PORT    $bf
-.define zest.vdp.STATUS_PORT     $bf    ; same as control port (read-only)
-.define zest.vdp.DATA_PORT       $be
+.define zest.vdp.CONTROL_PORT   $bf
+.define zest.vdp.STATUS_PORT    $bf    ; same as control port (read-only)
+.define zest.vdp.DATA_PORT      $be
+
+.define zest.vdp.SCROLL_X
+
+.define zest.vdp.SCROLL_X_REGISTER 8
+.define zest.vdp.SCROLL_Y_REGISTER 9
 
 ;====
 ; Initialises the VDP's registers to sensible defaults
@@ -53,6 +58,19 @@
 .endm
 
 ;====
+; Sets the given VDP register
+;
+; @in   registerNumber
+; @in   value
+;====
+.macro "zest.vdp.setRegister" args registerNumber value
+    ld a, value                         ; load A with value
+    out (zest.vdp.CONTROL_PORT), a      ; send the register value first
+    ld a, %10000000 | registerNumber    ; load write command with register number
+    out (zest.vdp.CONTROL_PORT), a      ; send the register write command
+.endm
+
+;====
 ; Fills the graphics RAM with zeroes
 ;====
 .section "zest.vdp.clearVram" free
@@ -85,6 +103,41 @@
             ld a, b
             or c
         jp nz,-
+        ret
+.ends
+
+;====
+; @in   a   the pattern to fill the tilemap with
+;====
+.section "zest.vdp.clearTilemap" free
+    zest.vdp.clearTilemap:
+        ; Preserve pattern in D
+        ld d, a
+
+        ; Set scroll registers to 0
+        zest.vdp.setRegister zest.vdp.SCROLL_X_REGISTER 0
+        zest.vdp.setRegister zest.vdp.SCROLL_Y_REGISTER 0
+
+        ; Set tilemap address
+        zest.vdp.setAddress zest.vdp.TILEMAP_BASE | zest.vdp.VRAMWrite
+
+        ; Clear tiles
+        ld bc, 32 * 28
+        -:
+            ; Pattern
+            ld a, d
+            out (zest.vdp.DATA_PORT), a
+
+            ; Attributes
+            xor a
+            out (zest.vdp.DATA_PORT), a
+
+            ; Decrement BC and check if it's 0
+            dec bc
+            ld a, b
+            or c
+        jp nz, -
+
         ret
 .ends
 

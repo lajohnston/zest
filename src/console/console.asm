@@ -50,6 +50,10 @@
             ld bc, zest.console.data.font_end - zest.console.data.font
             call zest.vdp.copyToVram
 
+            ; Erase tilemap
+            ld a, asc(' ')
+            call zest.vdp.clearTilemap
+
             ; Initial cursor position in tilemap
             ld hl, zest.vdp.TILEMAP_BASE | zest.vdp.VRAMWrite
             ld (zest.console.cursor_vram_address), hl
