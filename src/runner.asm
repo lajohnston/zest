@@ -349,11 +349,6 @@
         inc hl
         ld (zest.runner.tests_passed), hl
 
-        ; Return if no tests have run yet
-        ld a, h
-        or l
-        ret z
-
         ; Set Z if checksum is valid
         zest.test.validateChecksum
         ret z   ; return if the checksum is valid
