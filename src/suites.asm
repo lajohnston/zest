@@ -7,6 +7,11 @@
 ;====
 .section "zest.suite" free bank zest.mapper.SUITE_BANK_1 slot zest.mapper.SUITE_SLOT keep
     zest.suite:
+        call zest.preSuite
+
+        ; Tests get appended here
+
+        ; zest.suite.end finished the code block
 .ends
 
 ;====

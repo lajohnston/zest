@@ -38,6 +38,8 @@
 .include "./src/expect/r.toBe.asm"
 .include "./src/expect/rr.toBe.asm"
 
+.include "./src/preSuite.asm"
+
 .include "./src/suites.asm"
 
 ;====
