@@ -30,3 +30,11 @@
 
 .include "./src/preSuite.asm"
 .include "./src/preTest.asm"
+
+.include "./src/suites.asm"
+
+;====
+; Global aliases
+;====
+
+.define zest.RAM_SLOT zest.mapper.RAM_SLOT
