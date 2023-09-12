@@ -39,6 +39,8 @@
 .include "./src/expect/rr.toBe.asm"
 
 .include "./src/preSuite.asm"
+.include "./src/preTest.asm"
+.include "./src/postTest.asm"
 
 .include "./src/suites.asm"
 
@@ -82,5 +84,5 @@
 ; @in   frames  the number of full frames (1-255)
 ;====
 .macro "zest.setTimeout" args frames
-    zest.timeout.setCurrent frames
+    ; zest.timeout.setCurrent frames
 .endm

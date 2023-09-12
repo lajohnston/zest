@@ -19,4 +19,5 @@
 ;====
 .section "zest.suite.end" after zest.suite keep
     jp zest.runner.finish
+    ; ret
 .ends

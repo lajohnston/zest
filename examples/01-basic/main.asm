@@ -1,12 +1,47 @@
 ; Include the Zest lib
 .incdir "../../"
     .include "zest.asm"
+    ; .include "./src/mapper.asm"
 .incdir "."
 
-; Include any code you want to test
-.include "increment.asm"
+; ;====
+; ; Boot sequence
+; ;====
+; .orga $0000
+; .section "zest.main" force
+;     di              ; disable interrupts
+;     im 1            ; Interrupt mode 1
+;     ld sp, $dff0    ; set stack pointer
+;     jp zest.suite
+; .ends
 
-; Append your test files to zest.suite
-.section "suite" appendto zest.suite
-    .include "increment.test.asm"
-.ends
+; .section "zest.runner.finish" free
+;     zest.runner.finish:
+;         ret
+; .ends
+
+; .section "zest.preSuite" free keep
+;     zest.preSuite:
+;         nop
+; .ends
+
+; .section "zest.preSuite.end" after zest.preSuite keep
+;     ret
+; .ends
+
+; .section "zest.suite" free bank 1 slot 1 keep
+;     zest.suite:
+;         call zest.preSuite
+
+;         ; Tests get appended here
+
+;         ; zest.suite.end finished the code block
+; .ends
+
+; ;====
+; ; The end of the default suite
+; ;====
+; .section "zest.suite.end" after zest.suite keep
+;     jp zest.runner.finish
+;     ; ret
+; .ends

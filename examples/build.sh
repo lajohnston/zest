@@ -20,7 +20,7 @@ mkdir $TEMP_DIR
 
 # Build examples
 
-EXAMPLES=( $(ls -d [0-9][0-9]-*) )
+EXAMPLES=( $(ls -d 01-*) )
 
 for EXAMPLE in "${EXAMPLES[@]}"
 do
@@ -38,7 +38,7 @@ do
 
     # Link objects
     cd $TEMP_DIR
-    wlalink -d -S -A linkfile $EXAMPLE.sms
+    wlalink -v -d -S -A linkfile $EXAMPLE.sms
     cd - > /dev/null # return to former directory
 
     # Place output in build directory
