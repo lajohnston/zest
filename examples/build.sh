@@ -34,7 +34,7 @@ do
     echo $EXAMPLE.o >> $LINKFILE
 
     # Assemble objects
-    wla-z80 -o $TEMP_DIR/$EXAMPLE.o main.asm
+    wla-z80 -o $TEMP_DIR/$EXAMPLE.o suite.asm
 
     # Link objects
     cd $TEMP_DIR
