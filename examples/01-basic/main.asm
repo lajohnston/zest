@@ -1,47 +1,106 @@
-; Include the Zest lib
 .incdir "../../"
-    .include "zest.asm"
-    ; .include "./src/mapper.asm"
-.incdir "."
 
-; ;====
-; ; Boot sequence
-; ;====
-; .orga $0000
-; .section "zest.main" force
-;     di              ; disable interrupts
-;     im 1            ; Interrupt mode 1
-;     ld sp, $dff0    ; set stack pointer
-;     jp zest.suite
-; .ends
+;====
+; Slots
+; These contain fixed address ranges that ROM banks can be mapped into
+;====
+.define zest.mapper.ZEST_SLOT 0     ; fixed Zest code + assets
+.define zest.mapper.SUITE_SLOT 1    ; where user's code is paged
+.define zest.mapper.RAM_SLOT 3
 
-; .section "zest.runner.finish" free
-;     zest.runner.finish:
-;         ret
-; .ends
+; Sega mapper (4x16KB slots)
+.memorymap
+    defaultslot 0
 
-; .section "zest.preSuite" free keep
-;     zest.preSuite:
-;         nop
-; .ends
+    ; 16KB - Zest code
+    slotsize $4000
+    slot zest.mapper.ZEST_SLOT $0000
 
-; .section "zest.preSuite.end" after zest.preSuite keep
-;     ret
-; .ends
+    ; 16KB - Pageable user suite
+    slotsize $4000
+    slot zest.mapper.SUITE_SLOT $4000
 
-; .section "zest.suite" free bank 1 slot 1 keep
-;     zest.suite:
-;         call zest.preSuite
+    ; 16KB - Pageable (not used)
+    slotsize $4000
+    slot 2 $8000
 
-;         ; Tests get appended here
+    ; 16KB RAM (8KB + 8KB mirror)
+    slotsize $4000
+    slot zest.mapper.RAM_SLOT $c000
+.endme
 
-;         ; zest.suite.end finished the code block
-; .ends
+;====
+; ROM Banks
+; These can be mapped into the slots above
+;====
+.define zest.mapper.ZEST_BANK 0
+.define zest.mapper.SUITE_BANK_1 1
 
-; ;====
-; ; The end of the default suite
-; ;====
-; .section "zest.suite.end" after zest.suite keep
-;     jp zest.runner.finish
-;     ; ret
-; .ends
+.rombankmap
+    bankstotal 2
+
+    ; 16KB Zest bank
+    banksize $4000
+    banks 1
+
+    ; 16KB suite bank
+    banksize $4000
+    banks 1
+.endro
+
+; Ensure SMS header and checksum is added
+.smstag
+
+; ASCII table
+.asciitable
+    map " " to "~" = 0
+.enda
+
+;====
+; Boot sequence
+;====
+.orga $0000
+.section "zest.main" force
+    di              ; disable interrupts
+    im 1            ; Interrupt mode 1
+    ld sp, $dff0    ; set stack pointer
+    jp zest.runner.init
+.ends
+
+;====
+; VBlank handler
+;
+; Detects if the Zest state has been overwritten or if the current test has
+; reached its timeout limit
+;====
+.orga $0038
+.section "main.interruptHandler" force
+    push af
+    push hl
+        ; Satisfy interrupt
+        in a, (zest.vdp.STATUS_PORT)
+
+        ; Ensure timeout limit hasn't been reached
+        ; call zest.timeout.update
+    pop hl
+    pop af
+
+    ei      ; re-enable interrupts
+    reti    ; return
+.ends
+
+;====
+; Pause handler
+;====
+.orga $0066
+.section "main.pauseHandler" force
+    retn
+.ends
+
+
+.include "./src/vdp.asm"
+
+.include "./src/console/console.asm"
+
+.include "./src/preSuite.asm"
+.include "./src/preTest.asm"

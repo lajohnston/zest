@@ -31,7 +31,7 @@
         in a, (zest.vdp.STATUS_PORT)
 
         ; Ensure timeout limit hasn't been reached
-        call zest.timeout.update
+        ; call zest.timeout.update
     pop hl
     pop af
 

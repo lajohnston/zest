@@ -5,29 +5,7 @@
 ;====
 .section "zest.preTest" free keep
     zest.preTest:
-        zest.test.setTestDescription
-
-        ; Update checksum + VRAM backup
-        zest.test.preTest
-
-        ; Reset mocks
-        zest.mock.initAll
-
-        ; Reset timeout counter
-        zest.timeout.reset
-
-        ; Set test in progress flag
-        ld a, (zest.runner.flags)
-        or zest.runner.TEST_IN_PROGRESS_MASK
-        ld (zest.runner.flags), a
-
-        ; Disable display
-        in a, (zest.vdp.STATUS_PORT)    ; clear pending interrupts
-        zest.vdp.setRegister1 %10100000 ; enable VBlank interrupts
-
-        ; Custom hooks will go here
-
-        ; zest.preTest.end will add the return at the end
+        nop
 .ends
 
 .section "zest.preTest.end" after zest.preTest keep

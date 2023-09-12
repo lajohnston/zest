@@ -1,29 +1,6 @@
 .section "zest.postTest" free keep
     zest.postTest:
-        ; Ensure interrupts are disabled
-        di
-
-        ; If no test is in progress, return
-        ld a, (zest.runner.flags)
-        bit zest.runner.TEST_IN_PROGRESS_BIT, a
-        ret z   ; return if a test isn't in progress
-
-        ; Reset the test in progress flag
-        and (zest.runner.TEST_IN_PROGRESS_MASK ~ $ff)   ; reset the bit
-        ld (zest.runner.flags), a                       ; store
-
-        ; Set Z if checksum is valid
-        zest.test.validateChecksum
-        jp nz, zest.runner.memoryOverwriteDetected
-
-        ; Increment tests passed
-        ld hl, (zest.runner.tests_passed)
-        inc hl
-        ld (zest.runner.tests_passed), hl
-
-        ; Custom hooks go here
-
-        ; zest.postTest.end returns
+        nop
 .ends
 
 .section "zest.postTest.end" after zest.postTest keep
