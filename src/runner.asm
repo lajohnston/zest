@@ -378,7 +378,7 @@
 
     ; Define test description in ROM
     zest.test.defineTestDescription message
-    call zest.runner.preTest
+    call zest.preTest
 
     ; Reset stack
     ld sp, $dff0

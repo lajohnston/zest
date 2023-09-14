@@ -207,3 +207,13 @@ Runs at the start of the suite.
     ; some code
 .ends
 ```
+
+### zest.preTest
+
+Runs at the start of each test.
+
+```asm
+.section "myPreTestHook" appendto zest.preTest
+    ; some code
+.ends
+```

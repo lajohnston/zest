@@ -8,6 +8,10 @@
 
 ;====
 ; Returns at the end of the preSuite hook
+;
+; WLA-DX 'after' directive seems to have allocation issues (issue 609)
+; `appendto` works, and strangely always places this at the end where it's
+; intended
 ;====
 .section "zest.preSuite.end" appendto zest.preSuite keep
     ret
