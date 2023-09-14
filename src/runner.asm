@@ -44,7 +44,7 @@
 .section "zest.runner.finish" free
     zest.runner.finish:
         ; Perform postTest checks for the last test
-        call zest.runner.postTest
+        call zest.postTest
 
         ; Check how many tests ran
         ld hl, (zest.runner.tests_passed)
@@ -297,73 +297,12 @@
 .ends
 
 ;====
-; Prepares the start of a new test
-;
-; @in   hl  pointer to the test description
-;====
-.section "zest.runner.preTest" free
-    zest.runner.preTest:
-        zest.test.setTestDescription
-
-        ; Update checksum + VRAM backup
-        zest.test.preTest
-
-        ; Reset mocks
-        zest.mock.initAll
-
-        ; Reset timeout counter
-        zest.timeout.reset
-
-        ; Set test in progress flag
-        ld a, (zest.runner.flags)
-        or zest.runner.TEST_IN_PROGRESS_MASK
-        ld (zest.runner.flags), a
-
-        ; Disable display and enable VBlank interrupts
-        in a, (zest.vdp.STATUS_PORT)    ; clear pending interrupts
-        zest.vdp.setRegister1 %10100000 ; enable VBlank interrupts
-        ei                              ; enable CPU interrupts
-
-        ret
-.ends
-
-;====
-; Performs check and cleanup operations to be run after each test
-;====
-.section "zest.runner.postTest" free
-    zest.runner.postTest:
-        ; Ensure interrupts are disabled
-        di
-
-        ; If no test is in progress, return
-        ld a, (zest.runner.flags)
-        bit zest.runner.TEST_IN_PROGRESS_BIT, a
-        ret z   ; return if a test isn't in progress
-
-        ; Reset the test in progress flag
-        and (zest.runner.TEST_IN_PROGRESS_MASK ~ $ff)   ; reset the bit
-        ld (zest.runner.flags), a                       ; store
-
-        ; Increment tests passed
-        ld hl, (zest.runner.tests_passed)
-        inc hl
-        ld (zest.runner.tests_passed), hl
-
-        ; Set Z if checksum is valid
-        zest.test.validateChecksum
-        ret z   ; return if the checksum is valid
-
-        ; Checksum is invalid
-        jp zest.runner.memoryOverwriteDetected
-.ends
-
-;====
 ; Starts a new block of tests
 ;
 ; @in   message     pointer to the message string
 ;====
 .macro "zest.runner.startDescribeBlock" args message
-    call zest.runner.postTest
+    call zest.postTest
     zest.test.setBlockDescription message
 .endm
 
@@ -374,7 +313,7 @@
 ;====
 .macro "zest.runner.startTest" args message
     ; Run postTest checks for previous test (if any)
-    call zest.runner.postTest
+    call zest.postTest
 
     ; Define test description in ROM
     zest.test.defineTestDescription message

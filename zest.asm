@@ -40,6 +40,7 @@
 
 .include "./src/preSuite.asm"
 .include "./src/preTest.asm"
+.include "./src/postTest.asm"
 
 .include "./src/suites.asm"
 
