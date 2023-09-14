@@ -24,7 +24,7 @@
 ; reached its timeout limit
 ;====
 .orga $0038
-.section "main.interruptHandler" force
+.section "zest.main.interruptHandler" force
     push af
     push hl
         ; Satisfy interrupt
@@ -43,6 +43,6 @@
 ; Pause handler
 ;====
 .orga $0066
-.section "main.pauseHandler" force
+.section "zest.main.pauseHandler" force
     retn
 .ends
