@@ -104,9 +104,9 @@ expect.a.toBe 123
 
 With the above, when we call `someLabel`, we actually call the code defined between `zest.mock.start` and `zest.mock.end`. In the above case, register A would be loaded with a fixed value and would then return to the caller, which will continue running unaware.
 
-## Expectations
+## Assertions
 
-Zest comes with the following expectations out of the box.
+Zest comes with the following assertions out of the box.
 
 ### Registers
 
