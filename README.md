@@ -72,38 +72,6 @@ test "subtract"
     ...
 ```
 
-## Mocking/stubbing labels
-
-Sometimes when testing a routine it's necessary or preferable to mock/stub out routines it calls. One such case is when testing input handling code, whereby you want to ensure the routine is fed certain input values to simulate a given scenario without having to manually press buttons on the joypad.
-
-It may be necessary to extract some routines into separate files and ensure these files aren't imported into your test suite, then define your own fake versions of the routines instead. If the routine you're testing uses `call readPortA` to read the input value of controller A, it will instead call the fake `readPortA` you've defined in the test suite which can return a set value rather than reading the actual input.
-
-Alternatively, Zest also provides a 'Mock' API that lets you define fake routines in RAM so that you can define different behaviour for different test scenarios.
-
-In your test suite, define your mocks in a ramsection using `appendto zest.mocks`:
-
-```asm
-.ramsection "my mock instances" appendto zest.mocks
-    ; Calls to someLabel will point to this mock in RAM
-    someLabel instanceof zest.Mock
-.ends
-```
-
-Mocks get reset at the start of each test with a default handler that will simply return (`ret`) to the caller. To override this in a test, wrap some code in `zest.mock.start` and `zest.mock.end`:
-
-```asm
-; Define a custom handler for this label
-zest.mock.start someLabel
-    ld a, 123
-    ; ret is added automatically
-zest.mock.end
-
-call someLabel      ; this will call our handler
-expect.a.toBe 123
-```
-
-With the above, when we call `someLabel`, we actually call the code defined between `zest.mock.start` and `zest.mock.end`. In the above case, register A would be loaded with a fixed value and would then return to the caller, which will continue running unaware.
-
 ## Assertions
 
 Zest comes with the following assertions out of the box.
@@ -151,7 +119,9 @@ expect.zeroFlag.toBe 0
 expect.zeroFlag.toBe 1
 ```
 
-### Mocks
+### Mock assertions
+
+See [Mocking/stubbing labels](#mockingstubbing-labels) for more details about mocks.
 
 ```asm
 expect.mock.toHaveBeenCalled myMock
@@ -163,6 +133,39 @@ You can use the `zest.mocks.getTimesCalled` macro to load A with the number of t
 zest.mock.getTimesCalled
 expect.a.toBe 2
 ```
+
+## Mocking/stubbing labels
+
+Sometimes when testing a routine it's necessary or preferable to mock/stub out routines it calls. One such case is when testing input handling code, whereby you want to ensure the routine is fed certain input values to simulate a given scenario without having to manually press buttons on the joypad.
+
+It may be necessary to extract some routines into separate files and ensure these files aren't imported into your test suite, then define your own fake versions of the routines instead. If the routine you're testing uses `call readPortA` to read the input value of controller A, it will instead call the fake `readPortA` you've defined in the test suite which can return a set value rather than reading the actual input.
+
+Alternatively, Zest also provides a 'Mock' API that lets you define fake routines in RAM so that you can define different behaviour for different test scenarios.
+
+In your test suite, define your mocks in a ramsection using `appendto zest.mocks`:
+
+```asm
+.ramsection "my mock instances" appendto zest.mocks
+    ; Calls to someLabel will point to this mock in RAM
+    someLabel instanceof zest.Mock
+.ends
+```
+
+Mocks get reset at the start of each test with a default handler that will simply return (`ret`) to the caller. To override this in a test, wrap some code in `zest.mock.start` and `zest.mock.end`:
+
+```asm
+; Define a custom handler for this label
+zest.mock.start someLabel
+    ld a, 123
+    ; ret is added automatically
+zest.mock.end
+
+call someLabel      ; this will call our handler
+expect.a.toBe 123
+```
+
+With the above, when we call `someLabel`, we actually call the code defined between `zest.mock.start` and `zest.mock.end`. In the above case, register A would be loaded with a fixed value and would then return to the caller, which will continue running unaware.
+
 
 ## Timeout detection
 
