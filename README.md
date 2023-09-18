@@ -166,6 +166,19 @@ expect.a.toBe 123
 
 With the above, when we call `someLabel`, we actually call the code defined between `zest.mock.start` and `zest.mock.end`. In the above case, register A would be loaded with a fixed value and would then return to the caller, which will continue running unaware.
 
+### Mocking macros
+
+The principals of mocking macros is the same in that you'd need to ensure you don't import the real macro and instead create a fake version with the same name. To plug this into the mock API you could just make the fake macro call one of the mocks:
+
+```asm
+.ramsection "my mock instances" appendto zest.mocks
+    myMock instanceof zest.Mock
+.ends
+
+.macro "myMacro"
+    call myMock
+.endm
+```
 
 ## Timeout detection
 
