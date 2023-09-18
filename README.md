@@ -136,35 +136,34 @@ expect.a.toBe 2
 
 ## Mocking/stubbing labels
 
-Sometimes when testing a routine it's necessary or preferable to mock/stub out routines it calls. One such case is when testing input handling code, whereby you want to ensure the routine is fed certain input values to simulate a given scenario without having to manually press buttons on the joypad.
+Sometimes when testing a routine it's necessary or preferable to mock/stub out some of the routines it calls. The mocked routine can assert it's been called with the expected register values, and you can craft it to have a fixed effect of your choosing (loading registers with fixed values, or setting values to RAM etc.).
 
-It may be necessary to extract some routines into separate files and ensure these files aren't imported into your test suite, then define your own fake versions of the routines instead. If the routine you're testing uses `call readPortA` to read the input value of controller A, it will instead call the fake `readPortA` you've defined in the test suite which can return a set value rather than reading the actual input.
+To do this you first need to separate these labels and routines into separate files, and ensure these files aren't imported into your test suite. This would then free up these labels so you can define you own versions in the test suite. When the code runs it will then utilise your fake versions rather than the real ones.
 
-Alternatively, Zest also provides a 'Mock' API that lets you define fake routines in RAM so that you can define different behaviour for different test scenarios.
-
-In your test suite, define your mocks in a ramsection using `appendto zest.mocks`:
+Zest provides a 'Mock' API that lets you define fake routines in RAM so that you can define different behaviour for different test scenarios. In your test suite you can define your mocks in `ramsection`s using `appendto zest.mocks`:
 
 ```asm
 .ramsection "my mock instances" appendto zest.mocks
-    ; Calls to someLabel will point to this mock in RAM
+    ; `call someLabel` will call this
     someLabel instanceof zest.Mock
 .ends
 ```
 
-Mocks get reset at the start of each test with a default handler that will simply return (`ret`) to the caller. To override this in a test, wrap some code in `zest.mock.start` and `zest.mock.end`:
+Mocks get reset at the start of each test with a default handler that will simply return (`ret`) to the caller. To override this in a given test, wrap some code in `zest.mock.start` and `zest.mock.end`:
 
 ```asm
-; Define a custom handler for this label
+; Define a custom handler for this mocked label
 zest.mock.start someLabel
     ld a, 123
     ; ret is added automatically
 zest.mock.end
 
+ld a, 0
 call someLabel      ; this will call our handler
-expect.a.toBe 123
+expect.a.toBe 123   ; this will pass
 ```
 
-With the above, when we call `someLabel`, we actually call the code defined between `zest.mock.start` and `zest.mock.end`. In the above case, register A would be loaded with a fixed value and would then return to the caller, which will continue running unaware.
+With the above, when we call `someLabel`, we actually call the code defined between `zest.mock.start` and `zest.mock.end`. Another test can implement its own behaviour for this same label so you can therefore test different scenarios.
 
 ### Mocking macros
 
