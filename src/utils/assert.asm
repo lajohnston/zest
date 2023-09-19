@@ -29,6 +29,20 @@
 .endm
 
 ;====
+; Asserts that the value matches the expected value
+;
+; @in   actual      actual value
+; @in   expected    expected value
+; @in   message     the message to print to the terminal if the actual value is
+;                   not equal to the expected value
+;====
+.macro "zest.utils.assert.equals" args actual expected message
+    .if actual != expected
+        zest.utils.assert.fail message
+    .endif
+.endm
+
+;====
 ; Asserts that the given value is a signed or unsigned byte in the value range
 ; of -128 to 255, otherwise fails
 ;
