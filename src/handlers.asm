@@ -1,16 +1,15 @@
+;====
+; Master System event handlers (boot, interrupts, pause)
+;====
+
 ; Ensure SMS header and checksum is added
 .smstag
-
-; ASCII table
-.asciitable
-    map " " to "~" = 0
-.enda
 
 ;====
 ; Boot sequence
 ;====
 .orga $0000
-.section "zest.main" force
+.section "zest.handlers.boot" force
     di              ; disable interrupts
     im 1            ; Interrupt mode 1
     ld sp, $dff0    ; set stack pointer
@@ -24,7 +23,7 @@
 ; reached its timeout limit
 ;====
 .orga $0038
-.section "zest.main.interruptHandler" force
+.section "zest.handlers.interrupts" force
     push af
     push hl
         ; Satisfy interrupt
@@ -43,6 +42,6 @@
 ; Pause handler
 ;====
 .orga $0066
-.section "zest.main.pauseHandler" force
+.section "zest.handlers.pause" force
     retn
 .ends
