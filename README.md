@@ -179,6 +179,58 @@ The principals of mocking macros is the same in that you'd need to ensure you do
 .endm
 ```
 
+## Mocking controller input
+
+For code that relies on user input, you'll want to be able to mock out the controller ports to return set values such as up, button 1 etc. You could use mocks to mock out your user input handling routines completely, but if you'd rather include this input handling in the test coverage, Zest provides some macros to fake the raw input values at the port level.
+
+It isn't possible to mock out the ports directly, so you'll need to decouple your code from the `in a, (port)` instruction and put this in a macro instead, such as:
+
+```asm
+.macro "readPort" args portNumber
+    in a, (portNumber)
+.endm
+```
+
+Place this in a separate file and don't import it in your test suite. Instead, define a fake version with the same name that loads register A with a fake value. You can use `zest.loadFakePortDC` and/or `zest.loadFakePortDD` to load fake input values, which we'll set later. `zest.loadFakePortDD` is only needed if you need to mock controller 2:
+
+```asm
+.macro "readPort" args portNumber
+    .if portNumber == $dc
+        zest.loadFakePortDC
+    .elif portNumber == $dd
+        zest.loadFakePortDD
+    .endif
+.endm
+```
+
+To set the values these return, you can use `zest.mockController1` and `zest.mockController2` in your tests, and provide one or more buttons you wish to simulate as being pressed.
+
+```asm
+zest.mockController1 zest.UP
+zest.mockController2 zest.DOWN
+```
+
+Input button arguments you can pass to these macros are:
+
+```asm
+zest.UP
+zest.DOWN
+zest.LEFT
+zest.RIGHT
+zest.BUTTON_1
+zest.BUTTON_2
+zest.NO_INPUT
+```
+
+OR these together with `|` to simulate multiple buttons being pressed:
+
+```asm
+; Down and button 1 pressed
+zest.mockController2 zest.DOWN|zest.BUTTON_1
+```
+
+These mock controller values are reset at the start of each test.
+
 ## Timeout detection
 
 By default, Zest will timeout and fail a test if it takes more than 10 full frames/VBlanks to complete, in case the code has got itself into an infinite loop, forgotten to return, or jumped to an invalid location. It does this by decrementing a counter at each VBlank and timing out when it reaches zero. Note: this timeout detection relies on the code not disabling interrupts.
