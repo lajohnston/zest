@@ -134,6 +134,15 @@ zest.mock.getTimesCalled
 expect.a.toBe 2
 ```
 
+### zest.fail
+
+Use the `zest.fail` macro to fail a test with an optional message if the program reaches that point.
+
+```
+zest.fail ; fails with a default message
+zest.fail "Did not expect this piece of code to run"
+```
+
 ## Mocking/stubbing labels
 
 Sometimes when testing a routine it's necessary or preferable to mock/stub out some of the routines it calls. The mocked routine can assert it's been called with the expected register values, and you can craft it to have a fixed effect of your choosing (loading registers with fixed values, or setting values to RAM etc.).

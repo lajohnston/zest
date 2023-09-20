@@ -322,3 +322,23 @@
     ; Reset stack
     ld sp, $dff0
 .endm
+
+;====
+; Fails the current test with the given message
+;
+; @in   [message]   optional message
+;====
+.macro "zest.runner.fail" args message
+    .if \?1 == ARG_STRING
+        jr +
+            \.\@:
+                zest.console.defineString message
+        +:
+
+        ld hl, \.\@
+    .else
+        ld hl, zest.console.data.zestFailDefaultMessage
+    .endif
+
+    call zest.runner.expectationFailed
+.endm

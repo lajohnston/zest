@@ -84,3 +84,12 @@
 .macro "zest.setTimeout" args frames
     zest.timeout.setCurrent frames
 .endm
+
+;====
+; Fails the current test with an assertion message
+;
+; @in   [message]   optional failure message
+;====
+.macro "zest.fail" args message
+    zest.runner.fail message
+.endm

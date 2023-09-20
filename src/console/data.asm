@@ -20,6 +20,9 @@
     zest.console.data.separatorText:
         zest.console.defineString "            ~~~~~~~~"
 
+    zest.console.data.zestFailDefaultMessage:
+        zest.console.defineString "zest.fail called"
+
     ; Console font
     zest.console.data.font:
     .db $00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00,$00
