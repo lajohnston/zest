@@ -12,7 +12,7 @@
 .define startingValue 100
 
 ; Runs once at start of suite
-.section "myPreSuiteHook" appendto zest.preSuite keep
+.section "myPreSuiteHook" appendto zest.preSuite
     ; Set counters to startingValue
     ld a, startingValue
     ld (preTestCounter), a

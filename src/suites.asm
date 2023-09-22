@@ -5,7 +5,7 @@
 ;====
 ; The start of the default suite
 ;====
-.section "zest.suite" free bank zest.mapper.SUITE_BANK_1 slot zest.mapper.SUITE_SLOT keep
+.section "zest.suite" free bank zest.mapper.SUITE_BANK_1 slot zest.mapper.SUITE_SLOT
     zest.suite:
         call zest.preSuite
 

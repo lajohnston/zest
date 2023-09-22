@@ -1,7 +1,7 @@
 ;====
 ; Performs post-test checks
 ;====
-.section "zest.postTest" free keep
+.section "zest.postTest" free
     zest.postTest:
         ; Ensure interrupts are disabled
         di
@@ -36,6 +36,6 @@
 ; `appendto` works, and strangely always places this at the end where it's
 ; intended
 ;====
-.section "zest.postTest.end" appendto zest.postTest keep
+.section "zest.postTest.end" appendto zest.postTest
     ret
 .ends

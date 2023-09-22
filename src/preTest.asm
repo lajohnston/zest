@@ -3,7 +3,7 @@
 ;
 ; @in   hl  pointer to the test description
 ;====
-.section "zest.preTest" free keep
+.section "zest.preTest" free
     zest.preTest:
         zest.test.setTestDescription
 
@@ -37,7 +37,7 @@
 ; `appendto` works, and strangely always places this at the end where it's
 ; intended
 ;====
-.section "zest.preTest.end" appendto zest.preTest keep
+.section "zest.preTest.end" appendto zest.preTest
     ei  ; ensure CPU interrupts are enabled
     ret
 .ends
