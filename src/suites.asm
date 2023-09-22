@@ -11,12 +11,12 @@
 
         ; Tests get appended here
 
-        ; zest.suite.end finished the code block
+        ; zest.suite.end finishes the code block
 .ends
 
 ;====
 ; The end of the default suite
 ;====
-.section "zest.suite.end" after zest.suite keep
+.section "zest.suite.end" appendto zest.suite priority -9999999999
     jp zest.runner.finish
 .ends

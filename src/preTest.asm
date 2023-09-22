@@ -32,12 +32,9 @@
 
 ;====
 ; Returns at the end of the preTest hook
-;
-; WLA-DX 'after' directive seems to have allocation issues (issue 609)
-; `appendto` works, and strangely always places this at the end where it's
-; intended
+; The negative priority ensures it's placed after the other sections
 ;====
-.section "zest.preTest.end" appendto zest.preTest
+.section "zest.preTest.end" appendto zest.preTest priority -9999999999
     ei  ; ensure CPU interrupts are enabled
     ret
 .ends

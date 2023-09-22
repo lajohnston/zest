@@ -8,11 +8,8 @@
 
 ;====
 ; Returns at the end of the preSuite hook
-;
-; WLA-DX 'after' directive seems to have allocation issues (issue 609)
-; `appendto` works, and strangely always places this at the end where it's
-; intended
+; The negative priority ensures it's placed after the other sections
 ;====
-.section "zest.preSuite.end" appendto zest.preSuite keep
+.section "zest.preSuite.end" appendto zest.preSuite priority -9999999999
     ret
 .ends
