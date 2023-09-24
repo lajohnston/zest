@@ -22,18 +22,14 @@
 .include "./src/console/console.asm"
 .include "./src/console/data.asm"
 
-; Extras
-.include "./src/timeout.asm"
-.include "./src/mock.asm"
-
 ; Runner
 .include "./src/runner.asm"
 .include "./src/test.asm"
+.include "./src/timeout.asm"
 .include "./src/suites.asm"
 
 ; Assertions
 .include "./src/expect/flags.asm"
-.include "./src/expect/mock.asm"
 .include "./src/expect/r.toBe.asm"
 .include "./src/expect/rr.toBe.asm"
 

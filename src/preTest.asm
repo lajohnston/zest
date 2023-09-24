@@ -10,9 +10,6 @@
         ; Update checksum + VRAM backup
         zest.test.preTest
 
-        ; Reset mocks
-        zest.mock.initAll
-
         ; Reset timeout counter
         zest.timeout.reset
 
@@ -35,6 +32,7 @@
 ; The negative priority ensures it's placed after the other sections
 ;====
 .section "zest.preTest.end" appendto zest.preTest priority -9999999999
-    ei  ; ensure CPU interrupts are enabled
-    ret
+    zest.preTest.end:
+        ei  ; ensure CPU interrupts are enabled
+        ret
 .ends

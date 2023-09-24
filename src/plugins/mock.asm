@@ -38,20 +38,20 @@
 .define zest.mock._mockStarted 0
 
 ;====
-; Initialises all mocks
-;
-; @clobs af
+; (Private) Initialises all mocks at the start of each test
 ;====
-.macro "zest.mock.initAll"
-    ; Calculate number of mocks
-    ld a, (zest.mocks.endByte - zest.mocks.startByte - 1) / _sizeof_zest.Mock
+.section "zest.mock.preTest" appendto zest.preTest
+    ; Reset mocks
+    zest.mock.preTest:
+        ; Calculate number of mocks
+        ld a, (zest.mocks.endByte - zest.mocks.startByte - 1) / _sizeof_zest.Mock
 
-    ; Update flags
-    or a
+        ; Update flags
+        or a
 
-    ; Call initAll if there are more than 0 mocks
-    call nz, zest.mock._initAll
-.endm
+        ; Call initAll if there are more than 0 mocks
+        call nz, zest.mock._initAll
+.ends
 
 ;====
 ; (Private) Initialises/resets all the mock instances
@@ -188,3 +188,30 @@
 .macro "zest.mock.getTimesCalled" args mock
     ld a, (mock + zest.Mock.times_called)
 .endm
+
+;====
+; Fails the test if the given mock wasn't called at least once
+;
+; @in   mock        the mock (instance in RAM)
+;====
+.macro "expect.mock.toHaveBeenCalled" args mock
+    \@_\.:
+
+    push af
+        zest.mock.getTimesCalled mock
+        or a    ; update flags
+        jp nz, +; jp if not zero
+            ; Mock was called zero times - fail the test
+            push hl
+                ld hl, expect.mock.toHaveBeenCalled.defaultMessage
+                call zest.runner.expectationFailed
+            pop hl
+        +:
+    pop af
+.endm
+
+; Default error messages for expectations
+.section "expect.mock.defaultMessages" free
+    expect.mock.toHaveBeenCalled.defaultMessage:
+        zest.console.defineString "Expected mock to have been called at least once, but it was not"
+.ends

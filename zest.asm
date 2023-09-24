@@ -11,7 +11,13 @@
 ; Core framework
 .include "./src/core.asm"
 
+;===
 ; Core plugins
+;===
 .ifndef zest.plugin.mockInput
     .include "./src/plugins/mockInput.asm"
+.endif
+
+.ifndef zest.plugin.mock
+    .include "./src/plugins/mock.asm"
 .endif
