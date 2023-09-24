@@ -2,7 +2,7 @@
 ; Mocks the input ports ($DC and $DD) for controller 1 and controller 2
 ;====
 
-.define zest.mockInput 1
+.define zest.plugin.mockInput 1
 
 ;====
 ; Constants
