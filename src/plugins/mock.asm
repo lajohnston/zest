@@ -15,21 +15,19 @@
 ; "appendto zest.mocks", and populating them with zest.mock instances
 ;====
 .ramsection "zest.mocks" slot zest.mapper.RAM_SLOT
-    zest.mocks.startByte:   db
+    ; Temporary location to preserve HL in the mediator without touching the stack
+    zest.mocks.hlTemp:      db  ; low byte of hlTemp
+
+    ; Start byte indicator, used to determine number of mocks at runtime
+    zest.mocks.startByte:   db  ; (also high byte of hlTemp)
 .ends
 
 ;====
 ; Marks the end of the mocks list
 ;====
 .ramsection "zest.mocks.endByte" appendto zest.mocks priority -9999999999
+    ; End byte indicator, used to determine number of mocks at runtime
     zest.mocks.endByte:     db
-.ends
-
-;====
-; Temporary location to preserve HL in the mediator without touching the stack
-;====
-.ramsection "zest.mocks.hlTemp" slot zest.mapper.RAM_SLOT
-    zest.mock.hlTemp:     dw
 .ends
 
 ;====
@@ -148,7 +146,7 @@
 ;====
 .section "zest.mock.mediator" free
     zest.mock.mediator:
-        ld (zest.mock.hlTemp), hl   ; preserve HL in temporary location
+        ld (zest.mocks.hlTemp), hl  ; preserve HL in temporary location
 
         ;==
         ; Set HL to the caller's (zest.Mock instance RAM instance) return address
@@ -175,7 +173,7 @@
 
         ; Restore HL and call the handler
         push hl                     ; push handler to stack
-        ld hl, (zest.mock.hlTemp)   ; restore HL
+        ld hl, (zest.mocks.hlTemp)  ; restore HL
         ret                         ; 'return' to the handler
 .ends
 
