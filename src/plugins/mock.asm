@@ -21,7 +21,7 @@
 ;====
 ; Marks the end of the mocks list
 ;====
-.ramsection "zest.mocks.endByte" after zest.mocks
+.ramsection "zest.mocks.endByte" appendto zest.mocks priority -9999999999
     zest.mocks.endByte:     db
 .ends
 
