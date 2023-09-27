@@ -5,18 +5,30 @@
 
 ; Hooks
 .ramsection "hooks" slot zest.RAM_SLOT
+    preSuiteCounter:    db
+
     preTestCounter:     db
     postTestCounter:    db
+
+    testValue:          db
 .ends
 
-.define startingValue 100
+.section "resetCounters"
+    resetCounters:
+        ld a, 0
+        ld (preSuiteCounter), a
+        ld (preTestCounter), a
+        ld (postTestCounter), a
+
+        ret
+.ends
 
 ; Runs once at start of suite
 .section "myPreSuiteHook" appendto zest.preSuite
-    ; Set counters to startingValue
-    ld a, startingValue
-    ld (preTestCounter), a
-    ld (postTestCounter), a
+    call resetCounters
+
+    ld hl, preSuiteCounter
+    inc (hl)
 .ends
 
 ; Runs before each test
@@ -35,5 +47,7 @@
 
 ; Append your test files to zest.suite
 .section "suite" appendto zest.suite
-    .include "hooks.test.asm"
+    .include "preSuite.test.asm"
+    .include "preTest.test.asm"
+    .include "postTest.test.asm"
 .ends
