@@ -3,7 +3,7 @@
 ;====
 .section "slowRoutine" free
     slowRoutine:
-        ld bc, $E200
+        ld bc, $D200
 
         -:
             dec bc
