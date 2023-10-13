@@ -66,10 +66,10 @@
     zest.utils.assert.byte value, "\. expects a numeric byte value"
 
     \@_\.:
-    push af
-        ld a, value ~ $ff   ; invert so 0 = pressed
+    push bc
+        ld b, value ~ $ff   ; invert so 0 = pressed
         call zest.mockInput._controller2
-    pop af
+    pop bc
 .endm
 
 ;====
@@ -110,13 +110,11 @@
 ;====
 ; (Private) Mocks the raw controller 2 input
 ;
-; @in   a   input values (--21rldu) (0 = pressed)
+; @in   b   input values (--21rldu) (0 = pressed)
 ;====
 .section "zest.mockInput._setController2" free
     zest.mockInput._controller2:
-        push bc
-            ld b, a                          ; preserve input in B
-
+        push af
             ;===
             ; Load current fake portDC value. This mostly contains controller 1
             ; buttons but also contains UP and DOWN for controller 2 (DU------)
@@ -138,7 +136,7 @@
             ld a, b                         ; du--21rl
             or %11110000                    ; ----21rl
             ld (zest.mockInput.portDD), a   ; load current stubbed value
-        pop bc
+        pop af
 
         ret
 .ends
