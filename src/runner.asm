@@ -4,6 +4,9 @@
 .define zest.runner.TEST_IN_PROGRESS_BIT 0
 .define zest.runner.TEST_IN_PROGRESS_MASK %00000001
 
+; Default pointer minus 2 for zest.suite call
+.define zest.runner.DEFAULT_STACK_POINTER $dff0 - 2
+
 ;====
 ; RAM
 ;====
@@ -33,8 +36,11 @@
         ; Reset flags
         ld (zest.runner.flags), a
 
-        ; Run the test suite
-        jp zest.suite
+        ; Run the test suites
+        zest.suites.run
+
+        ; Finish tests (all tests passed)
+        jp zest.runner.finish
 .ends
 
 ;====
@@ -264,7 +270,7 @@
 .section "zest.runner.memoryOverwriteDetected" free
     zest.runner.memoryOverwriteDetected:
         ; Reset stack pointer, in case it's invalid
-        ld sp, $dff0
+        ld sp, zest.runner.DEFAULT_STACK_POINTER
 
         ; Ensure the test description data hasn't been overwritten
         call zest.test.ensureDescriptionIsValid
@@ -320,7 +326,7 @@
     call zest.preTest
 
     ; Reset stack
-    ld sp, $dff0
+    ld sp, zest.runner.DEFAULT_STACK_POINTER
 .endm
 
 ;====

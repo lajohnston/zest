@@ -23,10 +23,10 @@
 .include "./src/console/data.asm"
 
 ; Runner
+.include "./src/suites.asm"
 .include "./src/runner.asm"
 .include "./src/test.asm"
 .include "./src/timeout.asm"
-.include "./src/suites.asm"
 
 ; Assertions
 .include "./src/expect/flags.asm"

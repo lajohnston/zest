@@ -3,6 +3,13 @@
 ;====
 
 ;====
+; Run each of the test suites
+;====
+.macro "zest.suites.run"
+    call zest.suite
+.endm
+
+;====
 ; The start of the default suite
 ;====
 .section "zest.suite" free bank zest.mapper.SUITE_BANK_1 slot zest.mapper.SUITE_SLOT
@@ -18,5 +25,5 @@
 ; The end of the default suite
 ;====
 .section "zest.suite.end" appendto zest.suite priority -9999999999
-    jp zest.runner.finish
+    ret
 .ends
