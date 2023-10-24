@@ -1,4 +1,18 @@
 ;====
+; Memory mapper
+;====
+
+;====
+; Settings
+;====
+.ifdef zest.SUITE_BANKS
+    zest.utils.assert.range zest.SUITE_BANKS, 1, 8, "Invalid zest.SUITE_BANKS defined"
+    .define zest.mapper.SUITE_BANKS zest.SUITE_BANKS
+.else
+    .define zest.mapper.SUITE_BANKS 1
+.endif
+
+;====
 ; Slots
 ; These contain fixed address ranges that ROM banks can be mapped into
 ;====
@@ -35,13 +49,13 @@
 .define zest.mapper.SUITE_BANK_1 1
 
 .rombankmap
-    bankstotal 2
+    bankstotal 1 + zest.mapper.SUITE_BANKS
 
     ; 16KB Zest bank
     banksize $4000
     banks 1
 
-    ; 16KB suite bank
+    ; 16KB suite banks
     banksize $4000
-    banks 1
+    banks zest.mapper.SUITE_BANKS
 .endro
