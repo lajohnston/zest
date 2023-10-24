@@ -20,6 +20,9 @@
 .define zest.mapper.SUITE_SLOT 1    ; where user's code is paged
 .define zest.mapper.RAM_SLOT 3
 
+; The register used to page the bank into slot 1
+.define zest.mapper.SLOT_1_REGISTER = $fffe
+
 ; Sega mapper (4x16KB slots)
 .memorymap
     defaultslot 0
@@ -59,3 +62,29 @@
     banksize $4000
     banks zest.mapper.SUITE_BANKS
 .endro
+
+;====
+; Sets the current pageable bank. Free sections .included after this will be
+; placed in this bank
+;
+; @in   bankNumber  the bank number
+;====
+.macro "zest.mapper.setBank" args bankNumber
+    zest.utils.assert.range bankNumber 1, zest.mapper.SUITE_BANKS, "\.: Invalid bankNumber"
+
+    .bank bankNumber slot zest.mapper.SUITE_SLOT
+.endm
+
+;====
+; Page a bank into the given slot
+;
+; @in   bankNumber      the bank number to page in. Use the colon prefix in
+;                       WLA-DX to retrieve the bank number of an address,
+;                       i.e. mapper.pageBank :myAsset
+;====
+.macro "zest.mapper.pageBank" args bankNumber
+    zest.utils.assert.range bankNumber 0, zest.mapper.SUITE_BANKS, "\.: Invalid bankNumber"
+
+    ld a, bankNumber
+    ld (zest.mapper.SLOT_1_REGISTER), a
+.endm
