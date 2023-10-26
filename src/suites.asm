@@ -24,6 +24,6 @@
 ;====
 ; The end of the default suite
 ;====
-.section "zest.suite.end" appendto zest.suite priority -9999999999
+.section "zest.suite.end" appendto zest.suite priority zest.FOOTER_PRIORITY
     ret
 .ends

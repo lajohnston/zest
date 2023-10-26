@@ -33,6 +33,6 @@
 ; Returns after the zest.postTest hook
 ; The negative priority ensures it's placed after the other sections
 ;====
-.section "zest.postTest.end" appendto zest.postTest priority -9999999999
+.section "zest.postTest.end" appendto zest.postTest priority zest.FOOTER_PRIORITY
     ret
 .ends

@@ -31,7 +31,7 @@
 ; Returns at the end of the preTest hook
 ; The negative priority ensures it's placed after the other sections
 ;====
-.section "zest.preTest.end" appendto zest.preTest priority -9999999999
+.section "zest.preTest.end" appendto zest.preTest priority zest.FOOTER_PRIORITY
     zest.preTest.end:
         ei  ; ensure CPU interrupts are enabled
         ret

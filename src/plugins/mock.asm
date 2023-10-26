@@ -25,7 +25,7 @@
 ;====
 ; Marks the end of the mocks list
 ;====
-.ramsection "zest.mocks.endByte" appendto zest.mocks priority -9999999999
+.ramsection "zest.mocks.endByte" appendto zest.mocks priority zest.FOOTER_PRIORITY
     ; End byte indicator, used to determine number of mocks at runtime
     zest.mocks.endByte:     db
 .ends

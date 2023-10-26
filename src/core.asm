@@ -2,6 +2,9 @@
 ; Imports the core framework without plugins
 ;====
 
+; Constants
+.define zest.FOOTER_PRIORITY -9999999999
+
 ; ASCII table
 .asciitable
     map " " to "~" = 0

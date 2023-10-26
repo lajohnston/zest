@@ -10,6 +10,6 @@
 ; Returns at the end of the preSuite hook
 ; The negative priority ensures it's placed after the other sections
 ;====
-.section "zest.preSuite.end" appendto zest.preSuite priority -9999999999
+.section "zest.preSuite.end" appendto zest.preSuite priority zest.FOOTER_PRIORITY
     ret
 .ends
