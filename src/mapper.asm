@@ -70,9 +70,13 @@
 ; @in   bankNumber  the bank number
 ;====
 .macro "zest.mapper.setBank" args bankNumber
-    zest.utils.assert.range bankNumber 1, zest.mapper.SUITE_BANKS, "\.: Invalid bankNumber"
+    zest.utils.assert.range bankNumber 0, zest.mapper.SUITE_BANKS, "\.: Invalid bankNumber"
 
-    .bank bankNumber slot zest.mapper.SUITE_SLOT
+    .if bankNumber == 0
+        .bank bankNumber slot zest.mapper.ZEST_SLOT
+    .else
+        .bank bankNumber slot zest.mapper.SUITE_SLOT
+    .endif
 .endm
 
 ;====

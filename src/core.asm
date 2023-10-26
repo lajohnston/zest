@@ -96,7 +96,7 @@
 ;====
 ; Sets the current bank, where free sections will be placed
 ;
-; @in   bankNumber  the bank number (between 1 and zest.SUITE_BANKS)
+; @in   bankNumber  the bank number (between 0 and zest.SUITE_BANKS)
 ;====
 .macro "zest.setBank" args bankNumber
     zest.mapper.setBank bankNumber
