@@ -303,3 +303,41 @@ Runs at the end of each test.
     ; some code
 .ends
 ```
+
+## Paging
+
+The suite ROM bank is 16KB but if you use this all you can split your tests across multiple banks. To enable this, define a numeric `zest.SUITE_BANKS` value before importing the library. This defaults to 1.
+
+```asm
+.define zest.SUITE_BANKS 3  ; enable 3x16KB test suite banks
+```
+
+Append your tests to `zest.suite` (bank 1), `zest.suiteBank2`, `zest.suiteBank3` etc.
+
+```asm
+.section "tests in bank 1" appendto zest.suite
+    ...
+.ends
+
+.section "tests in bank 2" appendto zest.suiteBank2
+    ...
+.ends
+
+.section "tests in bank 3" appendto zest.suiteBank3
+    ...
+.ends
+```
+
+### zest.setBank
+
+Any `free` sections you `.include` are placed in bank 0 by default and are accessible by all the tests. If this bank runs out of space you can use `zest.setBank` to place the code in the additional banks. You should ensure they are in the same bank as the tests that require them.
+
+```asm
+.include "a.asm"    ; bank 0 (default)- accessible by all tests
+
+zest.setBank 1
+.include "one.asm"  ; bank 1 - accessible by tests in zest.suite
+
+zest.setBank 2
+.include "two.asm"  ; bank 2 - accessible by tests in zest.suiteBank2
+```

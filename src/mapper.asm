@@ -6,9 +6,10 @@
 ; Settings
 ;====
 .ifdef zest.SUITE_BANKS
-    zest.utils.assert.range zest.SUITE_BANKS, 1, 8, "Invalid zest.SUITE_BANKS defined"
+    zest.utils.assert.range zest.SUITE_BANKS, 1, 255, "Invalid zest.SUITE_BANKS defined"
     .define zest.mapper.SUITE_BANKS zest.SUITE_BANKS
 .else
+    ; Default to 1 suite bank
     .define zest.mapper.SUITE_BANKS 1
 .endif
 
@@ -49,7 +50,6 @@
 ; These can be mapped into the slots above
 ;====
 .define zest.mapper.ZEST_BANK 0
-.define zest.mapper.SUITE_BANK_1 1
 
 .rombankmap
     bankstotal 1 + zest.mapper.SUITE_BANKS
