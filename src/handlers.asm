@@ -2,9 +2,6 @@
 ; Master System event handlers (boot, interrupts, pause)
 ;====
 
-; Ensure SMS header and checksum is added
-.smstag
-
 ;====
 ; Boot sequence
 ;====

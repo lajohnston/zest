@@ -14,6 +14,14 @@
 .endif
 
 ;====
+; SMS header and checksum
+;====
+.smsheader
+    romsize $a          ; 8KB checksum - fastest
+    baseaddress $3ff0   ; move header outside of SUITE bank
+.endsms
+
+;====
 ; Slots
 ; These contain fixed address ranges that ROM banks can be mapped into
 ;====

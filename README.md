@@ -2,7 +2,7 @@
 
 ## What is it?
 
-Zest is a unit test runner for use with the Sega Master System and WLA DX assembler. Utilising the WLA DX macro features, it provides a high-level syntax so you can easily feed routines with fixed inputs and assert their output.
+Zest is a unit test runner for use with the Sega Master System and WLA DX assembler (v10.6+). Utilising the WLA DX macro features, it provides a high-level syntax so you can easily feed routines with fixed inputs and assert their output.
 
 ```asm
 describe "increment"
