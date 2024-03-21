@@ -127,10 +127,10 @@ See [Mocking/stubbing labels](#mockingstubbing-labels) for more details about mo
 expect.mock.toHaveBeenCalled myMock
 ```
 
-You can use the `zest.mocks.getTimesCalled` macro to load A with the number of times a given mock was called.
+You can use the `zest.mock.getTimesCalled` macro to load A with the number of times a given mock was called.
 
 ```asm
-zest.mock.getTimesCalled
+zest.mock.getTimesCalled myMock
 expect.a.toBe 2
 ```
 

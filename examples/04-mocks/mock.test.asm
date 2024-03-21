@@ -44,7 +44,7 @@ describe "Zest mock handlers"
 
 describe "zest.mock.getTimesCalled"
     test "loads A with the number of times the handler has been called"
-        ; Assert starting times called in 0
+        ; Assert starting times called is 0
         zest.mock.getTimesCalled someLabel
         expect.a.toBe 0
 
