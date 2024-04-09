@@ -35,40 +35,47 @@
 ; Sega mapper (4x16KB slots)
 .memorymap
     defaultslot 0
+    slotsize $4000
 
     ; 16KB - Zest code
-    slotsize $4000
     slot zest.mapper.ZEST_SLOT $0000
 
     ; 16KB - Pageable user suite
-    slotsize $4000
     slot zest.mapper.SUITE_SLOT $4000
 
     ; 16KB - Pageable (not used)
-    slotsize $4000
     slot 2 $8000
 
     ; 16KB RAM (8KB + 8KB mirror)
-    slotsize $4000
     slot zest.mapper.RAM_SLOT $c000
 .endme
 
 ;====
 ; ROM Banks
-; These can be mapped into the slots above
+; These can be mapped into the slots above using zest.mapper.pageBank
 ;====
 .define zest.mapper.ZEST_BANK 0
+.define zest.mapper.PADDING_BANKS 0
+
+.if zest.mapper.SUITE_BANKS == 2
+    ; Pad ROM from 48KB to 64KB, to mitigate emulator mapper detection issue
+    .redefine zest.mapper.PADDING_BANKS 1
+.endif
 
 .rombankmap
-    bankstotal 1 + zest.mapper.SUITE_BANKS
+    bankstotal 1 + zest.mapper.SUITE_BANKS + zest.mapper.PADDING_BANKS
+    banksize $4000  ; 16KB
 
     ; 16KB Zest bank
-    banksize $4000
     banks 1
 
     ; 16KB suite banks
-    banksize $4000
     banks zest.mapper.SUITE_BANKS
+
+    ; 16KB padding bank(s)
+    .if zest.mapper.PADDING_BANKS > 0
+        banks zest.mapper.PADDING_BANKS
+    .endif
 .endro
 
 ;====
@@ -80,8 +87,8 @@
 .macro "zest.mapper.setBank" args bankNumber
     zest.utils.assert.range bankNumber 0, zest.mapper.SUITE_BANKS, "\.: Invalid bankNumber"
 
-    .if bankNumber == 0
-        .bank bankNumber slot zest.mapper.ZEST_SLOT
+    .if bankNumber == zest.mapper.ZEST_BANK
+        .bank zest.mapper.ZEST_BANK slot zest.mapper.ZEST_SLOT
     .else
         .bank bankNumber slot zest.mapper.SUITE_SLOT
     .endif
