@@ -112,6 +112,7 @@
 .section "zest.vdp.clearTilemap" free
     zest.vdp.clearTilemap:
         ; Preserve pattern in D
+        push de
         ld d, a
 
         ; Set scroll registers to 0
@@ -138,6 +139,7 @@
             or c
         jp nz, -
 
+        pop de
         ret
 .ends
 
