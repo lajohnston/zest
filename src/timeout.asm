@@ -31,7 +31,7 @@
 ;
 ; @in   frames  the number of frames to timeout after
 ;
-; @clobs af
+; @clobbers af
 ;====
 .macro "zest.timeout._set" args frames
     ; Set timeout (default + 1 frame for the frame we're on)
@@ -46,7 +46,7 @@
 ;====
 ; Resets the timeout counter to the default value
 ;
-; @clobs af
+; @clobbers af
 ;====
 .macro "zest.timeout.reset"
     zest.timeout._set zest.timeout.default
@@ -70,7 +70,7 @@
 ; Also validates the existing checkum and will jump to the memoryOverwrite
 ; routine if it is invalid
 ;
-; @clobs af, hl
+; @clobbers af, hl
 ;====
 .section "zest.timeout.update" free
     zest.timeout.update:

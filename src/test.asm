@@ -71,8 +71,8 @@
 ; (Private) Calculates a 1-byte checksum value from the current describe and test text
 ; pointers in RAM
 ;
-; @out  a   the checksum
-; @clobs    f, hl
+; @out      a   the checksum
+; @clobbers f, hl
 ;====
 .macro "zest.test._calculateChecksum"
     ld a, zest.test.CHECKSUM_BASE
@@ -106,7 +106,7 @@
 
 ;====
 ; (Private) Backs up the test text description pointers to VRAM, incase of RAM overwrite
-; @clobs af, hl, bc
+; @clobbers af, hl, bc
 ;====
 .macro "zest.test._backupStateToVram"
     ; Set VRAM write address
@@ -181,7 +181,7 @@
 ;====
 ; (Private) Restores the test data from the VRAM backup
 ;
-; @clobs af, bc, hl
+; @clobbers af, bc, hl
 ;====
 .section "zest.test._restoreStateFromVram" free
     zest.test._restoreStateFromVram:

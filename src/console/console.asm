@@ -114,7 +114,7 @@
 ; @out  de      new vram address
 ; @out  vdp     VRAM pointing to next character
 ;
-; @clobs a
+; @clobbers a
 ;====
 .macro "zest.console._outputCharacter"
     out (zest.vdp.DATA_PORT), a         ; output character
@@ -250,7 +250,7 @@
 ; Add the given number of rows to the cursor and set the column to 0
 ;
 ; @in       hl  the number of rows to add * 64
-; @clobs    hl
+; @clobbers hl
 ;====
 .section "zest.console._newlines" free
     zest.console._newlines:
@@ -278,8 +278,8 @@
 ;====
 ; Moves the cursor down the given number of rows and sets the column to 0
 ;
-; @in   rows    the number of rows to add
-; @clobs hl
+; @in       rows    the number of rows to add
+; @clobbers hl
 ;====
 .macro "zest.console.newlines" args rows
     ld hl, 64 * rows

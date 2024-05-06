@@ -37,7 +37,7 @@
 ; Sets the VDP address
 ;
 ; @in       address VRAM address + command
-; @clobs    a
+; @clobbers a
 ;====
 .macro "zest.vdp.setAddress" args address
     .if <(address) == 0
@@ -178,9 +178,9 @@
 ;====
 ; Copies data to the VDP
 ;
-; @in   hl  data address
-; @in   bc  data length
-; @clobs a, hl, bc
+; @in       hl  data address
+; @in       bc  data length
+; @clobbers a, hl, bc
 ;====
 .section "zest.vdp.copyToVram" free
     zest.vdp.copyToVram:
