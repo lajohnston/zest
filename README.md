@@ -79,8 +79,9 @@ Zest comes with the following assertions out of the box.
 ### Registers
 
 Example usage:
-* `expect.a.toBe 255`
-* `expect.b.toBe -128`
+
+- `expect.a.toBe 255`
+- `expect.b.toBe -128`
 
 ```asm
 expect.a.toBe -128
@@ -117,6 +118,27 @@ expect.sign.toBe 1
 
 expect.zeroFlag.toBe 0
 expect.zeroFlag.toBe 1
+```
+
+### Stack
+
+Expect the stack to contain x additional items since the start of the test:
+
+```asm
+expect.stack.size.toBe 3    ; 3 values (16-bit words)
+
+; With custom message
+expect.stack.size.toBe 3 "Expected stack size to still be 3"
+```
+
+Expect a position in the stack to contain a given word value. You will need to use this before other assertions as those might affect the values in the stack.
+
+```asm
+expect.stack.toContain $1234    ; expect the most recent pushed word to be $1234
+expect.stack.toContain $1234 1  ; expect the stack position before to contain $1234
+
+; With custom assertion failure message
+expect.stack.toContain $1234 0 "my custom message"
 ```
 
 ### Mock assertions
