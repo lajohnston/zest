@@ -7,13 +7,15 @@ Zest is a unit test runner for use with the Sega Master System and WLA DX assemb
 ```asm
 describe "increment"
 
-it "should increment the value in A"
-    ld a, 0             ; prep test
+it "should increment the value in register A"
+    ld a, 0
     call increment      ; call routine
     expect.a.toBe 1     ; assert the result
 ```
 
 If the above test fails, the tests will stop running and the test description and failure will be printed on the screen.
+
+![Zest pass scenario](examples/screenshots/pass.png) ![Zest failure scenario](examples/screenshots/fail.png)
 
 ## Why?
 
