@@ -90,7 +90,8 @@
 ;====
 .section "zest.runner.byteExpectationFailed" free
     zest.runner.byteExpectationFailed:
-        call zest.runner._printTestFailure
+        call zest.runner._printTestDescription
+        call zest.runner._printAssertionMessage
 
         ; Print 'Expected:' label
         call zest.runner._printExpectedLabel
@@ -119,8 +120,8 @@
 ;====
 .section "zest.runner.wordExpectationFailed" free
     zest.runner.wordExpectationFailed:
-        ; Print the test describe/it descriptions
-        call zest.runner._printTestFailure
+        call zest.runner._printTestDescription
+        call zest.runner._printAssertionMessage
 
         ; Print expected label
         call zest.runner._printExpectedLabel
@@ -145,7 +146,8 @@
 ;====
 .section "zest.runner.booleanExpectationFailed" free
     zest.runner.booleanExpectationFailed:
-        call zest.runner._printTestFailure
+        call zest.runner._printTestDescription
+        call zest.runner._printAssertionMessage
 
         ; Print 'Expected:' label
         call zest.runner._printExpectedLabel
@@ -173,27 +175,25 @@
 ;====
 .section "zest.runner.expectationFailed" free
     zest.runner.expectationFailed:
-        call zest.runner._printTestFailure
+        call zest.runner._printTestDescription
+        call zest.runner._printAssertionMessage
+
         jp zest.console.displayAndStop
 .ends
 
 ;====
-; (Private) Prints the test failed heading, test description, and assertion
-; message
+; (Private) Prints the test description
 ;
 ; @in   hl  pointer to the assertion message
 ;====
-.section "zest.runner._printTestFailure" free
-    zest.runner._printTestFailure:
+.section "zest.runner._printTestDescription" free
+    zest.runner._printTestDescription:
         ; Initialise the console
         zest.console.initFailure
 
         ; Print test details
         call zest.runner._printTestFailedHeading
-        call zest.test.printTestDescription
-
-        ; Print the failed assertion message
-        jp zest.runner._printAssertionMessage   ; jp (then ret)
+        jp zest.test.printTestDescription   ; jp (then ret)
 .ends
 
 ;====
