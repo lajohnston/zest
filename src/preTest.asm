@@ -33,6 +33,8 @@
 ;====
 .section "zest.preTest.end" appendto zest.preTest priority zest.FOOTER_PRIORITY
     zest.preTest.end:
-        ei  ; ensure CPU interrupts are enabled
-        ret
+        pop iy                                      ; pop caller from stack
+        ld sp, zest.runner.DEFAULT_STACK_POINTER    ; reset stack
+        ei      ; ensure CPU interrupts are enabled
+        jp (iy) ; return to caller
 .ends

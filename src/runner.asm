@@ -326,9 +326,6 @@
     ; Define test description in ROM
     zest.test.defineTestDescription message
     call zest.preTest
-
-    ; Reset stack
-    ld sp, zest.runner.DEFAULT_STACK_POINTER
 .endm
 
 ;====
