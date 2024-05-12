@@ -68,6 +68,7 @@
 ; Asserts that the given value is a 1 or a 0
 ;
 ; @in   value   the value to assert
+; @in   message the message to print to the terminal if the value is not valid
 ;====
 .macro "zest.utils.assert.boolean" args value message
     zest.utils.assert.range value 0, 1, message
@@ -77,9 +78,22 @@
 ; Asserts that the given value is a label
 ;
 ; @in   value   the value to assert
+; @in   message the message to print to the terminal if the value is not valid
 ;====
 .macro "zest.utils.assert.label" args value message
     .if \?1 != ARG_LABEL
+        zest.utils.assert.fail message
+    .endif
+.endm
+
+;====
+; Asserts that the given value is a string
+;
+; @in   value   the value to assert
+; @in   message the message to print to the terminal if the value is not valid
+;====
+.macro "zest.utils.assert.string" args value message
+    .if \?1 != ARG_STRING
         zest.utils.assert.fail message
     .endif
 .endm
