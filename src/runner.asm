@@ -80,27 +80,40 @@
         jp zest.console.displayAndStop
 .ends
 
+.section "zest.runner.printAssertionSeparator" free
+    zest.runner.printAssertionSeparator:
+        push hl
+            zest.console.newlines 3
+
+            ; Write assertion message
+            ld hl, zest.console.data.separatorText
+            call zest.console.out
+
+            zest.console.newlines 2
+        pop hl
+        ret
+.ends
+
 ;====
 ; Displays details about a byte/single register assertion that doesn't match
 ; the expectation, then stops the program
 ;
 ; @in   a   the actual value
-; @in   b   the expected value
-; @in   hl  pointer to the assertion message
+; @in   ix  pointer to the assertion data
 ;====
 .section "zest.runner.byteExpectationFailed" free
     zest.runner.byteExpectationFailed:
         call zest.runner._printTestDescription
-        call zest.runner._printAssertionMessage
+
+        ; Print assertion message
+        call zest.runner.printAssertionSeparator
+        call zest.byteAssertion.printMessage
 
         ; Print 'Expected:' label
         call zest.runner._printExpectedLabel
 
         ; Print expected value
-        push af
-            ld a, b ; set A to expected value
-            call zest.console.outputHexA
-        pop af
+        call zest.byteAssertion.printExpected
 
         ; Print 'Actual:' label
         call zest.runner._printActualLabel
@@ -123,6 +136,7 @@
         call zest.runner._printTestDescription
 
         ; Print assertion message
+        call zest.runner.printAssertionSeparator
         call zest.wordAssertion.printMessage
 
         ; Print expected label

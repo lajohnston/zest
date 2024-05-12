@@ -1,31 +1,31 @@
 ;====
 ; Word (16-bit value) assertion
 ;====
-.struct "zest.WordAssertion"
-    expectedValue:  dw
+.struct "zest.ByteAssertion"
+    expectedValue:  db
     messagePointer: dw
 .endst
 
 ;====
-; Defines inline assertion data and sets zest.wordAssertion.define.returnValue
+; Defines inline assertion data and sets zest.byteAssertion.define.returnValue
 ; to the addres
 ;
-; @in   expectedValue   the expected word value
+; @in   expectedValue   the expected byte value
 ; @in   message         pointer to a assertion failure message, or a custom
 ;                       message string
 ;
-; @out zest.wordAssertion.define.returnValue    address of the data
+; @out zest.byteAssertion.define.returnValue    address of the data
 ;====
-.macro "zest.wordAssertion.define" isolated args expectedValue message
+.macro "zest.byteAssertion.define" isolated args expectedValue message
     ; Assert arguments (assemble-time)
     zest.utils.assert.equals NARGS 2 "\.: Unexpected number of arguments"
-    zest.utils.assert.word expectedValue "\. expectedValue should be a 16-bit value"
+    zest.utils.assert.byte expectedValue "\. expectedValue should be an 8-bit value"
 
     ; Define data
     .if \?2 == ARG_STRING
         jp +
             \.\@_assertionData:
-                .dw expectedValue
+                .db expectedValue
                 .dw _customMessage
                 _customMessage:
                     zest.console.defineString message
@@ -33,7 +33,7 @@
     .elif \?2 == ARG_LABEL
         jr +
             \.\@_assertionData:
-                .dw expectedValue
+                .db expectedValue
                 .db <(message)
                 .db >(message)
         +:
@@ -41,7 +41,7 @@
         zest.utils.assert.fail "\.: message should be a string or a label"
     .endif
 
-    .redefine zest.wordAssertion.define.returnValue (\.\@_assertionData)
+    .redefine zest.byteAssertion.define.returnValue (\.\@_assertionData)
 .endm
 
 ;====
@@ -49,11 +49,11 @@
 ;
 ; @in   ix  pointer to the word zest.assertion.Word instance
 ;====
-.section "zest.wordAssertion.printMessage" free
-    zest.wordAssertion.printMessage:
+.section "zest.byteAssertion.printMessage" free
+    zest.byteAssertion.printMessage:
         push hl
-            ld l, (ix + zest.WordAssertion.messagePointer)
-            ld h, (ix + zest.WordAssertion.messagePointer + 1)
+            ld l, (ix + zest.ByteAssertion.messagePointer)
+            ld h, (ix + zest.ByteAssertion.messagePointer + 1)
             call zest.console.out
         pop hl
 
@@ -63,14 +63,14 @@
 ;====
 ; Prints the expected word value to the on-screen console
 ;
-; @in   ix  pointer to the zest.WordAssertion instance
+; @in   ix  pointer to the zest.ByteAssertion instance
 ;====
-.section "zest.wordAssertion.printExpected"
-    zest.wordAssertion.printExpected:
-        push bc
-            ld c, (ix + 0)
-            ld b, (ix + 1)
-            call zest.console.outputHexBC
-        pop bc
+.section "zest.byteAssertion.printExpected"
+    zest.byteAssertion.printExpected:
+        push af
+            ; Set A to expected value
+            ld a, (ix + zest.ByteAssertion.expectedValue)
+            call zest.console.outputHexA
+        pop af
         ret
 .ends
