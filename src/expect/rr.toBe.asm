@@ -10,36 +10,47 @@
 ;====
 .macro "expect.bc.toBe" isolated args expectedValue
     zest.utils.assert.word expectedValue "\. expects a 16-bit value"
-
-    \@_\..{expectedValue}:
-
-    push af
-    push hl
-        ld hl, expectedValue    ; set HL to expected value
-        or a                    ; clear carry flag
-        sbc hl, bc              ; set z flag if BC equals expected value
-
-        jp z, +                 ; jp if zero/pass
-            push bc
-            push de
-                ; Load DE with actual value
-                ld d, b
-                ld e, c
-
-                ; Load BC with expected value
-                ld bc, expectedValue
-
-                ; Load HL with assertion message
-                ld hl, expect.rr.toBe.defaultMessages.bc
-
-                ; Print test failure
-                call zest.runner.wordExpectationFailedV1
-            pop de
-            pop bc
-        +:
-    pop hl
-    pop af
+    zest.wordAssertion.assert expect.bc.toBe expectedValue expect.rr.toBe.defaultMessages.bc
 .endm
+
+;====
+; Asserts that BC is equal to the expected value, otherwise fails the test
+;
+; @in   hl  pointer to the assertion data
+;====
+.section "expect.bc.toBe" free
+    expect.bc.toBe:
+        push af
+        push de
+        push hl
+            ; Set DE to expected value
+            ld e, (hl)
+            inc hl
+            ld d, (hl)
+
+            ; Set HL to actual value
+            ld h, b
+            ld l, c
+
+            or a            ; clear carry flag
+            sbc hl, de      ; subtract actual from expected
+            jr nz, _fail    ; jp if the values didn't match
+        pop hl
+        pop de
+        pop af
+        ret
+
+    _fail:
+        ; Pop message pointer into IX
+        pop ix
+
+        ; Set DE to actual value
+        ld d, b
+        ld e, c
+
+        ; Fail test with message
+        jp zest.runner.wordExpectationFailed
+.ends
 
 ;====
 ; Asserts the value in DE matches the expected value
@@ -49,8 +60,6 @@
 ;====
 .macro "expect.de.toBe" isolated args expectedValue
     zest.utils.assert.word expectedValue "\. expects a 16-bit value"
-
-    \@_\..{expectedValue}:
 
     push af
     push hl
@@ -83,8 +92,6 @@
 .macro "expect.hl.toBe" isolated args expectedValue
     zest.utils.assert.word expectedValue "\. expects a 16-bit value"
 
-    \@_\..{expectedValue}:
-
     push af
     push bc
         ld bc, expectedValue
@@ -115,8 +122,6 @@
 ;====
 .macro "expect.ix.toBe" isolated args expectedValue
     zest.utils.assert.word expectedValue "\. expects a 16-bit value"
-
-    \@_\..{expectedValue}:
 
     push af
     push hl
@@ -156,8 +161,6 @@
 ;====
 .macro "expect.iy.toBe" isolated args expectedValue
     zest.utils.assert.word expectedValue "\. expects a 16-bit value"
-
-    \@_\..{expectedValue}:
 
     push af
     push hl
