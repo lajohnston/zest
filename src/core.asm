@@ -32,6 +32,7 @@
 .include "./src/timeout.asm"
 
 ; Assertions
+.include "./src/wordAssertion.asm"
 .include "./src/expect/flags.asm"
 .include "./src/expect/r.toBe.asm"
 .include "./src/expect/rr.toBe.asm"
