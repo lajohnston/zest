@@ -140,33 +140,6 @@
 .ends
 
 ;====
-; (Deprecated) Displays details about a 16-bit value assertion that doesn't match
-; the expectation, then stops the program
-;
-; @in   bc  the expected value
-; @in   de  the actual value
-; @in   hl  pointer to the assertion message
-;====
-.section "zest.runner.wordExpectationFailedV1" free
-    zest.runner.wordExpectationFailedV1:
-        call zest.runner._printTestDescription
-        call zest.runner._printAssertionMessage
-
-        ; Print expected label
-        call zest.runner._printExpectedLabel
-
-        ; Print expected value
-        call zest.console.outputHexBC
-
-        ; Print actual label
-        call zest.runner._printActualLabel
-
-        ; Print actual value
-        call zest.console.outputHexDE
-        jp zest.console.displayAndStop
-.ends
-
-;====
 ; Displays details about a boolean/flag assertion that doesn't match
 ; the expectation, then stops the program
 ;

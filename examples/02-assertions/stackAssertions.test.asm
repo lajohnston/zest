@@ -16,7 +16,7 @@ describe "expect.stack.toContain"
         scf
 
         expect.stack.toContain $1234
-        expect.stack.toContain $1234
+        expect.stack.toContain $1234 0 "Expected stack to be unchanged"
 
         expect.a.toBe 0
         expect.carry.toBe 1

@@ -23,6 +23,14 @@
 
     \@_\..{expectedWord}:
 
+    ; Define assertion data
+    .ifdef message
+        zest.utils.assert.string message "\.: Message should be a string value"
+        zest.wordAssertion.define expectedWord message
+    .else
+        zest.wordAssertion.define expectedWord expect.stack.toContain.defaultMessage
+    .endif
+
     ; Navigate to stack position
     .ifdef offset
         .repeat offset
@@ -38,12 +46,12 @@
     ; Compare low byte
     ld a, <expectedWord
     cp e
-    jr nz,  +                           ; jp if not equal
+    jr nz, _fail                        ; jp if not equal
 
     ; Compare high byte
     ld a, >expectedWord
     cp d
-    jr nz, +                            ; jp if not equal
+    jr nz, _fail                        ; jp if not equal
 
     ; Assertion passed; Restore stack
     pop af                              ; restore AF
@@ -58,24 +66,11 @@
         .endr
     .endif
 
-    jp ++   ; jump over assertion failed routine
-        +:
-            ; Assertion failed
-            ld bc, expectedWord
-
-            .ifdef message
-                ld hl, \..customMessage.\@
-            .else
-                ld hl, expect.stack.toContain.defaultMessage
-            .endif
-
-            jp zest.runner.wordExpectationFailedV1
-
-            .ifdef message
-                \..customMessage.\@:
-                    zest.console.defineString message
-            .endif
-    ++:
+    jr +   ; jump over assertion failed routine
+        _fail:
+            ld ix, zest.wordAssertion.define.returnValue
+            jp zest.runner.wordExpectationFailed
+    +:
 .endm
 
 ;====
