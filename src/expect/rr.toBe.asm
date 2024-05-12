@@ -11,7 +11,15 @@
 .macro "expect.bc.toBe" isolated args expectedValue
     \@_\..{expectedValue}:
     zest.utils.assert.word expectedValue "\. expects a 16-bit value"
-    zest.wordAssertion.assert expect.bc.toBe expectedValue expect.rr.toBe.defaultMessages.bc
+
+    ; Define assertion data
+    zest.wordAssertion.define expectedValue expect.rr.toBe.defaultMessages.bc
+
+    ; Call routine
+    push hl
+        ld hl, zest.wordAssertion.define.returnValue
+        call expect.bc.toBe
+    pop hl
 .endm
 
 ;====
@@ -38,7 +46,15 @@
 .macro "expect.de.toBe" isolated args expectedValue
     \@_\..{expectedValue}:
     zest.utils.assert.word expectedValue "\. expects a 16-bit value"
-    zest.wordAssertion.assert expect.de.toBe expectedValue expect.rr.toBe.defaultMessages.de
+
+    ; Define assertion data
+    zest.wordAssertion.define expectedValue expect.rr.toBe.defaultMessages.de
+
+    ; Call routine
+    push hl
+        ld hl, zest.wordAssertion.define.returnValue
+        call expect.de.toBe
+    pop hl
 .endm
 
 ;====
@@ -81,7 +97,15 @@
 .macro "expect.hl.toBe" isolated args expectedValue
     \@_\..{expectedValue}:
     zest.utils.assert.word expectedValue "\. expects a 16-bit value"
-    zest.wordAssertion.assert expect.hl.toBe expectedValue expect.rr.toBe.defaultMessages.hl "de"
+
+    ; Define assertion data
+    zest.wordAssertion.define expectedValue expect.rr.toBe.defaultMessages.hl
+
+    ; Call routine
+    push de
+        ld de, zest.wordAssertion.define.returnValue
+        call expect.hl.toBe
+    pop de
 .endm
 
 ;====
@@ -107,7 +131,15 @@
 .macro "expect.ix.toBe" isolated args expectedValue
     \@_\..{expectedValue}:
     zest.utils.assert.word expectedValue "\. expects a 16-bit value"
-    zest.wordAssertion.assert expect.ix.toBe expectedValue expect.rr.toBe.defaultMessages.ix
+
+    ; Define assertion data
+    zest.wordAssertion.define expectedValue expect.rr.toBe.defaultMessages.ix
+
+    ; Call routine
+    push hl
+        ld hl, zest.wordAssertion.define.returnValue
+        call expect.ix.toBe
+    pop hl
 .endm
 
 ;====
@@ -134,7 +166,15 @@
 .macro "expect.iy.toBe" isolated args expectedValue
     \@_\..{expectedValue}:
     zest.utils.assert.word expectedValue "\. expects a 16-bit value"
-    zest.wordAssertion.assert expect.iy.toBe expectedValue expect.rr.toBe.defaultMessages.iy
+
+    ; Define assertion data
+    zest.wordAssertion.define expectedValue expect.rr.toBe.defaultMessages.iy
+
+    ; Call routine
+    push hl
+        ld hl, zest.wordAssertion.define.returnValue
+        call expect.iy.toBe
+    pop hl
 .endm
 
 ;====

@@ -7,34 +7,32 @@
 .endst
 
 ;====
-; Asserts the given condition at runtime
+; Defines inline assertion data and sets zest.wordAssertion.define.returnValue
+; to the addres
 ;
-; @in   routine         the assertion routine to call, accepting HL as a pointer
-;                       to the zest.WordAssertion instance
 ; @in   expectedValue   the expected word value
 ; @in   message         pointer to a assertion failure message, or a custom
 ;                       message string
-; @in   useDE           if set, uses DE to point to the assertion data rather
-;                       than HL
+;
+; @out zest.wordAssertion.define.returnValue    address of the data
 ;====
-.macro "zest.wordAssertion.assert" isolated args routine expectedValue message useDe
+.macro "zest.wordAssertion.define" isolated args expectedValue message
     ; Assert arguments (assemble-time)
-    zest.utils.assert.range NARGS 3 4 "\.: Unexpected number of arguments"
-    zest.utils.assert.label routine "\.: routine argument should be a label"
+    zest.utils.assert.equals NARGS 2 "\.: Unexpected number of arguments"
     zest.utils.assert.word expectedValue "\. expectedValue should be a 16-bit value"
 
     ; Define data
-    .if \?3 == ARG_STRING
+    .if \?2 == ARG_STRING
         jp +
-            _assertionData:
+            \.\@_assertionData:
                 .dw expectedValue
                 .dw _customMessage
                 _customMessage:
                     zest.console.defineString message
         +:
-    .elif \?3 == ARG_LABEL
+    .elif \?2 == ARG_LABEL
         jr +
-            _assertionData:
+            \.\@_assertionData:
                 .dw expectedValue
                 .db <(message)
                 .db >(message)
@@ -43,18 +41,7 @@
         zest.utils.assert.fail "\.: message should be a string or a label"
     .endif
 
-    ; Call assertion routine
-    .if NARGS == 4
-        push de
-            ld de, _assertionData
-            call routine
-        pop de
-    .else
-        push hl
-            ld hl, _assertionData
-            call routine
-        pop hl
-    .endif
+    .redefine zest.wordAssertion.define.returnValue (\.\@_assertionData)
 .endm
 
 ;====
