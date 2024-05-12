@@ -181,36 +181,45 @@
 ;====
 .macro "expect.iy.toBe" isolated args expectedValue
     zest.utils.assert.word expectedValue "\. expects a 16-bit value"
-
-    push af
-    push hl
-    push de
-        ; Set HL to expected value
-        ld hl, expectedValue
-
-        ; Set DE to actual value
-        ld d, iyh
-        ld e, iyl
-
-        or a                    ; clear carry flag
-        sbc hl, de              ; set z flag if DE equals expected value
-
-        jp z, +                 ; jp if zero/pass
-            push bc
-                ; Load BC with expected value
-                ld bc, expectedValue
-
-                ; Load HL with assertion message
-                ld hl, expect.rr.toBe.defaultMessages.iy
-
-                ; Print test failure
-                call zest.runner.wordExpectationFailedV1
-            pop bc
-        +:
-    pop de
-    pop hl
-    pop af
+    zest.wordAssertion.assert expect.iy.toBe expectedValue expect.rr.toBe.defaultMessages.iy
 .endm
+
+;====
+; Asserts that IY is equal to the expected value, otherwise fails the test
+;
+; @in   hl  pointer to the assertion data
+;====
+.section "expect.iy.toBe" free
+    expect.iy.toBe:
+        push af
+        push de
+        push hl
+            ; Set HL to expected value
+            ld a, (hl)
+            inc hl
+            ld h, (hl)
+            ld l, a
+
+            ; Set DE to actual value
+            ld d, iyh
+            ld e, iyl
+
+            or a            ; clear carry flag
+            sbc hl, de      ; subtract actual from expected
+            jr nz, _fail    ; jp if the values didn't match
+        pop hl
+        pop de
+        pop af
+        ret
+
+    _fail:
+        ; Pop message pointer into IX
+        pop ix
+
+        ; Fail test with message
+        ; DE = actual value
+        jp zest.runner.wordExpectationFailed
+.ends
 
 ; Default error messages for expectations
 .section "expect.rr.toBe.defaultMessages" free
