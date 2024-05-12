@@ -9,6 +9,7 @@
 ; @in   expectedValue   the expected value
 ;====
 .macro "expect.bc.toBe" isolated args expectedValue
+    \@_\..{expectedValue}:
     zest.utils.assert.word expectedValue "\. expects a 16-bit value"
     zest.wordAssertion.assert expect.bc.toBe expectedValue expect.rr.toBe.defaultMessages.bc
 .endm
@@ -35,6 +36,7 @@
 ; @in   expectedValue   the expected value
 ;====
 .macro "expect.de.toBe" isolated args expectedValue
+    \@_\..{expectedValue}:
     zest.utils.assert.word expectedValue "\. expects a 16-bit value"
     zest.wordAssertion.assert expect.de.toBe expectedValue expect.rr.toBe.defaultMessages.de
 .endm
@@ -77,6 +79,7 @@
 ; @in   expectedValue   the expected value
 ;====
 .macro "expect.hl.toBe" isolated args expectedValue
+    \@_\..{expectedValue}:
     zest.utils.assert.word expectedValue "\. expects a 16-bit value"
     zest.wordAssertion.assert expect.hl.toBe expectedValue expect.rr.toBe.defaultMessages.hl "de"
 .endm
@@ -102,6 +105,7 @@
 ; @in   expectedValue   the expected value
 ;====
 .macro "expect.ix.toBe" isolated args expectedValue
+    \@_\..{expectedValue}:
     zest.utils.assert.word expectedValue "\. expects a 16-bit value"
     zest.wordAssertion.assert expect.ix.toBe expectedValue expect.rr.toBe.defaultMessages.ix
 .endm
@@ -128,6 +132,7 @@
 ; @in   expectedValue   the expected value
 ;====
 .macro "expect.iy.toBe" isolated args expectedValue
+    \@_\..{expectedValue}:
     zest.utils.assert.word expectedValue "\. expects a 16-bit value"
     zest.wordAssertion.assert expect.iy.toBe expectedValue expect.rr.toBe.defaultMessages.iy
 .endm
