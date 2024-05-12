@@ -114,12 +114,41 @@
 ; Displays details about a 16-bit value assertion that doesn't match
 ; the expectation, then stops the program
 ;
+; @in   de  the actual value
+; @in   ix  pointer to the assertion.Word instance, containing the expected
+;           value and assertion message
+;====
+.section "zest.runner.wordExpectationFailed" free
+    zest.runner.wordExpectationFailed:
+        call zest.runner._printTestDescription
+
+        ; Print assertion message
+        call zest.wordAssertion.printMessage
+
+        ; Print expected label
+        call zest.runner._printExpectedLabel
+
+        ; Print expected value
+        call zest.wordAssertion.printExpected
+
+        ; Print actual label
+        call zest.runner._printActualLabel
+
+        ; Print actual value
+        call zest.console.outputHexDE
+        jp zest.console.displayAndStop
+.ends
+
+;====
+; (Deprecated) Displays details about a 16-bit value assertion that doesn't match
+; the expectation, then stops the program
+;
 ; @in   bc  the expected value
 ; @in   de  the actual value
 ; @in   hl  pointer to the assertion message
 ;====
-.section "zest.runner.wordExpectationFailed" free
-    zest.runner.wordExpectationFailed:
+.section "zest.runner.wordExpectationFailedV1" free
+    zest.runner.wordExpectationFailedV1:
         call zest.runner._printTestDescription
         call zest.runner._printAssertionMessage
 

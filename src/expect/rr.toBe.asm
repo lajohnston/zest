@@ -33,7 +33,7 @@
                 ld hl, expect.rr.toBe.defaultMessages.bc
 
                 ; Print test failure
-                call zest.runner.wordExpectationFailed
+                call zest.runner.wordExpectationFailedV1
             pop de
             pop bc
         +:
@@ -67,7 +67,7 @@
                 ld hl, expect.rr.toBe.defaultMessages.de
 
                 ; Print test failure
-                call zest.runner.wordExpectationFailed
+                call zest.runner.wordExpectationFailedV1
             pop bc
         +:
     pop hl
@@ -99,7 +99,7 @@
             push hl
                 ; Print test failure
                 ld hl, expect.rr.toBe.defaultMessages.hl
-                call zest.runner.wordExpectationFailed
+                call zest.runner.wordExpectationFailedV1
             pop hl
             ex de, hl   ; restore HL and DE
         +:
@@ -140,7 +140,7 @@
                 ld hl, expect.rr.toBe.defaultMessages.ix
 
                 ; Print test failure
-                call zest.runner.wordExpectationFailed
+                call zest.runner.wordExpectationFailedV1
             pop bc
         +:
     pop de
@@ -181,7 +181,7 @@
                 ld hl, expect.rr.toBe.defaultMessages.iy
 
                 ; Print test failure
-                call zest.runner.wordExpectationFailed
+                call zest.runner.wordExpectationFailedV1
             pop bc
         +:
     pop de
