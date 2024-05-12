@@ -20,36 +20,12 @@
 ;====
 .section "expect.bc.toBe" free
     expect.bc.toBe:
-        push af
         push de
-        push hl
-            ; Set DE to expected value
-            ld e, (hl)
-            inc hl
-            ld d, (hl)
-
-            ; Set HL to actual value
-            ld h, b
-            ld l, c
-
-            or a            ; clear carry flag
-            sbc hl, de      ; subtract actual from expected
-            jr nz, _fail    ; jp if the values didn't match
-        pop hl
+            ld d, b
+            ld e, c
+            call expect.de.toBe
         pop de
-        pop af
         ret
-
-    _fail:
-        ; Pop message pointer into IX
-        pop ix
-
-        ; Set DE to actual value
-        ld d, b
-        ld e, c
-
-        ; Fail test with message
-        jp zest.runner.wordExpectationFailed
 .ends
 
 ;====
@@ -137,34 +113,12 @@
 ;====
 .section "expect.ix.toBe" free
     expect.ix.toBe:
-        push af
         push de
-        push hl
-            ; Set HL to expected value
-            ld a, (hl)
-            inc hl
-            ld h, (hl)
-            ld l, a
-
-            ; Set DE to actual value
             ld d, ixh
             ld e, ixl
-
-            or a            ; clear carry flag
-            sbc hl, de      ; subtract actual from expected
-            jr nz, _fail    ; jp if the values didn't match
-        pop hl
+            call expect.de.toBe
         pop de
-        pop af
         ret
-
-    _fail:
-        ; Pop message pointer into IX
-        pop ix
-
-        ; Fail test with message
-        ; DE = actual value
-        jp zest.runner.wordExpectationFailed
 .ends
 
 ;====
@@ -185,34 +139,12 @@
 ;====
 .section "expect.iy.toBe" free
     expect.iy.toBe:
-        push af
         push de
-        push hl
-            ; Set HL to expected value
-            ld a, (hl)
-            inc hl
-            ld h, (hl)
-            ld l, a
-
-            ; Set DE to actual value
             ld d, iyh
             ld e, iyl
-
-            or a            ; clear carry flag
-            sbc hl, de      ; subtract actual from expected
-            jr nz, _fail    ; jp if the values didn't match
-        pop hl
+            call expect.de.toBe
         pop de
-        pop af
         ret
-
-    _fail:
-        ; Pop message pointer into IX
-        pop ix
-
-        ; Fail test with message
-        ; DE = actual value
-        jp zest.runner.wordExpectationFailed
 .ends
 
 ; Default error messages for expectations
