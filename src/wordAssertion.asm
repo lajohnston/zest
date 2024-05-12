@@ -14,10 +14,12 @@
 ; @in   expectedValue   the expected word value
 ; @in   message         pointer to a assertion failure message, or a custom
 ;                       message string
+; @in   useDE           if set, uses DE to point to the assertion data rather
+;                       than HL
 ;====
-.macro "zest.wordAssertion.assert" isolated args routine expectedValue message
+.macro "zest.wordAssertion.assert" isolated args routine expectedValue message useDe
     ; Assert arguments (assemble-time)
-    zest.utils.assert.equals NARGS 3 "\.: Unexpected number of arguments"
+    zest.utils.assert.range NARGS 3 4 "\.: Unexpected number of arguments"
     zest.utils.assert.label routine "\.: routine argument should be a label"
     zest.utils.assert.word expectedValue "\. expectedValue should be a 16-bit value"
 
@@ -42,10 +44,17 @@
     .endif
 
     ; Call assertion routine
-    push hl
-        ld hl, _assertionData
-        call routine
-    pop hl
+    .if NARGS == 4
+        push de
+            ld de, _assertionData
+            call routine
+        pop de
+    .else
+        push hl
+            ld hl, _assertionData
+            call routine
+        pop hl
+    .endif
 .endm
 
 ;====

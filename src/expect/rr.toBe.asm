@@ -102,28 +102,22 @@
 ;====
 .macro "expect.hl.toBe" isolated args expectedValue
     zest.utils.assert.word expectedValue "\. expects a 16-bit value"
-
-    push af
-    push bc
-        ld bc, expectedValue
-        or a            ; clear carry flag
-
-        push hl
-            sbc hl, bc  ; set z flag if HL == BC (expected value)
-        pop hl
-
-        jp z, +         ; jp if zero/pass
-            ex de, hl   ; move actual value to DE
-            push hl
-                ; Print test failure
-                ld hl, expect.rr.toBe.defaultMessages.hl
-                call zest.runner.wordExpectationFailedV1
-            pop hl
-            ex de, hl   ; restore HL and DE
-        +:
-    pop bc
-    pop af
+    zest.wordAssertion.assert expect.hl.toBe expectedValue expect.rr.toBe.defaultMessages.hl "de"
 .endm
+
+;====
+; Asserts that HL is equal to the expected value, otherwise fails the test
+;
+; @in   hl  the actual value
+; @in   de  pointer to the assertion data
+;====
+.section "expect.hl.toBe" free
+    expect.hl.toBe:
+        ex de, hl           ; set HL to assertion pointer and DE to actual value
+        call expect.de.toBe
+        ex de, hl           ; switch values back
+        ret
+.ends
 
 ;====
 ; Asserts the value in IX matches the expected value
