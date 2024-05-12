@@ -69,7 +69,7 @@
                 ld hl, expect.stack.toContain.defaultMessage
             .endif
 
-            jp zest.runner.wordExpectationFailed
+            jp zest.runner.wordExpectationFailedV1
 
             .ifdef message
                 \..customMessage.\@:
