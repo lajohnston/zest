@@ -84,6 +84,7 @@ Example usage:
 
 - `expect.a.toBe 255`
 - `expect.b.toBe -128`
+- `expect.a.toBe 1 "Custom assertion failure message"`
 
 ```asm
 expect.a.toBe -128
