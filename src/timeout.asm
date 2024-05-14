@@ -27,6 +27,17 @@
 .ends
 
 ;====
+; Derive the timeout checksum
+;
+; @in   a   the remainingFrames value
+; @out  a   the checksum
+;====
+.macro "zest.timeout._calculateChecksum"
+    inc a
+    rrca
+.endm
+
+;====
 ; Sets the timeout counter to the given value
 ;
 ; @in   frames  the number of frames to timeout after
@@ -39,7 +50,7 @@
     ld (zest.timeout.remainingFrames), a
 
     ; Set checksum
-    rrca
+    zest.timeout._calculateChecksum
     ld (zest.timeout.checksum), a
 .endm
 
@@ -79,17 +90,18 @@
 
         ; Validate checksum
         ld a, l
-        rrca
+        zest.timeout._calculateChecksum
         cp h
         jr nz, _checksumInvalid
 
         ; Update timeout
-        dec l
+        dec l           ; dec remainingFrames
         jr z, _timeout  ; if zero, timeout
 
         ; Update checksum
-        ld h, l
-        rrc h
+        ld a, l                             ; set A to new remainingFrames
+        zest.timeout._calculateChecksum     ; calculate checksum
+        ld h, a                             ; set H to new checksum
 
         ; Store values
         ld (zest.timeout.remainingFrames), hl
