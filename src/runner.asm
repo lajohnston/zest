@@ -17,6 +17,9 @@
     ; Flags
     ; Bit 0 = set if a test is in progress
     zest.runner.flags:  db
+
+    ; Temporary location to store a word value
+    zest.runner.tempWord: dw
 .ends
 
 ;====

@@ -3,34 +3,13 @@
 ;====
 
 ;====
-; (Private) Asserts the value in register A matches the expected value,
-; otherwise jumps to zest.runner.byteExpectationFailed
-;
-; @in   a           the actual value
-; @in   expected    the expected value
-; @in   message     pointer to the failure message string
-;====
-.macro "expect._assertAEquals" isolated args expected message
-    cp expected
-    jp z, +
-        push bc
-        push hl
-            ld b, expected
-            ld hl, message
-            call zest.runner.byteExpectationFailed
-        pop hl
-        pop bc
-    +:
-.endm
-
-;====
 ; Asserts that A is equal to the expected value, otherwise fails the test
 ;
 ; @in   a   the value
 ; @in   hl  pointer to the assertion data
 ;====
-.section "expect.a.toBe" free
-    expect.a.toBe:
+.section "expect._assertAEquals" free
+    expect._assertAEquals:
         push af
             cp (hl)
             jr nz, _fail
@@ -51,20 +30,26 @@
 ; @in   a           the actual value
 ; @in   expected    the expected value
 ;====
-.macro "expect.a.toBe" args expected
-    zest.utils.assert.byte expected "\. expects a numeric byte value"
+.macro "expect.a.toBe" args expectedValue
+    zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
-    \@_\..{expected}:
-
-    ; Define assertion data
-    zest.byteAssertion.define expected expect.a.toBe.defaultMessage
-
-    ; Call routine
-    push hl
-        ld hl, zest.byteAssertion.define.returnValue
-        call expect.a.toBe
-    pop hl
+    \@_\..{expectedValue}:
+        zest.byteAssertion.assert expect.a.toBe expectedValue expect.a.toBe.defaultMessage
 .endm
+
+;====
+; Asserts that A is equal to the expected value, otherwise fails the test.
+; Returns to the return address + 3, to skip the assertion data
+;
+; @in   a   the value
+; @in   hl  pointer to the assertion data
+;====
+.section "expect.a.toBe" free
+    expect.a.toBe:
+        zest.byteAssertion.loadHLPointer
+            call expect._assertAEquals
+        zest.byteAssertion.return.HL
+.ends
 
 ;====
 ; Fails the test if the value in register B does not match the expected value
@@ -72,19 +57,11 @@
 ; @in   b           the actual value
 ; @in   expected    the expected value
 ;====
-.macro "expect.b.toBe" args expected
-    zest.utils.assert.byte expected "\. expects a numeric byte value"
+.macro "expect.b.toBe" args expectedValue
+    zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
-    \@_\..{expected}:
-
-    ; Define assertion data
-    zest.byteAssertion.define expected expect.b.toBe.defaultMessage
-
-    ; Call routine
-    push hl
-        ld hl, zest.byteAssertion.define.returnValue
-        call expect.b.toBe
-    pop hl
+    \@_\..{expectedValue}:
+        zest.byteAssertion.assert expect.b.toBe expectedValue expect.b.toBe.defaultMessage
 .endm
 
 ;====
@@ -95,11 +72,14 @@
 ;====
 .section "expect.b.toBe" free
     expect.b.toBe:
+        zest.byteAssertion.loadHLPointer
+
         push af
             ld a, b
-            call expect.a.toBe
+            call expect._assertAEquals
         pop af
-        ret
+
+        zest.byteAssertion.return.HL
 .ends
 
 ;====
@@ -108,17 +88,11 @@
 ; @in   c           the actual value
 ; @in   expected    the expected value
 ;====
-.macro "expect.c.toBe" args expected
-    zest.utils.assert.byte expected "\. expects a numeric byte value"
+.macro "expect.c.toBe" args expectedValue
+    zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
-    ; Define assertion data
-    zest.byteAssertion.define expected expect.c.toBe.defaultMessage
-
-    ; Call routine
-    push hl
-        ld hl, zest.byteAssertion.define.returnValue
-        call expect.c.toBe
-    pop hl
+    \@_\..{expectedValue}:
+        zest.byteAssertion.assert expect.c.toBe expectedValue expect.c.toBe.defaultMessage
 .endm
 
 ;====
@@ -129,30 +103,27 @@
 ;====
 .section "expect.c.toBe" free
     expect.c.toBe:
+        zest.byteAssertion.loadHLPointer
+
         push af
             ld a, c
-            call expect.a.toBe
+            call expect._assertAEquals
         pop af
-        ret
+
+        zest.byteAssertion.return.HL
 .ends
 
 ;====
 ; Fails the test if the value in register D does not match the expected value
 ;
-; @in   d           the actual value
-; @in   expected    the expected value
+; @in   d               the actual value
+; @in   expectedValue   the expected value
 ;====
-.macro "expect.d.toBe" args expected
-    zest.utils.assert.byte expected "\. expects a numeric byte value"
+.macro "expect.d.toBe" args expectedValue
+    zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
-    ; Define assertion data
-    zest.byteAssertion.define expected expect.d.toBe.defaultMessage
-
-    ; Call routine
-    push hl
-        ld hl, zest.byteAssertion.define.returnValue
-        call expect.d.toBe
-    pop hl
+    \@_\..{expectedValue}:
+        zest.byteAssertion.assert expect.d.toBe expectedValue expect.d.toBe.defaultMessage
 .endm
 
 ;====
@@ -163,32 +134,27 @@
 ;====
 .section "expect.d.toBe" free
     expect.d.toBe:
+        zest.byteAssertion.loadHLPointer
+
         push af
             ld a, d
-            call expect.a.toBe
+            call expect._assertAEquals
         pop af
-        ret
+
+        zest.byteAssertion.return.HL
 .ends
 
 ;====
 ; Fails the test if the value in register E does not match the expected value
 ;
-; @in   e           the actual value
-; @in   expected    the expected value
+; @in   e               the actual value
+; @in   expectedValue   the expected value
 ;====
-.macro "expect.e.toBe" args expected
-    zest.utils.assert.byte expected "\. expects a numeric byte value"
+.macro "expect.e.toBe" args expectedValue
+    zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
-    \@_\..{expected}:
-
-    ; Define assertion data
-    zest.byteAssertion.define expected expect.e.toBe.defaultMessage
-
-    ; Call routine
-    push hl
-        ld hl, zest.byteAssertion.define.returnValue
-        call expect.e.toBe
-    pop hl
+    \@_\..{expectedValue}:
+        zest.byteAssertion.assert expect.e.toBe expectedValue expect.e.toBe.defaultMessage
 .endm
 
 ;====
@@ -199,32 +165,27 @@
 ;====
 .section "expect.e.toBe" free
     expect.e.toBe:
+        zest.byteAssertion.loadHLPointer
+
         push af
             ld a, e
-            call expect.a.toBe
+            call expect._assertAEquals
         pop af
-        ret
+
+        zest.byteAssertion.return.HL
 .ends
 
 ;====
 ; Fails the test if the value in register H does not match the expected value
 ;
-; @in   h           the actual value
-; @in   expected    the expected value
+; @in   h               the actual value
+; @in   expectedValue   the expected value
 ;====
-.macro "expect.h.toBe" args expected
-    zest.utils.assert.byte expected "\. expects a numeric byte value"
+.macro "expect.h.toBe" args expectedValue
+    zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
-    \@_\..{expected}:
-
-    ; Define assertion data
-    zest.byteAssertion.define expected expect.h.toBe.defaultMessage
-
-    ; Call routine
-    push de
-        ld de, zest.byteAssertion.define.returnValue
-        call expect.h.toBe
-    pop de
+    \@_\..{expectedValue}:
+        zest.byteAssertion.assert expect.h.toBe expectedValue expect.h.toBe.defaultMessage
 .endm
 
 ;====
@@ -235,34 +196,29 @@
 ;====
 .section "expect.h.toBe" free
     expect.h.toBe:
+        zest.byteAssertion.loadDEPointer
+
         push af
             ld a, h
             ex de, hl
-            call expect.a.toBe
+                call expect._assertAEquals
             ex de, hl
         pop af
-        ret
+
+        zest.byteAssertion.return.DE
 .ends
 
 ;====
 ; Fails the test if the value in register L does not match the expected value
 ;
-; @in   l           the actual value
-; @in   expected    the expected value
+; @in   l               the actual value
+; @in   expectedValue   the expected value
 ;====
-.macro "expect.l.toBe" args expected
-    zest.utils.assert.byte expected "\. expects a numeric byte value"
+.macro "expect.l.toBe" args expectedValue
+    zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
-    \@_\..{expected}:
-
-    ; Define assertion data
-    zest.byteAssertion.define expected expect.l.toBe.defaultMessage
-
-    ; Call routine
-    push de
-        ld de, zest.byteAssertion.define.returnValue
-        call expect.l.toBe
-    pop de
+    \@_\..{expectedValue}:
+        zest.byteAssertion.assert expect.l.toBe expectedValue expect.l.toBe.defaultMessage
 .endm
 
 ;====
@@ -273,13 +229,16 @@
 ;====
 .section "expect.l.toBe" free
     expect.l.toBe:
+        zest.byteAssertion.loadDEPointer
+
         push af
             ld a, l
             ex de, hl
-            call expect.a.toBe
+                call expect._assertAEquals
             ex de, hl
         pop af
-        ret
+
+        zest.byteAssertion.return.DE
 .ends
 
 ;====
@@ -288,19 +247,11 @@
 ; @in   ixh           the actual value
 ; @in   expected    the expected value
 ;====
-.macro "expect.ixh.toBe" args expected
-    zest.utils.assert.byte expected "\. expects a numeric byte value"
+.macro "expect.ixh.toBe" args expectedValue
+    zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
-    \@_\..{expected}:
-
-    ; Define assertion data
-    zest.byteAssertion.define expected expect.ixh.toBe.defaultMessage
-
-    ; Call routine
-    push hl
-        ld hl, zest.byteAssertion.define.returnValue
-        call expect.ixh.toBe
-    pop hl
+    \@_\..{expectedValue}:
+        zest.byteAssertion.assert expect.ixh.toBe expectedValue expect.ixh.toBe.defaultMessage
 .endm
 
 ;====
@@ -311,11 +262,14 @@
 ;====
 .section "expect.ixh.toBe" free
     expect.ixh.toBe:
+        zest.byteAssertion.loadHLPointer
+
         push af
             ld a, ixh
-            call expect.a.toBe
+            call expect._assertAEquals
         pop af
-        ret
+
+        zest.byteAssertion.return.HL
 .ends
 
 ;====
@@ -324,19 +278,11 @@
 ; @in   ixl         the actual value
 ; @in   expected    the expected value
 ;====
-.macro "expect.ixl.toBe" args expected
-    zest.utils.assert.byte expected "\. expects a numeric byte value"
+.macro "expect.ixl.toBe" args expectedValue
+    zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
-    \@_\..{expected}:
-
-    ; Define assertion data
-    zest.byteAssertion.define expected expect.ixl.toBe.defaultMessage
-
-    ; Call routine
-    push hl
-        ld hl, zest.byteAssertion.define.returnValue
-        call expect.ixl.toBe
-    pop hl
+    \@_\..{expectedValue}:
+        zest.byteAssertion.assert expect.ixl.toBe expectedValue expect.ixl.toBe.defaultMessage
 .endm
 
 ;====
@@ -347,11 +293,14 @@
 ;====
 .section "expect.ixl.toBe" free
     expect.ixl.toBe:
+        zest.byteAssertion.loadHLPointer
+
         push af
             ld a, ixl
-            call expect.a.toBe
+            call expect._assertAEquals
         pop af
-        ret
+
+        zest.byteAssertion.return.HL
 .ends
 
 ;====
@@ -360,19 +309,11 @@
 ; @in   iyh         the actual value
 ; @in   expected    the expected value
 ;====
-.macro "expect.iyh.toBe" args expected
-    zest.utils.assert.byte expected "\. expects a numeric byte value"
+.macro "expect.iyh.toBe" args expectedValue
+     zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
-    \@_\..{expected}:
-
-    ; Define assertion data
-    zest.byteAssertion.define expected expect.iyh.toBe.defaultMessage
-
-    ; Call routine
-    push hl
-        ld hl, zest.byteAssertion.define.returnValue
-        call expect.iyh.toBe
-    pop hl
+    \@_\..{expectedValue}:
+        zest.byteAssertion.assert expect.iyh.toBe expectedValue expect.iyh.toBe.defaultMessage
 .endm
 
 ;====
@@ -383,11 +324,14 @@
 ;====
 .section "expect.iyh.toBe" free
     expect.iyh.toBe:
+        zest.byteAssertion.loadHLPointer
+
         push af
             ld a, iyh
-            call expect.a.toBe
+            call expect._assertAEquals
         pop af
-        ret
+
+        zest.byteAssertion.return.HL
 .ends
 
 ;====
@@ -396,19 +340,11 @@
 ; @in   iyl         the actual value
 ; @in   expected    the expected value
 ;====
-.macro "expect.iyl.toBe" args expected
-    zest.utils.assert.byte expected "\. expects a numeric byte value"
+.macro "expect.iyl.toBe" args expectedValue
+    zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
-    \@_\..{expected}:
-
-    ; Define assertion data
-    zest.byteAssertion.define expected expect.iyl.toBe.defaultMessage
-
-    ; Call routine
-    push hl
-        ld hl, zest.byteAssertion.define.returnValue
-        call expect.iyl.toBe
-    pop hl
+    \@_\..{expectedValue}:
+        zest.byteAssertion.assert expect.iyl.toBe expectedValue expect.iyl.toBe.defaultMessage
 .endm
 
 ;====
@@ -419,11 +355,14 @@
 ;====
 .section "expect.iyl.toBe" free
     expect.iyl.toBe:
+        zest.byteAssertion.loadHLPointer
+
         push af
             ld a, iyl
-            call expect.a.toBe
+            call expect._assertAEquals
         pop af
-        ret
+
+        zest.byteAssertion.return.HL
 .ends
 
 ;====
@@ -432,19 +371,11 @@
 ; @in   i           the actual value
 ; @in   expected    the expected value
 ;====
-.macro "expect.i.toBe" args expected
-    zest.utils.assert.byte expected "\. expects a numeric byte value"
+.macro "expect.i.toBe" args expectedValue
+    zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
-    \@_\..{expected}:
-
-    ; Define assertion data
-    zest.byteAssertion.define expected expect.i.toBe.defaultMessage
-
-    ; Call routine
-    push hl
-        ld hl, zest.byteAssertion.define.returnValue
-        call expect.i.toBe
-    pop hl
+    \@_\..{expectedValue}:
+        zest.byteAssertion.assert expect.i.toBe expectedValue expect.i.toBe.defaultMessage
 .endm
 
 ;====
@@ -455,11 +386,14 @@
 ;====
 .section "expect.i.toBe" free
     expect.i.toBe:
+        zest.byteAssertion.loadHLPointer
+
         push af
             ld a, i
-            call expect.a.toBe
+            call expect._assertAEquals
         pop af
-        ret
+
+        zest.byteAssertion.return.HL
 .ends
 
 ; Default error messages for expectations

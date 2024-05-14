@@ -7,41 +7,95 @@
 .endst
 
 ;====
-; Defines inline assertion data and sets zest.byteAssertion.define.returnValue
-; to the addres
+; Generates a call the given routine followed by the assertion data. The routine
+; should use zest.byteAssertion.loadHLPointer or loadDEPointer to pop the
+; assertion data pointer from the stack.
 ;
+; If the assertion passes, the routine should return to the caller using
+; zest.byteAssertion.return.HL or return.DE.
+;
+; @in   routine         the routine label to call
 ; @in   expectedValue   the expected byte value
 ; @in   message         pointer to a assertion failure message, or a custom
 ;                       message string
-;
-; @out zest.byteAssertion.define.returnValue    address of the data
 ;====
-.macro "zest.byteAssertion.define" isolated args expectedValue message
+.macro "zest.byteAssertion.assert" isolated args routine expectedValue message
     ; Assert arguments (assemble-time)
-    zest.utils.assert.equals NARGS 2 "\.: Unexpected number of arguments"
+    zest.utils.assert.equals NARGS 3 "\.: Unexpected number of arguments"
     zest.utils.assert.byte expectedValue "\. expectedValue should be an 8-bit value"
 
-    ; Define data
-    .if \?2 == ARG_STRING
-        jp +
-            \.\@_assertionData:
-                .db expectedValue
-                .dw _customMessage
-                _customMessage:
-                    zest.console.defineString message
-        +:
-    .elif \?2 == ARG_LABEL
-        jr +
-            \.\@_assertionData:
-                .db expectedValue
-                .db <(message)
-                .db >(message)
-        +:
+    .if \?3 == ARG_STRING
+        _messagePointer:
+            zest.console.defineString message
+    .elif \?3 == ARG_LABEL
+        .redefine _messagePointer message
     .else
         zest.utils.assert.fail "\.: message should be a string or a label"
     .endif
 
-    .redefine zest.byteAssertion.define.returnValue (\.\@_assertionData)
+    ; Call the assertion routine
+    call routine
+
+    ; Define the assertion data. The routine should skip over this if it returns
+    _assertionData:
+        .db expectedValue
+        .dw _messagePointer
+.endm
+
+;====
+; Should be called at the beginning of the assertion routine to preserve HL and
+; pop the assertion data pointer from the stack
+;
+; @out  de  pointer to the zest.ByteAssertion instance
+;====
+.macro "zest.byteAssertion.loadDEPointer" isolated args routine
+    ld (zest.runner.tempWord), de   ; preserve DE
+    pop de                          ; pop data pointer to DE
+.endm
+
+;====
+; Should be called at the beginning of the assertion routine to preserve HL and
+; pop the assertion data pointer from the stack
+;
+; @out  hl  pointer to the zest.ByteAssertion instance
+;====
+.macro "zest.byteAssertion.loadHLPointer" isolated args routine
+    ld (zest.runner.tempWord), hl   ; preserve HL
+    pop hl                          ; pop data pointer to HL
+.endm
+
+;====
+; Should be called at the end of the assertion routine if it passes. This
+; restores DE and returns to the test/caller, skipping over the inline assertion
+; data
+;====
+.macro "zest.byteAssertion.return.DE"
+    ; Skip over the byte assertion data
+    .repeat _sizeof_zest.ByteAssertion
+        inc de
+    .endr
+
+    ; Push the new return address to RAM
+    push de
+    ld de, (zest.runner.tempWord)   ; restore DE
+    ret ; return to the address we pushed
+.endm
+
+;====
+; Should be called at the end of the assertion routine if it passes. This
+; restores HL and returns to the test/caller, skipping over the inline assertion
+; data
+;====
+.macro "zest.byteAssertion.return.HL"
+    ; Skip over the byte assertion data
+    .repeat _sizeof_zest.ByteAssertion
+        inc hl
+    .endr
+
+    ; Push the new return address to RAM
+    push hl
+    ld hl, (zest.runner.tempWord)   ; restore HL
+    ret ; return to the address we pushed
 .endm
 
 ;====
