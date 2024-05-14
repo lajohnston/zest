@@ -3,7 +3,7 @@
 ;====
 
 ;====
-; Asserts that A is equal to the expected value, otherwise fails the test
+; (Private) Asserts that A is equal to the expected value, otherwise fails the test
 ;
 ; @in   a   the value
 ; @in   hl  pointer to the assertion data
@@ -34,18 +34,18 @@
     zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
-        zest.byteAssertion.assert expect.a.toBe expectedValue expect.a.toBe.defaultMessage
+        zest.byteAssertion.assert expect.a._toBe expectedValue expect.a.toBe.defaultMessage
 .endm
 
 ;====
-; Asserts that A is equal to the expected value, otherwise fails the test.
+; (Private) Asserts that A is equal to the expected value, otherwise fails the test.
 ; Returns to the return address + 3, to skip the assertion data
 ;
 ; @in   a   the value
 ; @in   hl  pointer to the assertion data
 ;====
-.section "expect.a.toBe" free
-    expect.a.toBe:
+.section "expect.a._toBe" free
+    expect.a._toBe:
         zest.byteAssertion.loadHLPointer
             call expect._assertAEquals
         zest.byteAssertion.return.HL
@@ -61,17 +61,17 @@
     zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
-        zest.byteAssertion.assert expect.b.toBe expectedValue expect.b.toBe.defaultMessage
+        zest.byteAssertion.assert expect.b._toBe expectedValue expect.b.toBe.defaultMessage
 .endm
 
 ;====
-; Asserts that B is equal to the expected value, otherwise fails the test
+; (Private) Asserts that B is equal to the expected value, otherwise fails the test
 ;
 ; @in   b   the value
 ; @in   hl  pointer to the assertion data
 ;====
-.section "expect.b.toBe" free
-    expect.b.toBe:
+.section "expect.b._toBe" free
+    expect.b._toBe:
         zest.byteAssertion.loadHLPointer
 
         push af
@@ -92,17 +92,17 @@
     zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
-        zest.byteAssertion.assert expect.c.toBe expectedValue expect.c.toBe.defaultMessage
+        zest.byteAssertion.assert expect.c._toBe expectedValue expect.c.toBe.defaultMessage
 .endm
 
 ;====
-; Asserts that C is equal to the expected value, otherwise fails the test
+; (Private) Asserts that C is equal to the expected value, otherwise fails the test
 ;
 ; @in   c   the value
 ; @in   hl  pointer to the assertion data
 ;====
-.section "expect.c.toBe" free
-    expect.c.toBe:
+.section "expect.c._toBe" free
+    expect.c._toBe:
         zest.byteAssertion.loadHLPointer
 
         push af
@@ -123,17 +123,17 @@
     zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
-        zest.byteAssertion.assert expect.d.toBe expectedValue expect.d.toBe.defaultMessage
+        zest.byteAssertion.assert expect.d._toBe expectedValue expect.d.toBe.defaultMessage
 .endm
 
 ;====
-; Asserts that D is equal to the expected value, otherwise fails the test
+; (Private) Asserts that D is equal to the expected value, otherwise fails the test
 ;
 ; @in   d   the value
 ; @in   hl  pointer to the assertion data
 ;====
-.section "expect.d.toBe" free
-    expect.d.toBe:
+.section "expect.d._toBe" free
+    expect.d._toBe:
         zest.byteAssertion.loadHLPointer
 
         push af
@@ -154,17 +154,17 @@
     zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
-        zest.byteAssertion.assert expect.e.toBe expectedValue expect.e.toBe.defaultMessage
+        zest.byteAssertion.assert expect.e._toBe expectedValue expect.e.toBe.defaultMessage
 .endm
 
 ;====
-; Asserts that E is equal to the expected value, otherwise fails the test
+; (Private) Asserts that E is equal to the expected value, otherwise fails the test
 ;
 ; @in   e   the value
 ; @in   hl  pointer to the assertion data
 ;====
-.section "expect.e.toBe" free
-    expect.e.toBe:
+.section "expect.e._toBe" free
+    expect.e._toBe:
         zest.byteAssertion.loadHLPointer
 
         push af
@@ -185,17 +185,17 @@
     zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
-        zest.byteAssertion.assert expect.h.toBe expectedValue expect.h.toBe.defaultMessage
+        zest.byteAssertion.assert expect.h._toBe expectedValue expect.h.toBe.defaultMessage
 .endm
 
 ;====
-; Asserts that H is equal to the expected value, otherwise fails the test
+; (Private) Asserts that H is equal to the expected value, otherwise fails the test
 ;
 ; @in   h   the value
 ; @in   de  pointer to the assertion data
 ;====
-.section "expect.h.toBe" free
-    expect.h.toBe:
+.section "expect.h._toBe" free
+    expect.h._toBe:
         zest.byteAssertion.loadDEPointer
 
         push af
@@ -218,17 +218,17 @@
     zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
-        zest.byteAssertion.assert expect.l.toBe expectedValue expect.l.toBe.defaultMessage
+        zest.byteAssertion.assert expect.l._toBe expectedValue expect.l.toBe.defaultMessage
 .endm
 
 ;====
-; Asserts that L is equal to the expected value, otherwise fails the test
+; (Private) Asserts that L is equal to the expected value, otherwise fails the test
 ;
 ; @in   l   the value
 ; @in   de  pointer to the assertion data
 ;====
-.section "expect.l.toBe" free
-    expect.l.toBe:
+.section "expect.l._toBe" free
+    expect.l._toBe:
         zest.byteAssertion.loadDEPointer
 
         push af
@@ -251,17 +251,17 @@
     zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
-        zest.byteAssertion.assert expect.ixh.toBe expectedValue expect.ixh.toBe.defaultMessage
+        zest.byteAssertion.assert expect.ixh._toBe expectedValue expect.ixh.toBe.defaultMessage
 .endm
 
 ;====
-; Asserts that IXH is equal to the expected value, otherwise fails the test
+; (Private) Asserts that IXH is equal to the expected value, otherwise fails the test
 ;
 ; @in   ixh the value
 ; @in   hl  pointer to the assertion data
 ;====
-.section "expect.ixh.toBe" free
-    expect.ixh.toBe:
+.section "expect.ixh._toBe" free
+    expect.ixh._toBe:
         zest.byteAssertion.loadHLPointer
 
         push af
@@ -282,17 +282,17 @@
     zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
-        zest.byteAssertion.assert expect.ixl.toBe expectedValue expect.ixl.toBe.defaultMessage
+        zest.byteAssertion.assert expect.ixl._toBe expectedValue expect.ixl.toBe.defaultMessage
 .endm
 
 ;====
-; Asserts that IXL is equal to the expected value, otherwise fails the test
+; (Private) Asserts that IXL is equal to the expected value, otherwise fails the test
 ;
 ; @in   ixl the value
 ; @in   hl  pointer to the assertion data
 ;====
-.section "expect.ixl.toBe" free
-    expect.ixl.toBe:
+.section "expect.ixl._toBe" free
+    expect.ixl._toBe:
         zest.byteAssertion.loadHLPointer
 
         push af
@@ -313,17 +313,17 @@
      zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
-        zest.byteAssertion.assert expect.iyh.toBe expectedValue expect.iyh.toBe.defaultMessage
+        zest.byteAssertion.assert expect.iyh._toBe expectedValue expect.iyh.toBe.defaultMessage
 .endm
 
 ;====
-; Asserts that IYH is equal to the expected value, otherwise fails the test
+; (Private) Asserts that IYH is equal to the expected value, otherwise fails the test
 ;
 ; @in   iyh the value
 ; @in   hl  pointer to the assertion data
 ;====
-.section "expect.iyh.toBe" free
-    expect.iyh.toBe:
+.section "expect.iyh._toBe" free
+    expect.iyh._toBe:
         zest.byteAssertion.loadHLPointer
 
         push af
@@ -344,17 +344,17 @@
     zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
-        zest.byteAssertion.assert expect.iyl.toBe expectedValue expect.iyl.toBe.defaultMessage
+        zest.byteAssertion.assert expect.iyl._toBe expectedValue expect.iyl.toBe.defaultMessage
 .endm
 
 ;====
-; Asserts that IYL is equal to the expected value, otherwise fails the test
+; (Private) Asserts that IYL is equal to the expected value, otherwise fails the test
 ;
 ; @in   iyl the value
 ; @in   hl  pointer to the assertion data
 ;====
-.section "expect.iyl.toBe" free
-    expect.iyl.toBe:
+.section "expect.iyl._toBe" free
+    expect.iyl._toBe:
         zest.byteAssertion.loadHLPointer
 
         push af
@@ -375,17 +375,17 @@
     zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
-        zest.byteAssertion.assert expect.i.toBe expectedValue expect.i.toBe.defaultMessage
+        zest.byteAssertion.assert expect.i._toBe expectedValue expect.i.toBe.defaultMessage
 .endm
 
 ;====
-; Asserts that I is equal to the expected value, otherwise fails the test
+; (Private) Asserts that I is equal to the expected value, otherwise fails the test
 ;
 ; @in   i the value
 ; @in   hl  pointer to the assertion data
 ;====
-.section "expect.i.toBe" free
-    expect.i.toBe:
+.section "expect.i._toBe" free
+    expect.i._toBe:
         zest.byteAssertion.loadHLPointer
 
         push af
