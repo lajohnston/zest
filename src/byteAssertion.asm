@@ -25,10 +25,12 @@
     zest.utils.assert.byte expectedValue "\. expectedValue should be an 8-bit value"
 
     .if \?3 == ARG_STRING
-        _messagePointer:
-            zest.console.defineString message
+        jp +
+            \.\@messagePointer:
+                zest.console.defineString message
+        +:
     .elif \?3 == ARG_LABEL
-        .redefine _messagePointer message
+        .redefine \.\@messagePointer message
     .else
         zest.utils.assert.fail "\.: message should be a string or a label"
     .endif
@@ -39,7 +41,7 @@
     ; Define the assertion data. The routine should skip over this if it returns
     _assertionData:
         .db expectedValue
-        .dw _messagePointer
+        .dw \.\@messagePointer
 .endm
 
 ;====
