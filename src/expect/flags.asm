@@ -13,7 +13,7 @@
     push af
         ld a, expectedValue
         ld hl, message
-        call zest.runner.booleanExpectationFailed
+        call zest.assertion.boolean.failed
     pop af
     pop hl
 .endm

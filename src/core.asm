@@ -33,6 +33,7 @@
 
 ; Assertions
 .include "./src/assertion/assertion.asm"
+.include "./src/assertion/boolean.asm"
 .include "./src/assertion/byte.asm"
 .include "./src/assertion/word.asm"
 
