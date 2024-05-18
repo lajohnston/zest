@@ -32,6 +32,7 @@
 .include "./src/timeout.asm"
 
 ; Assertions
+.include "./src/assertion/assertion.asm"
 .include "./src/assertion/byte.asm"
 .include "./src/assertion/word.asm"
 

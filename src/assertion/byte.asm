@@ -56,17 +56,17 @@
         call zest.runner.printTestDescription
 
         ; Print assertion message
-        call zest.runner.printAssertionSeparator
+        call zest.assertion.printSeparator
         call zest.assertion.byte.printMessage
 
         ; Print 'Expected:' label
-        call zest.runner.printExpectedLabel
+        call zest.assertion.printExpectedLabel
 
         ; Print expected value
         call zest.assertion.byte.printExpected
 
         ; Print 'Actual:' label
-        call zest.runner.printActualLabel
+        call zest.assertion.printActualLabel
 
         ; Print actual value
         call zest.console.outputHexA
