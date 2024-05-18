@@ -69,7 +69,7 @@
     jr +   ; jump over assertion failed routine
         _fail:
             ld ix, zest.assertion.word.define.returnValue
-            jp zest.runner.wordExpectationFailed
+            jp zest.assertion.word.failed
     +:
 .endm
 

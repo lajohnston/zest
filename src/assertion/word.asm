@@ -45,6 +45,36 @@
 .endm
 
 ;====
+; Displays details about a 16-bit value assertion that doesn't match
+; the expectation, then stops the program
+;
+; @in   de  the actual value
+; @in   ix  pointer to the assertion.Word instance, containing the expected
+;           value and assertion message
+;====
+.section "zest.assertion.word.failed" free
+    zest.assertion.word.failed:
+        call zest.runner.printTestDescription
+
+        ; Print assertion message
+        call zest.assertion.printSeparator
+        call zest.assertion.word.printMessage
+
+        ; Print expected label
+        call zest.assertion.printExpectedLabel
+
+        ; Print expected value
+        call zest.assertion.word.printExpected
+
+        ; Print actual label
+        call zest.assertion.printActualLabel
+
+        ; Print actual value
+        call zest.console.outputHexDE
+        jp zest.console.displayAndStop
+.ends
+
+;====
 ; Prints the assertion failure message to the on-screen console
 ;
 ; @in   ix  pointer to the word zest.assertion.Word instance

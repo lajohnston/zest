@@ -97,7 +97,7 @@
 
         ; Fail test with message
         ; DE = actual value
-        jp zest.runner.wordExpectationFailed
+        jp zest.assertion.word.failed
 .ends
 
 ;====
