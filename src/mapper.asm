@@ -6,7 +6,7 @@
 ; Settings
 ;====
 .ifdef zest.SUITE_BANKS
-    zest.utils.assert.range zest.SUITE_BANKS, 1, 255, "Invalid zest.SUITE_BANKS defined"
+    zest.utils.validate.range zest.SUITE_BANKS, 1, 255, "Invalid zest.SUITE_BANKS defined"
     .define zest.mapper.SUITE_BANKS zest.SUITE_BANKS
 .else
     ; Default to 1 suite bank
@@ -85,7 +85,7 @@
 ; @in   bankNumber  the bank number
 ;====
 .macro "zest.mapper.setBank" args bankNumber
-    zest.utils.assert.range bankNumber 0, zest.mapper.SUITE_BANKS, "\.: Invalid bankNumber"
+    zest.utils.validate.range bankNumber 0, zest.mapper.SUITE_BANKS, "\.: Invalid bankNumber"
 
     .if bankNumber == zest.mapper.ZEST_BANK
         .bank zest.mapper.ZEST_BANK slot zest.mapper.ZEST_SLOT
@@ -102,7 +102,7 @@
 ;                       i.e. mapper.pageBank :myAsset
 ;====
 .macro "zest.mapper.pageBank" args bankNumber
-    zest.utils.assert.range bankNumber 0, zest.mapper.SUITE_BANKS, "\.: Invalid bankNumber"
+    zest.utils.validate.range bankNumber 0, zest.mapper.SUITE_BANKS, "\.: Invalid bankNumber"
 
     ld a, bankNumber
     ld (zest.mapper.SLOT_1_REGISTER), a

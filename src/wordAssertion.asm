@@ -18,8 +18,8 @@
 ;====
 .macro "zest.wordAssertion.define" isolated args expectedValue message
     ; Assert arguments (assemble-time)
-    zest.utils.assert.equals NARGS 2 "\.: Unexpected number of arguments"
-    zest.utils.assert.word expectedValue "\. expectedValue should be a 16-bit value"
+    zest.utils.validate.equals NARGS 2 "\.: Unexpected number of arguments"
+    zest.utils.validate.word expectedValue "\. expectedValue should be a 16-bit value"
 
     ; Define data
     .if \?2 == ARG_STRING
@@ -38,7 +38,7 @@
                 .db >(message)
         +:
     .else
-        zest.utils.assert.fail "\.: message should be a string or a label"
+        zest.utils.validate.fail "\.: message should be a string or a label"
     .endif
 
     .redefine zest.wordAssertion.define.returnValue (\.\@_assertionData)

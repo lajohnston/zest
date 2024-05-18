@@ -1,7 +1,7 @@
 ;====
 ; Prints an error message and stops the assembler
 ;====
-.macro "zest.utils.assert.fail" args message
+.macro "zest.utils.validate.fail" args message
     .print "\nZest error:\n  ", message, "\n\n"
     .fail
 .endm
@@ -14,17 +14,17 @@
 ; @in   max     the maximum value
 ; @in   message the message to print to the terminal if the value is not valid
 ;====
-.macro "zest.utils.assert.range" args value min max message
+.macro "zest.utils.validate.range" args value min max message
     .if \?1 != ARG_NUMBER
-        zest.utils.assert.fail message
+        zest.utils.validate.fail message
     .endif
 
     .if value > max
-        zest.utils.assert.fail message
+        zest.utils.validate.fail message
     .endif
 
     .if value < min
-        zest.utils.assert.fail message
+        zest.utils.validate.fail message
     .endif
 .endm
 
@@ -36,9 +36,9 @@
 ; @in   message     the message to print to the terminal if the actual value is
 ;                   not equal to the expected value
 ;====
-.macro "zest.utils.assert.equals" args actual expected message
+.macro "zest.utils.validate.equals" args actual expected message
     .if actual != expected
-        zest.utils.assert.fail message
+        zest.utils.validate.fail message
     .endif
 .endm
 
@@ -49,8 +49,8 @@
 ; @in   value   the value to assert
 ; @in   message the message to print to the terminal if the value is not valid
 ;====
-.macro "zest.utils.assert.byte" args value message
-    zest.utils.assert.range value, -128, 255, message
+.macro "zest.utils.validate.byte" args value message
+    zest.utils.validate.range value, -128, 255, message
 .endm
 
 ;====
@@ -60,8 +60,8 @@
 ; @in   value   the value to assert
 ; @in   message the message to print to the terminal if the value is not valid
 ;====
-.macro "zest.utils.assert.word" args value message
-    zest.utils.assert.range value, -32768, 65535, message
+.macro "zest.utils.validate.word" args value message
+    zest.utils.validate.range value, -32768, 65535, message
 .endm
 
 ;====
@@ -70,8 +70,8 @@
 ; @in   value   the value to assert
 ; @in   message the message to print to the terminal if the value is not valid
 ;====
-.macro "zest.utils.assert.boolean" args value message
-    zest.utils.assert.range value 0, 1, message
+.macro "zest.utils.validate.boolean" args value message
+    zest.utils.validate.range value 0, 1, message
 .endm
 
 ;====
@@ -80,9 +80,9 @@
 ; @in   value   the value to assert
 ; @in   message the message to print to the terminal if the value is not valid
 ;====
-.macro "zest.utils.assert.label" args value message
+.macro "zest.utils.validate.label" args value message
     .if \?1 != ARG_LABEL
-        zest.utils.assert.fail message
+        zest.utils.validate.fail message
     .endif
 .endm
 
@@ -92,8 +92,8 @@
 ; @in   value   the value to assert
 ; @in   message the message to print to the terminal if the value is not valid
 ;====
-.macro "zest.utils.assert.string" args value message
+.macro "zest.utils.validate.string" args value message
     .if \?1 != ARG_STRING
-        zest.utils.assert.fail message
+        zest.utils.validate.fail message
     .endif
 .endm

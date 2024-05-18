@@ -11,7 +11,7 @@
 .enda
 
 ; Utils
-.include "./src/utils/assert.asm"
+.include "./src/utils/validate.asm"
 
 ; Memory mapper
 .include "./src/mapper.asm"

@@ -21,8 +21,8 @@
 ;====
 .macro "zest.byteAssertion.assert" isolated args routine expectedValue message
     ; Assert arguments (assemble-time)
-    zest.utils.assert.equals NARGS 3 "\.: Unexpected number of arguments"
-    zest.utils.assert.byte expectedValue "\. expectedValue should be an 8-bit value"
+    zest.utils.validate.equals NARGS 3 "\.: Unexpected number of arguments"
+    zest.utils.validate.byte expectedValue "\. expectedValue should be an 8-bit value"
 
     .if \?3 == ARG_STRING
         jp +
@@ -32,7 +32,7 @@
     .elif \?3 == ARG_LABEL
         .redefine \.\@messagePointer message
     .else
-        zest.utils.assert.fail "\.: message should be a string or a label"
+        zest.utils.validate.fail "\.: message should be a string or a label"
     .endif
 
     ; Call the assertion routine

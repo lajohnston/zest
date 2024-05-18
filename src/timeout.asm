@@ -11,7 +11,7 @@
     ; Timeout tests if they take more than 10 full frames to complete
     .define zest.timeout.default 10
 .else
-    zest.utils.assert.range zest.defaultTimeout, 1, 255, "zest.defaultTimeout should be between 1 and 255"
+    zest.utils.validate.range zest.defaultTimeout, 1, 255, "zest.defaultTimeout should be between 1 and 255"
     .define zest.timeout.default zest.defaultTimeout
 .endif
 

@@ -97,13 +97,13 @@
 ;====
 .macro "zest.mock.start" args mockAddress
     .ifndef mockAddress
-        zest.utils.assert.fail "zest.mock.start expects a label argument that points to the mock"
+        zest.utils.validate.fail "zest.mock.start expects a label argument that points to the mock"
     .endif
 
-    zest.utils.assert.label mockAddress "zest.mock.start expects a label argument that points to the mock"
+    zest.utils.validate.label mockAddress "zest.mock.start expects a label argument that points to the mock"
 
     .if zest.mock._mockStarted == 1
-        zest.utils.assert.fail "Please ensure you've called the zest.mock.end macro at the end of your mock routines"
+        zest.utils.validate.fail "Please ensure you've called the zest.mock.end macro at the end of your mock routines"
     .endif
 
     .redefine zest.mock._mockStarted 1

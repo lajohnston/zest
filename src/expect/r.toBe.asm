@@ -32,14 +32,14 @@
 ; @in   message         (optional) Custom string assertion failure message
 ;====
 .macro "expect.a.toBe" args expectedValue message
-    zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
+    zest.utils.validate.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
 
     .if NARGS == 1
         zest.byteAssertion.assert expect.a._toBe expectedValue expect.a.toBe.defaultMessage
     .else
-        zest.utils.assert.string message "\.: Message should be a string"
+        zest.utils.validate.string message "\.: Message should be a string"
         zest.byteAssertion.assert expect.a._toBe expectedValue message
     .endif
 .endm
@@ -66,14 +66,14 @@
 ; @in   message         (optional) Custom string assertion failure message
 ;====
 .macro "expect.b.toBe" args expectedValue message
-    zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
+    zest.utils.validate.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
 
     .if NARGS == 1
         zest.byteAssertion.assert expect.b._toBe expectedValue expect.b.toBe.defaultMessage
     .else
-        zest.utils.assert.string message "\.: Message should be a string"
+        zest.utils.validate.string message "\.: Message should be a string"
         zest.byteAssertion.assert expect.b._toBe expectedValue message
     .endif
 .endm
@@ -104,13 +104,13 @@
 ; @in   message         (optional) Custom string assertion failure message
 ;====
 .macro "expect.c.toBe" args expectedValue message
-    zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
+    zest.utils.validate.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
         .if NARGS == 1
             zest.byteAssertion.assert expect.c._toBe expectedValue expect.c.toBe.defaultMessage
         .else
-            zest.utils.assert.string message "\.: Message should be a string"
+            zest.utils.validate.string message "\.: Message should be a string"
             zest.byteAssertion.assert expect.c._toBe expectedValue message
         .endif
 .endm
@@ -141,13 +141,13 @@
 ; @in   message         (optional) Custom string assertion failure message
 ;====
 .macro "expect.d.toBe" args expectedValue message
-    zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
+    zest.utils.validate.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
         .if NARGS == 1
             zest.byteAssertion.assert expect.d._toBe expectedValue expect.d.toBe.defaultMessage
         .else
-            zest.utils.assert.string message "\.: Message should be a string"
+            zest.utils.validate.string message "\.: Message should be a string"
             zest.byteAssertion.assert expect.d._toBe expectedValue message
         .endif
 .endm
@@ -178,13 +178,13 @@
 ; @in   message         (optional) Custom string assertion failure message
 ;====
 .macro "expect.e.toBe" args expectedValue message
-    zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
+    zest.utils.validate.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
         .if NARGS == 1
             zest.byteAssertion.assert expect.e._toBe expectedValue expect.e.toBe.defaultMessage
         .else
-            zest.utils.assert.string message "\.: Message should be a string"
+            zest.utils.validate.string message "\.: Message should be a string"
             zest.byteAssertion.assert expect.e._toBe expectedValue message
         .endif
 .endm
@@ -215,13 +215,13 @@
 ; @in   message         (optional) Custom string assertion failure message
 ;====
 .macro "expect.h.toBe" args expectedValue message
-    zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
+    zest.utils.validate.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
         .if NARGS == 1
             zest.byteAssertion.assert expect.h._toBe expectedValue expect.h.toBe.defaultMessage
         .else
-            zest.utils.assert.string message "\.: Message should be a string"
+            zest.utils.validate.string message "\.: Message should be a string"
             zest.byteAssertion.assert expect.h._toBe expectedValue message
         .endif
 .endm
@@ -254,13 +254,13 @@
 ; @in   message         (optional) Custom string assertion failure message
 ;====
 .macro "expect.l.toBe" args expectedValue message
-    zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
+    zest.utils.validate.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
         .if NARGS == 1
             zest.byteAssertion.assert expect.l._toBe expectedValue expect.l.toBe.defaultMessage
         .else
-            zest.utils.assert.string message "\.: Message should be a string"
+            zest.utils.validate.string message "\.: Message should be a string"
             zest.byteAssertion.assert expect.l._toBe expectedValue message
         .endif
 .endm
@@ -293,13 +293,13 @@
 ; @in   message         (optional) Custom string assertion failure message
 ;====
 .macro "expect.ixh.toBe" args expectedValue message
-    zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
+    zest.utils.validate.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
         .if NARGS == 1
             zest.byteAssertion.assert expect.ixh._toBe expectedValue expect.ixh.toBe.defaultMessage
         .else
-            zest.utils.assert.string message "\.: Message should be a string"
+            zest.utils.validate.string message "\.: Message should be a string"
             zest.byteAssertion.assert expect.ixh._toBe expectedValue message
         .endif
 .endm
@@ -330,13 +330,13 @@
 ; @in   message         (optional) Custom string assertion failure message
 ;====
 .macro "expect.ixl.toBe" args expectedValue message
-    zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
+    zest.utils.validate.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
         .if NARGS == 1
             zest.byteAssertion.assert expect.ixl._toBe expectedValue expect.ixl.toBe.defaultMessage
         .else
-            zest.utils.assert.string message "\.: Message should be a string"
+            zest.utils.validate.string message "\.: Message should be a string"
             zest.byteAssertion.assert expect.ixl._toBe expectedValue message
         .endif
 .endm
@@ -367,13 +367,13 @@
 ; @in   message         (optional) Custom string assertion failure message
 ;====
 .macro "expect.iyh.toBe" args expectedValue message
-     zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
+     zest.utils.validate.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
         .if NARGS == 1
             zest.byteAssertion.assert expect.iyh._toBe expectedValue expect.iyh.toBe.defaultMessage
         .else
-            zest.utils.assert.string message "\.: Message should be a string"
+            zest.utils.validate.string message "\.: Message should be a string"
             zest.byteAssertion.assert expect.iyh._toBe expectedValue message
         .endif
 .endm
@@ -404,13 +404,13 @@
 ; @in   message         (optional) Custom string assertion failure message
 ;====
 .macro "expect.iyl.toBe" args expectedValue message
-    zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
+    zest.utils.validate.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
         .if NARGS == 1
             zest.byteAssertion.assert expect.iyl._toBe expectedValue expect.iyl.toBe.defaultMessage
         .else
-            zest.utils.assert.string message "\.: Message should be a string"
+            zest.utils.validate.string message "\.: Message should be a string"
             zest.byteAssertion.assert expect.iyl._toBe expectedValue message
         .endif
 .endm
@@ -441,13 +441,13 @@
 ; @in   message         (optional) Custom string assertion failure message
 ;====
 .macro "expect.i.toBe" args expectedValue message
-    zest.utils.assert.byte expectedValue "\. expects a numeric byte value"
+    zest.utils.validate.byte expectedValue "\. expects a numeric byte value"
 
     \@_\..{expectedValue}:
         .if NARGS == 1
             zest.byteAssertion.assert expect.i._toBe expectedValue expect.i.toBe.defaultMessage
         .else
-            zest.utils.assert.string message "\.: Message should be a string"
+            zest.utils.validate.string message "\.: Message should be a string"
             zest.byteAssertion.assert expect.i._toBe expectedValue message
         .endif
 .endm

@@ -44,8 +44,8 @@
 ;               combine multiple buttons with | (i.e. zest.UP|zest.BUTTON_1)
 ;====
 .macro "zest.mockController1" args value
-    zest.utils.assert.equals NARGS, 1, "\. expects 1 argument (i.e. zest.UP, zest.DOWN). Combine multiple with '|', i.e zest.UP | zest.BUTTON_1"
-    zest.utils.assert.byte value, "\. expects a numeric byte value"
+    zest.utils.validate.equals NARGS, 1, "\. expects 1 argument (i.e. zest.UP, zest.DOWN). Combine multiple with '|', i.e zest.UP | zest.BUTTON_1"
+    zest.utils.validate.byte value, "\. expects a numeric byte value"
 
     \@_\.:
     push bc
@@ -62,8 +62,8 @@
 ;               combine multiple buttons with | (i.e. zest.UP|zest.BUTTON_1)
 ;====
 .macro "zest.mockController2" args value
-    zest.utils.assert.equals NARGS, 1, "\. expects 1 argument (i.e. zest.UP, zest.DOWN). Combine multiple with '|', i.e zest.UP | zest.BUTTON_1"
-    zest.utils.assert.byte value, "\. expects a numeric byte value"
+    zest.utils.validate.equals NARGS, 1, "\. expects 1 argument (i.e. zest.UP, zest.DOWN). Combine multiple with '|', i.e zest.UP | zest.BUTTON_1"
+    zest.utils.validate.byte value, "\. expects a numeric byte value"
 
     \@_\.:
     push bc

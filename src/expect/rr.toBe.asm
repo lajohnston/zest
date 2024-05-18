@@ -11,13 +11,13 @@
 ;====
 .macro "expect.bc.toBe" isolated args expectedValue message
     \@_\..{expectedValue}:
-    zest.utils.assert.word expectedValue "\. expects a 16-bit value"
+    zest.utils.validate.word expectedValue "\. expects a 16-bit value"
 
     ; Define assertion data
     .if NARGS == 1
         zest.wordAssertion.define expectedValue expect.rr.toBe.defaultMessages.bc
     .else
-        zest.utils.assert.string message "\.: Message should be a string"
+        zest.utils.validate.string message "\.: Message should be a string"
         zest.wordAssertion.define expectedValue message
     .endif
 
@@ -52,13 +52,13 @@
 ;====
 .macro "expect.de.toBe" isolated args expectedValue message
     \@_\..{expectedValue}:
-    zest.utils.assert.word expectedValue "\. expects a 16-bit value"
+    zest.utils.validate.word expectedValue "\. expects a 16-bit value"
 
     ; Define assertion data
     .if NARGS == 1
         zest.wordAssertion.define expectedValue expect.rr.toBe.defaultMessages.de
     .else
-        zest.utils.assert.string message "\.: Message should be a string"
+        zest.utils.validate.string message "\.: Message should be a string"
         zest.wordAssertion.define expectedValue message
     .endif
 
@@ -109,13 +109,13 @@
 ;====
 .macro "expect.hl.toBe" isolated args expectedValue message
     \@_\..{expectedValue}:
-    zest.utils.assert.word expectedValue "\. expects a 16-bit value"
+    zest.utils.validate.word expectedValue "\. expects a 16-bit value"
 
     ; Define assertion data
     .if NARGS == 1
         zest.wordAssertion.define expectedValue expect.rr.toBe.defaultMessages.hl
     .else
-        zest.utils.assert.string message "\.: Message should be a string"
+        zest.utils.validate.string message "\.: Message should be a string"
         zest.wordAssertion.define expectedValue message
     .endif
 
@@ -149,13 +149,13 @@
 ;====
 .macro "expect.ix.toBe" isolated args expectedValue message
     \@_\..{expectedValue}:
-    zest.utils.assert.word expectedValue "\. expects a 16-bit value"
+    zest.utils.validate.word expectedValue "\. expects a 16-bit value"
 
     ; Define assertion data
     .if NARGS == 1
         zest.wordAssertion.define expectedValue expect.rr.toBe.defaultMessages.ix
     .else
-        zest.utils.assert.string message "\.: Message should be a string"
+        zest.utils.validate.string message "\.: Message should be a string"
         zest.wordAssertion.define expectedValue message
     .endif
 
@@ -190,13 +190,13 @@
 ;====
 .macro "expect.iy.toBe" isolated args expectedValue message
     \@_\..{expectedValue}:
-    zest.utils.assert.word expectedValue "\. expects a 16-bit value"
+    zest.utils.validate.word expectedValue "\. expects a 16-bit value"
 
     ; Define assertion data
     .if NARGS == 1
         zest.wordAssertion.define expectedValue expect.rr.toBe.defaultMessages.iy
     .else
-        zest.utils.assert.string message "\.: Message should be a string"
+        zest.utils.validate.string message "\.: Message should be a string"
         zest.wordAssertion.define expectedValue message
     .endif
 

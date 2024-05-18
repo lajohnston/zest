@@ -15,17 +15,17 @@
 ; @in   message         (optional) custom message to display if the assertion fails
 ;====
 .macro "expect.stack.toContain" isolated args expectedWord offset message
-    zest.utils.assert.word expectedWord "\. expectedWord should be a 16-bit value"
+    zest.utils.validate.word expectedWord "\. expectedWord should be a 16-bit value"
 
     .ifdef offset
-        zest.utils.assert.range offset 0 32 "\. offset should be between 0 and 32 inclusive"
+        zest.utils.validate.range offset 0 32 "\. offset should be between 0 and 32 inclusive"
     .endif
 
     \@_\..{expectedWord}:
 
     ; Define assertion data
     .ifdef message
-        zest.utils.assert.string message "\.: Message should be a string value"
+        zest.utils.validate.string message "\.: Message should be a string value"
         zest.wordAssertion.define expectedWord message
     .else
         zest.wordAssertion.define expectedWord expect.stack.toContain.defaultMessage
@@ -81,7 +81,7 @@
 ; @in   message         (optional) the custom assertion-failed message
 ;====
 .macro "expect.stack.size.toBe" isolated args expectedSize message
-    zest.utils.assert.range expectedSize, 0, 40, "\. Invalid expectedSize argument"
+    zest.utils.validate.range expectedSize, 0, 40, "\. Invalid expectedSize argument"
 
     \@_\..{expectedSize}:
         ; Preserve registers without affecting stack
