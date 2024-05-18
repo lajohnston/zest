@@ -112,11 +112,11 @@
         jp zest.runner.memoryOverwriteDetected
 
     _timeout:
-        call zest.runner.printTestDescription
+        call zest.assertion.printTestDescription
 
         ; Print the failed assertion message
         ld hl, _timeoutMessage
-        call zest.runner.printAssertionMessage
+        call zest.assertion.printMessage
 
         jp zest.console.displayAndStop
 

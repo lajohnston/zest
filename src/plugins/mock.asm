@@ -202,7 +202,7 @@
             ; Mock was called zero times - fail the test
             push hl
                 ld hl, expect.mock.toHaveBeenCalled.defaultMessage
-                call zest.runner.expectationFailed
+                call zest.assertion.failed
             pop hl
         +:
     pop af

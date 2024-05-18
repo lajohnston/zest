@@ -53,7 +53,7 @@
 ;====
 .section "zest.assertion.byte.failed" free
     zest.assertion.byte.failed:
-        call zest.runner.printTestDescription
+        call zest.assertion.printTestDescription
 
         ; Print assertion message
         call zest.assertion.printSeparator

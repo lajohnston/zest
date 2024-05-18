@@ -84,75 +84,6 @@
 .ends
 
 ;====
-; Displays details about a general expectation that hasn't been met
-;
-; @in   hl  pointer to the assertion message
-;====
-.section "zest.runner.expectationFailed" free
-    zest.runner.expectationFailed:
-        call zest.runner.printTestDescription
-        call zest.runner.printAssertionMessage
-
-        jp zest.console.displayAndStop
-.ends
-
-;====
-; Prints the test description
-;
-; @in   hl  pointer to the assertion message
-;====
-.section "zest.runner.printTestDescription" free
-    zest.runner.printTestDescription:
-        ; Initialise the console
-        zest.console.initFailure
-
-        ; Print test details
-        call zest.runner._printTestFailedHeading
-        jp zest.test.printTestDescription   ; jp (then ret)
-.ends
-
-;====
-; (Private) Prints the Test Failed heading
-;====
-.section "zest.runner._printTestFailedHeading" free
-    zest.runner._printTestFailedHeading:
-        push hl
-            ; Write test failed message
-            ld hl, zest.console.data.testFailedHeading
-            call zest.console.out
-
-            ; Separator
-            zest.console.newlines 2
-            ld hl, zest.console.data.separatorText
-            call zest.console.out
-            zest.console.newlines 2
-        pop hl
-
-        ret
-.ends
-
-;====
-; Prints the message of the assertion that failed
-;
-; @in   hl  pointer to the message
-;====
-.section "zest.runner.printAssertionMessage" free
-    zest.runner.printAssertionMessage:
-        push hl
-            zest.console.newlines 3
-
-            ; Write separator
-            ld hl, zest.console.data.separatorText
-            call zest.console.out
-
-            zest.console.newlines 2
-        pop hl
-
-        ; Write message
-        jp zest.console.out ; jp then ret
-.ends
-
-;====
 ; Recovers from a memory corruption and displays a test failure message
 ;====
 .section "zest.runner.memoryOverwriteDetected" free
@@ -166,7 +97,7 @@
 
         ; Description has been overwritten - display generic message
         zest.console.initFailure
-        call zest.runner._printTestFailedHeading
+        call zest.assertion.printTestFailedHeading
 
         ; Display RAM overwritten error
         ld hl, _memoryCorruptionMessage
@@ -176,14 +107,14 @@
     _printTestDescription:
         ; Initialise failure heading
         zest.console.initFailure
-        call zest.runner._printTestFailedHeading
+        call zest.assertion.printTestFailedHeading
 
         ; Print the test description
         call zest.test.printTestDescription
 
         ; Print the RAM overwritten message
         ld hl, _memoryCorruptionMessage
-        call zest.runner.printAssertionMessage
+        call zest.assertion.printMessage
         jp zest.console.displayAndStop
 
     _memoryCorruptionMessage:
@@ -231,5 +162,5 @@
         ld hl, zest.console.data.zestFailDefaultMessage
     .endif
 
-    call zest.runner.expectationFailed
+    call zest.assertion.failed
 .endm

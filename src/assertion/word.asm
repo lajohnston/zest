@@ -54,7 +54,7 @@
 ;====
 .section "zest.assertion.word.failed" free
     zest.assertion.word.failed:
-        call zest.runner.printTestDescription
+        call zest.assertion.printTestDescription
 
         ; Print assertion message
         call zest.assertion.printSeparator

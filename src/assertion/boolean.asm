@@ -7,8 +7,8 @@
 ;====
 .section "zest.assertion.boolean.failed" free
     zest.assertion.boolean.failed:
-        call zest.runner.printTestDescription
-        call zest.runner.printAssertionMessage
+        call zest.assertion.printTestDescription
+        call zest.assertion.printMessage
 
         ; Print 'Expected:' label
         call zest.assertion.printExpectedLabel
