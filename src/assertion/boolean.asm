@@ -8,7 +8,7 @@
 .section "zest.assertion.boolean.failed" free
     zest.assertion.boolean.failed:
         call zest.runner.printTestDescription
-        call zest.runner._printAssertionMessage
+        call zest.runner.printAssertionMessage
 
         ; Print 'Expected:' label
         call zest.assertion.printExpectedLabel

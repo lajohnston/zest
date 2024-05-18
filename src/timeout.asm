@@ -116,7 +116,7 @@
 
         ; Print the failed assertion message
         ld hl, _timeoutMessage
-        call zest.runner._printAssertionMessage
+        call zest.runner.printAssertionMessage
 
         jp zest.console.displayAndStop
 

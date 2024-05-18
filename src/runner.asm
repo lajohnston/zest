@@ -91,7 +91,7 @@
 .section "zest.runner.expectationFailed" free
     zest.runner.expectationFailed:
         call zest.runner.printTestDescription
-        call zest.runner._printAssertionMessage
+        call zest.runner.printAssertionMessage
 
         jp zest.console.displayAndStop
 .ends
@@ -132,22 +132,23 @@
 .ends
 
 ;====
-; (Private) Prints the message of the assertion that failed
+; Prints the message of the assertion that failed
 ;
 ; @in   hl  pointer to the message
 ;====
-.section "zest.runner._printAssertionMessage" free
-    zest.runner._printAssertionMessage:
+.section "zest.runner.printAssertionMessage" free
+    zest.runner.printAssertionMessage:
         push hl
             zest.console.newlines 3
 
-            ; Write assertion message
+            ; Write separator
             ld hl, zest.console.data.separatorText
             call zest.console.out
 
             zest.console.newlines 2
         pop hl
 
+        ; Write message
         jp zest.console.out ; jp then ret
 .ends
 
@@ -182,7 +183,7 @@
 
         ; Print the RAM overwritten message
         ld hl, _memoryCorruptionMessage
-        call zest.runner._printAssertionMessage
+        call zest.runner.printAssertionMessage
         jp zest.console.displayAndStop
 
     _memoryCorruptionMessage:
