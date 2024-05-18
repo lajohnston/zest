@@ -26,9 +26,9 @@
     ; Define assertion data
     .ifdef message
         zest.utils.validate.string message "\.: Message should be a string value"
-        zest.wordAssertion.define expectedWord message
+        zest.assertion.word.define expectedWord message
     .else
-        zest.wordAssertion.define expectedWord expect.stack.toContain.defaultMessage
+        zest.assertion.word.define expectedWord expect.stack.toContain.defaultMessage
     .endif
 
     ; Navigate to stack position
@@ -68,7 +68,7 @@
 
     jr +   ; jump over assertion failed routine
         _fail:
-            ld ix, zest.wordAssertion.define.returnValue
+            ld ix, zest.assertion.word.define.returnValue
             jp zest.runner.wordExpectationFailed
     +:
 .endm

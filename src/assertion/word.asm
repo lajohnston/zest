@@ -1,22 +1,22 @@
 ;====
 ; Word (16-bit value) assertion
 ;====
-.struct "zest.WordAssertion"
+.struct "zest.assertion.word"
     expectedValue:  dw
     messagePointer: dw
 .endst
 
 ;====
-; Defines inline assertion data and sets zest.wordAssertion.define.returnValue
+; Defines inline assertion data and sets zest.assertion.word.define.returnValue
 ; to the addres
 ;
 ; @in   expectedValue   the expected word value
 ; @in   message         pointer to a assertion failure message, or a custom
 ;                       message string
 ;
-; @out zest.wordAssertion.define.returnValue    address of the data
+; @out zest.assertion.word.define.returnValue    address of the data
 ;====
-.macro "zest.wordAssertion.define" isolated args expectedValue message
+.macro "zest.assertion.word.define" isolated args expectedValue message
     ; Assert arguments (assemble-time)
     zest.utils.validate.equals NARGS 2 "\.: Unexpected number of arguments"
     zest.utils.validate.word expectedValue "\. expectedValue should be a 16-bit value"
@@ -41,7 +41,7 @@
         zest.utils.validate.fail "\.: message should be a string or a label"
     .endif
 
-    .redefine zest.wordAssertion.define.returnValue (\.\@_assertionData)
+    .redefine zest.assertion.word.define.returnValue (\.\@_assertionData)
 .endm
 
 ;====
@@ -49,11 +49,11 @@
 ;
 ; @in   ix  pointer to the word zest.assertion.Word instance
 ;====
-.section "zest.wordAssertion.printMessage" free
-    zest.wordAssertion.printMessage:
+.section "zest.assertion.word.printMessage" free
+    zest.assertion.word.printMessage:
         push hl
-            ld l, (ix + zest.WordAssertion.messagePointer)
-            ld h, (ix + zest.WordAssertion.messagePointer + 1)
+            ld l, (ix + zest.assertion.word.messagePointer)
+            ld h, (ix + zest.assertion.word.messagePointer + 1)
             call zest.console.out
         pop hl
 
@@ -63,10 +63,10 @@
 ;====
 ; Prints the expected word value to the on-screen console
 ;
-; @in   ix  pointer to the zest.WordAssertion instance
+; @in   ix  pointer to the zest.assertion.word instance
 ;====
-.section "zest.wordAssertion.printExpected"
-    zest.wordAssertion.printExpected:
+.section "zest.assertion.word.printExpected"
+    zest.assertion.word.printExpected:
         push bc
             ld c, (ix + 0)
             ld b, (ix + 1)

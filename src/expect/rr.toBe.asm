@@ -15,15 +15,15 @@
 
     ; Define assertion data
     .if NARGS == 1
-        zest.wordAssertion.define expectedValue expect.rr.toBe.defaultMessages.bc
+        zest.assertion.word.define expectedValue expect.rr.toBe.defaultMessages.bc
     .else
         zest.utils.validate.string message "\.: Message should be a string"
-        zest.wordAssertion.define expectedValue message
+        zest.assertion.word.define expectedValue message
     .endif
 
     ; Call routine
     push hl
-        ld hl, zest.wordAssertion.define.returnValue
+        ld hl, zest.assertion.word.define.returnValue
         call expect.bc.toBe
     pop hl
 .endm
@@ -56,15 +56,15 @@
 
     ; Define assertion data
     .if NARGS == 1
-        zest.wordAssertion.define expectedValue expect.rr.toBe.defaultMessages.de
+        zest.assertion.word.define expectedValue expect.rr.toBe.defaultMessages.de
     .else
         zest.utils.validate.string message "\.: Message should be a string"
-        zest.wordAssertion.define expectedValue message
+        zest.assertion.word.define expectedValue message
     .endif
 
     ; Call routine
     push hl
-        ld hl, zest.wordAssertion.define.returnValue
+        ld hl, zest.assertion.word.define.returnValue
         call expect.de.toBe
     pop hl
 .endm
@@ -113,15 +113,15 @@
 
     ; Define assertion data
     .if NARGS == 1
-        zest.wordAssertion.define expectedValue expect.rr.toBe.defaultMessages.hl
+        zest.assertion.word.define expectedValue expect.rr.toBe.defaultMessages.hl
     .else
         zest.utils.validate.string message "\.: Message should be a string"
-        zest.wordAssertion.define expectedValue message
+        zest.assertion.word.define expectedValue message
     .endif
 
     ; Call routine
     push de
-        ld de, zest.wordAssertion.define.returnValue
+        ld de, zest.assertion.word.define.returnValue
         call expect.hl.toBe
     pop de
 .endm
@@ -153,15 +153,15 @@
 
     ; Define assertion data
     .if NARGS == 1
-        zest.wordAssertion.define expectedValue expect.rr.toBe.defaultMessages.ix
+        zest.assertion.word.define expectedValue expect.rr.toBe.defaultMessages.ix
     .else
         zest.utils.validate.string message "\.: Message should be a string"
-        zest.wordAssertion.define expectedValue message
+        zest.assertion.word.define expectedValue message
     .endif
 
     ; Call routine
     push hl
-        ld hl, zest.wordAssertion.define.returnValue
+        ld hl, zest.assertion.word.define.returnValue
         call expect.ix.toBe
     pop hl
 .endm
@@ -194,15 +194,15 @@
 
     ; Define assertion data
     .if NARGS == 1
-        zest.wordAssertion.define expectedValue expect.rr.toBe.defaultMessages.iy
+        zest.assertion.word.define expectedValue expect.rr.toBe.defaultMessages.iy
     .else
         zest.utils.validate.string message "\.: Message should be a string"
-        zest.wordAssertion.define expectedValue message
+        zest.assertion.word.define expectedValue message
     .endif
 
     ; Call routine
     push hl
-        ld hl, zest.wordAssertion.define.returnValue
+        ld hl, zest.assertion.word.define.returnValue
         call expect.iy.toBe
     pop hl
 .endm

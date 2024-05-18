@@ -140,13 +140,13 @@
 
         ; Print assertion message
         call zest.runner.printAssertionSeparator
-        call zest.wordAssertion.printMessage
+        call zest.assertion.word.printMessage
 
         ; Print expected label
         call zest.runner._printExpectedLabel
 
         ; Print expected value
-        call zest.wordAssertion.printExpected
+        call zest.assertion.word.printExpected
 
         ; Print actual label
         call zest.runner._printActualLabel
