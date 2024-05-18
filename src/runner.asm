@@ -83,47 +83,22 @@
         jp zest.console.displayAndStop
 .ends
 
+;====
+; Writes newlines to the on-screen console to separate the test description
+; from the assertion message
+;====
 .section "zest.runner.printAssertionSeparator" free
     zest.runner.printAssertionSeparator:
         push hl
             zest.console.newlines 3
 
-            ; Write assertion message
+            ; Write separator line
             ld hl, zest.console.data.separatorText
             call zest.console.out
 
             zest.console.newlines 2
         pop hl
         ret
-.ends
-
-;====
-; Displays details about a byte/single register assertion that doesn't match
-; the expectation, then stops the program
-;
-; @in   a   the actual value
-; @in   ix  pointer to the assertion data
-;====
-.section "zest.runner.byteExpectationFailed" free
-    zest.runner.byteExpectationFailed:
-        call zest.runner._printTestDescription
-
-        ; Print assertion message
-        call zest.runner.printAssertionSeparator
-        call zest.assertion.byte.printMessage
-
-        ; Print 'Expected:' label
-        call zest.runner._printExpectedLabel
-
-        ; Print expected value
-        call zest.assertion.byte.printExpected
-
-        ; Print 'Actual:' label
-        call zest.runner._printActualLabel
-
-        ; Print actual value
-        call zest.console.outputHexA
-        jp zest.console.displayAndStop
 .ends
 
 ;====
@@ -136,20 +111,20 @@
 ;====
 .section "zest.runner.wordExpectationFailed" free
     zest.runner.wordExpectationFailed:
-        call zest.runner._printTestDescription
+        call zest.runner.printTestDescription
 
         ; Print assertion message
         call zest.runner.printAssertionSeparator
         call zest.assertion.word.printMessage
 
         ; Print expected label
-        call zest.runner._printExpectedLabel
+        call zest.runner.printExpectedLabel
 
         ; Print expected value
         call zest.assertion.word.printExpected
 
         ; Print actual label
-        call zest.runner._printActualLabel
+        call zest.runner.printActualLabel
 
         ; Print actual value
         call zest.console.outputHexDE
@@ -165,17 +140,17 @@
 ;====
 .section "zest.runner.booleanExpectationFailed" free
     zest.runner.booleanExpectationFailed:
-        call zest.runner._printTestDescription
+        call zest.runner.printTestDescription
         call zest.runner._printAssertionMessage
 
         ; Print 'Expected:' label
-        call zest.runner._printExpectedLabel
+        call zest.runner.printExpectedLabel
 
         ; Print expected value
         call zest.console.outputBoolean
 
         ; Print 'Actual:' label
-        call zest.runner._printActualLabel
+        call zest.runner.printActualLabel
 
         ; Print actual value
         push af
@@ -194,19 +169,19 @@
 ;====
 .section "zest.runner.expectationFailed" free
     zest.runner.expectationFailed:
-        call zest.runner._printTestDescription
+        call zest.runner.printTestDescription
         call zest.runner._printAssertionMessage
 
         jp zest.console.displayAndStop
 .ends
 
 ;====
-; (Private) Prints the test description
+; Prints the test description
 ;
 ; @in   hl  pointer to the assertion message
 ;====
-.section "zest.runner._printTestDescription" free
-    zest.runner._printTestDescription:
+.section "zest.runner.printTestDescription" free
+    zest.runner.printTestDescription:
         ; Initialise the console
         zest.console.initFailure
 
@@ -256,10 +231,10 @@
 .ends
 
 ;====
-; (Private) Prints the 'Expected:' label
+; Prints the 'Expected:' label
 ;====
-.section "zest.runner._printExpectedLabel" free
-    zest.runner._printExpectedLabel:
+.section "zest.runner.printExpectedLabel" free
+    zest.runner.printExpectedLabel:
         push hl
             zest.console.newlines 2
             ld hl, zest.console.data.expectedValueLabel
@@ -270,10 +245,10 @@
 .ends
 
 ;====
-; (Private) Prints the 'Actual:' label
+; Prints the 'Actual:' label
 ;====
-.section "zest.runner._printActualLabel" free
-    zest.runner._printActualLabel:
+.section "zest.runner.printActualLabel" free
+    zest.runner.printActualLabel:
         push hl
             zest.console.newlines 1
             ld hl, zest.console.data.actualValueLabel

@@ -45,6 +45,35 @@
 .endm
 
 ;====
+; Displays details about a byte/single register assertion that doesn't match
+; the expectation, then stops the program
+;
+; @in   a   the actual value
+; @in   ix  pointer to the assertion data
+;====
+.section "zest.assertion.byte.failed" free
+    zest.assertion.byte.failed:
+        call zest.runner.printTestDescription
+
+        ; Print assertion message
+        call zest.runner.printAssertionSeparator
+        call zest.assertion.byte.printMessage
+
+        ; Print 'Expected:' label
+        call zest.runner.printExpectedLabel
+
+        ; Print expected value
+        call zest.assertion.byte.printExpected
+
+        ; Print 'Actual:' label
+        call zest.runner.printActualLabel
+
+        ; Print actual value
+        call zest.console.outputHexA
+        jp zest.console.displayAndStop
+.ends
+
+;====
 ; Should be called at the beginning of the assertion routine to preserve HL and
 ; pop the assertion data pointer from the stack
 ;

@@ -111,7 +111,7 @@
                 ld hl, expect.stack.size.toBe.defaultMessage
             .endif
 
-            jp zest.runner.byteExpectationFailed
+            jp zest.assertion.byte.failed
 
             .ifdef message
                 \..customMessage.\@:

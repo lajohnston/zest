@@ -21,7 +21,7 @@
         push hl
         pop ix
 
-        call zest.runner.byteExpectationFailed
+        call zest.assertion.byte.failed
 .ends
 
 ;====
