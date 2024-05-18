@@ -1,25 +1,25 @@
 ;====
 ; Word (16-bit value) assertion
 ;====
-.struct "zest.ByteAssertion"
+.struct "zest.assertion.byte"
     expectedValue:  db
     messagePointer: dw
 .endst
 
 ;====
 ; Generates a call the given routine followed by the assertion data. The routine
-; should use zest.byteAssertion.loadHLPointer or loadDEPointer to pop the
+; should use zest.assertion.byte.loadHLPointer or loadDEPointer to pop the
 ; assertion data pointer from the stack.
 ;
 ; If the assertion passes, the routine should return to the caller using
-; zest.byteAssertion.return.HL or return.DE.
+; zest.assertion.byte.return.HL or return.DE.
 ;
 ; @in   routine         the routine label to call
 ; @in   expectedValue   the expected byte value
 ; @in   message         pointer to a assertion failure message, or a custom
 ;                       message string
 ;====
-.macro "zest.byteAssertion.assert" isolated args routine expectedValue message
+.macro "zest.assertion.byte.assert" isolated args routine expectedValue message
     ; Assert arguments (assemble-time)
     zest.utils.validate.equals NARGS 3 "\.: Unexpected number of arguments"
     zest.utils.validate.byte expectedValue "\. expectedValue should be an 8-bit value"
@@ -48,9 +48,9 @@
 ; Should be called at the beginning of the assertion routine to preserve HL and
 ; pop the assertion data pointer from the stack
 ;
-; @out  de  pointer to the zest.ByteAssertion instance
+; @out  de  pointer to the zest.assertion.byte instance
 ;====
-.macro "zest.byteAssertion.loadDEPointer" isolated args routine
+.macro "zest.assertion.byte.loadDEPointer" isolated args routine
     ld (zest.runner.tempWord), de   ; preserve DE
     pop de                          ; pop data pointer to DE
 .endm
@@ -59,9 +59,9 @@
 ; Should be called at the beginning of the assertion routine to preserve HL and
 ; pop the assertion data pointer from the stack
 ;
-; @out  hl  pointer to the zest.ByteAssertion instance
+; @out  hl  pointer to the zest.assertion.byte instance
 ;====
-.macro "zest.byteAssertion.loadHLPointer" isolated args routine
+.macro "zest.assertion.byte.loadHLPointer" isolated args routine
     ld (zest.runner.tempWord), hl   ; preserve HL
     pop hl                          ; pop data pointer to HL
 .endm
@@ -71,9 +71,9 @@
 ; restores DE and returns to the test/caller, skipping over the inline assertion
 ; data
 ;====
-.macro "zest.byteAssertion.return.DE"
+.macro "zest.assertion.byte.return.DE"
     ; Skip over the byte assertion data
-    .repeat _sizeof_zest.ByteAssertion
+    .repeat _sizeof_zest.assertion.byte
         inc de
     .endr
 
@@ -88,9 +88,9 @@
 ; restores HL and returns to the test/caller, skipping over the inline assertion
 ; data
 ;====
-.macro "zest.byteAssertion.return.HL"
+.macro "zest.assertion.byte.return.HL"
     ; Skip over the byte assertion data
-    .repeat _sizeof_zest.ByteAssertion
+    .repeat _sizeof_zest.assertion.byte
         inc hl
     .endr
 
@@ -105,11 +105,11 @@
 ;
 ; @in   ix  pointer to the word zest.assertion.Word instance
 ;====
-.section "zest.byteAssertion.printMessage" free
-    zest.byteAssertion.printMessage:
+.section "zest.assertion.byte.printMessage" free
+    zest.assertion.byte.printMessage:
         push hl
-            ld l, (ix + zest.ByteAssertion.messagePointer)
-            ld h, (ix + zest.ByteAssertion.messagePointer + 1)
+            ld l, (ix + zest.assertion.byte.messagePointer)
+            ld h, (ix + zest.assertion.byte.messagePointer + 1)
             call zest.console.out
         pop hl
 
@@ -119,13 +119,13 @@
 ;====
 ; Prints the expected word value to the on-screen console
 ;
-; @in   ix  pointer to the zest.ByteAssertion instance
+; @in   ix  pointer to the zest.assertion.byte instance
 ;====
-.section "zest.byteAssertion.printExpected"
-    zest.byteAssertion.printExpected:
+.section "zest.assertion.byte.printExpected"
+    zest.assertion.byte.printExpected:
         push af
             ; Set A to expected value
-            ld a, (ix + zest.ByteAssertion.expectedValue)
+            ld a, (ix + zest.assertion.byte.expectedValue)
             call zest.console.outputHexA
         pop af
         ret

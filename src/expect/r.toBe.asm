@@ -37,10 +37,10 @@
     \@_\..{expectedValue}:
 
     .if NARGS == 1
-        zest.byteAssertion.assert expect.a._toBe expectedValue expect.a.toBe.defaultMessage
+        zest.assertion.byte.assert expect.a._toBe expectedValue expect.a.toBe.defaultMessage
     .else
         zest.utils.validate.string message "\.: Message should be a string"
-        zest.byteAssertion.assert expect.a._toBe expectedValue message
+        zest.assertion.byte.assert expect.a._toBe expectedValue message
     .endif
 .endm
 
@@ -53,9 +53,9 @@
 ;====
 .section "expect.a._toBe" free
     expect.a._toBe:
-        zest.byteAssertion.loadHLPointer
+        zest.assertion.byte.loadHLPointer
             call expect._assertAEquals
-        zest.byteAssertion.return.HL
+        zest.assertion.byte.return.HL
 .ends
 
 ;====
@@ -71,10 +71,10 @@
     \@_\..{expectedValue}:
 
     .if NARGS == 1
-        zest.byteAssertion.assert expect.b._toBe expectedValue expect.b.toBe.defaultMessage
+        zest.assertion.byte.assert expect.b._toBe expectedValue expect.b.toBe.defaultMessage
     .else
         zest.utils.validate.string message "\.: Message should be a string"
-        zest.byteAssertion.assert expect.b._toBe expectedValue message
+        zest.assertion.byte.assert expect.b._toBe expectedValue message
     .endif
 .endm
 
@@ -86,14 +86,14 @@
 ;====
 .section "expect.b._toBe" free
     expect.b._toBe:
-        zest.byteAssertion.loadHLPointer
+        zest.assertion.byte.loadHLPointer
 
         push af
             ld a, b
             call expect._assertAEquals
         pop af
 
-        zest.byteAssertion.return.HL
+        zest.assertion.byte.return.HL
 .ends
 
 ;====
@@ -108,10 +108,10 @@
 
     \@_\..{expectedValue}:
         .if NARGS == 1
-            zest.byteAssertion.assert expect.c._toBe expectedValue expect.c.toBe.defaultMessage
+            zest.assertion.byte.assert expect.c._toBe expectedValue expect.c.toBe.defaultMessage
         .else
             zest.utils.validate.string message "\.: Message should be a string"
-            zest.byteAssertion.assert expect.c._toBe expectedValue message
+            zest.assertion.byte.assert expect.c._toBe expectedValue message
         .endif
 .endm
 
@@ -123,14 +123,14 @@
 ;====
 .section "expect.c._toBe" free
     expect.c._toBe:
-        zest.byteAssertion.loadHLPointer
+        zest.assertion.byte.loadHLPointer
 
         push af
             ld a, c
             call expect._assertAEquals
         pop af
 
-        zest.byteAssertion.return.HL
+        zest.assertion.byte.return.HL
 .ends
 
 ;====
@@ -145,10 +145,10 @@
 
     \@_\..{expectedValue}:
         .if NARGS == 1
-            zest.byteAssertion.assert expect.d._toBe expectedValue expect.d.toBe.defaultMessage
+            zest.assertion.byte.assert expect.d._toBe expectedValue expect.d.toBe.defaultMessage
         .else
             zest.utils.validate.string message "\.: Message should be a string"
-            zest.byteAssertion.assert expect.d._toBe expectedValue message
+            zest.assertion.byte.assert expect.d._toBe expectedValue message
         .endif
 .endm
 
@@ -160,14 +160,14 @@
 ;====
 .section "expect.d._toBe" free
     expect.d._toBe:
-        zest.byteAssertion.loadHLPointer
+        zest.assertion.byte.loadHLPointer
 
         push af
             ld a, d
             call expect._assertAEquals
         pop af
 
-        zest.byteAssertion.return.HL
+        zest.assertion.byte.return.HL
 .ends
 
 ;====
@@ -182,10 +182,10 @@
 
     \@_\..{expectedValue}:
         .if NARGS == 1
-            zest.byteAssertion.assert expect.e._toBe expectedValue expect.e.toBe.defaultMessage
+            zest.assertion.byte.assert expect.e._toBe expectedValue expect.e.toBe.defaultMessage
         .else
             zest.utils.validate.string message "\.: Message should be a string"
-            zest.byteAssertion.assert expect.e._toBe expectedValue message
+            zest.assertion.byte.assert expect.e._toBe expectedValue message
         .endif
 .endm
 
@@ -197,14 +197,14 @@
 ;====
 .section "expect.e._toBe" free
     expect.e._toBe:
-        zest.byteAssertion.loadHLPointer
+        zest.assertion.byte.loadHLPointer
 
         push af
             ld a, e
             call expect._assertAEquals
         pop af
 
-        zest.byteAssertion.return.HL
+        zest.assertion.byte.return.HL
 .ends
 
 ;====
@@ -219,10 +219,10 @@
 
     \@_\..{expectedValue}:
         .if NARGS == 1
-            zest.byteAssertion.assert expect.h._toBe expectedValue expect.h.toBe.defaultMessage
+            zest.assertion.byte.assert expect.h._toBe expectedValue expect.h.toBe.defaultMessage
         .else
             zest.utils.validate.string message "\.: Message should be a string"
-            zest.byteAssertion.assert expect.h._toBe expectedValue message
+            zest.assertion.byte.assert expect.h._toBe expectedValue message
         .endif
 .endm
 
@@ -234,7 +234,7 @@
 ;====
 .section "expect.h._toBe" free
     expect.h._toBe:
-        zest.byteAssertion.loadDEPointer
+        zest.assertion.byte.loadDEPointer
 
         push af
             ld a, h
@@ -243,7 +243,7 @@
             ex de, hl
         pop af
 
-        zest.byteAssertion.return.DE
+        zest.assertion.byte.return.DE
 .ends
 
 ;====
@@ -258,10 +258,10 @@
 
     \@_\..{expectedValue}:
         .if NARGS == 1
-            zest.byteAssertion.assert expect.l._toBe expectedValue expect.l.toBe.defaultMessage
+            zest.assertion.byte.assert expect.l._toBe expectedValue expect.l.toBe.defaultMessage
         .else
             zest.utils.validate.string message "\.: Message should be a string"
-            zest.byteAssertion.assert expect.l._toBe expectedValue message
+            zest.assertion.byte.assert expect.l._toBe expectedValue message
         .endif
 .endm
 
@@ -273,7 +273,7 @@
 ;====
 .section "expect.l._toBe" free
     expect.l._toBe:
-        zest.byteAssertion.loadDEPointer
+        zest.assertion.byte.loadDEPointer
 
         push af
             ld a, l
@@ -282,7 +282,7 @@
             ex de, hl
         pop af
 
-        zest.byteAssertion.return.DE
+        zest.assertion.byte.return.DE
 .ends
 
 ;====
@@ -297,10 +297,10 @@
 
     \@_\..{expectedValue}:
         .if NARGS == 1
-            zest.byteAssertion.assert expect.ixh._toBe expectedValue expect.ixh.toBe.defaultMessage
+            zest.assertion.byte.assert expect.ixh._toBe expectedValue expect.ixh.toBe.defaultMessage
         .else
             zest.utils.validate.string message "\.: Message should be a string"
-            zest.byteAssertion.assert expect.ixh._toBe expectedValue message
+            zest.assertion.byte.assert expect.ixh._toBe expectedValue message
         .endif
 .endm
 
@@ -312,14 +312,14 @@
 ;====
 .section "expect.ixh._toBe" free
     expect.ixh._toBe:
-        zest.byteAssertion.loadHLPointer
+        zest.assertion.byte.loadHLPointer
 
         push af
             ld a, ixh
             call expect._assertAEquals
         pop af
 
-        zest.byteAssertion.return.HL
+        zest.assertion.byte.return.HL
 .ends
 
 ;====
@@ -334,10 +334,10 @@
 
     \@_\..{expectedValue}:
         .if NARGS == 1
-            zest.byteAssertion.assert expect.ixl._toBe expectedValue expect.ixl.toBe.defaultMessage
+            zest.assertion.byte.assert expect.ixl._toBe expectedValue expect.ixl.toBe.defaultMessage
         .else
             zest.utils.validate.string message "\.: Message should be a string"
-            zest.byteAssertion.assert expect.ixl._toBe expectedValue message
+            zest.assertion.byte.assert expect.ixl._toBe expectedValue message
         .endif
 .endm
 
@@ -349,14 +349,14 @@
 ;====
 .section "expect.ixl._toBe" free
     expect.ixl._toBe:
-        zest.byteAssertion.loadHLPointer
+        zest.assertion.byte.loadHLPointer
 
         push af
             ld a, ixl
             call expect._assertAEquals
         pop af
 
-        zest.byteAssertion.return.HL
+        zest.assertion.byte.return.HL
 .ends
 
 ;====
@@ -371,10 +371,10 @@
 
     \@_\..{expectedValue}:
         .if NARGS == 1
-            zest.byteAssertion.assert expect.iyh._toBe expectedValue expect.iyh.toBe.defaultMessage
+            zest.assertion.byte.assert expect.iyh._toBe expectedValue expect.iyh.toBe.defaultMessage
         .else
             zest.utils.validate.string message "\.: Message should be a string"
-            zest.byteAssertion.assert expect.iyh._toBe expectedValue message
+            zest.assertion.byte.assert expect.iyh._toBe expectedValue message
         .endif
 .endm
 
@@ -386,14 +386,14 @@
 ;====
 .section "expect.iyh._toBe" free
     expect.iyh._toBe:
-        zest.byteAssertion.loadHLPointer
+        zest.assertion.byte.loadHLPointer
 
         push af
             ld a, iyh
             call expect._assertAEquals
         pop af
 
-        zest.byteAssertion.return.HL
+        zest.assertion.byte.return.HL
 .ends
 
 ;====
@@ -408,10 +408,10 @@
 
     \@_\..{expectedValue}:
         .if NARGS == 1
-            zest.byteAssertion.assert expect.iyl._toBe expectedValue expect.iyl.toBe.defaultMessage
+            zest.assertion.byte.assert expect.iyl._toBe expectedValue expect.iyl.toBe.defaultMessage
         .else
             zest.utils.validate.string message "\.: Message should be a string"
-            zest.byteAssertion.assert expect.iyl._toBe expectedValue message
+            zest.assertion.byte.assert expect.iyl._toBe expectedValue message
         .endif
 .endm
 
@@ -423,14 +423,14 @@
 ;====
 .section "expect.iyl._toBe" free
     expect.iyl._toBe:
-        zest.byteAssertion.loadHLPointer
+        zest.assertion.byte.loadHLPointer
 
         push af
             ld a, iyl
             call expect._assertAEquals
         pop af
 
-        zest.byteAssertion.return.HL
+        zest.assertion.byte.return.HL
 .ends
 
 ;====
@@ -445,10 +445,10 @@
 
     \@_\..{expectedValue}:
         .if NARGS == 1
-            zest.byteAssertion.assert expect.i._toBe expectedValue expect.i.toBe.defaultMessage
+            zest.assertion.byte.assert expect.i._toBe expectedValue expect.i.toBe.defaultMessage
         .else
             zest.utils.validate.string message "\.: Message should be a string"
-            zest.byteAssertion.assert expect.i._toBe expectedValue message
+            zest.assertion.byte.assert expect.i._toBe expectedValue message
         .endif
 .endm
 
@@ -460,14 +460,14 @@
 ;====
 .section "expect.i._toBe" free
     expect.i._toBe:
-        zest.byteAssertion.loadHLPointer
+        zest.assertion.byte.loadHLPointer
 
         push af
             ld a, i
             call expect._assertAEquals
         pop af
 
-        zest.byteAssertion.return.HL
+        zest.assertion.byte.return.HL
 .ends
 
 ; Default error messages for expectations

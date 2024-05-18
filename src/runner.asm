@@ -110,13 +110,13 @@
 
         ; Print assertion message
         call zest.runner.printAssertionSeparator
-        call zest.byteAssertion.printMessage
+        call zest.assertion.byte.printMessage
 
         ; Print 'Expected:' label
         call zest.runner._printExpectedLabel
 
         ; Print expected value
-        call zest.byteAssertion.printExpected
+        call zest.assertion.byte.printExpected
 
         ; Print 'Actual:' label
         call zest.runner._printActualLabel
