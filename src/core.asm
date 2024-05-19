@@ -37,6 +37,7 @@
 .include "./src/assertion/byte.asm"
 .include "./src/assertion/word.asm"
 
+.include "./src/expect/all.toBeUnclobbered.asm"
 .include "./src/expect/flags.asm"
 .include "./src/expect/r.toBe.asm"
 .include "./src/expect/rr.toBe.asm"

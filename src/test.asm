@@ -179,6 +179,13 @@
 .ends
 
 ;====
+; @out  a   the current test's checksum
+;====
+.macro "zest.test.loadAChecksum"
+    ld a, (zest.test.checksum)
+.endm
+
+;====
 ; (Private) Restores the test data from the VRAM backup
 ;
 ; @clobbers af, bc, hl
