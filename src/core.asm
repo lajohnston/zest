@@ -10,7 +10,7 @@
     map " " to "~" = 0
 .enda
 
-; Utils
+; Utils for internal use
 .include "./src/utils/validate.asm"
 
 ; Memory mapper
@@ -46,6 +46,9 @@
 .include "./src/preSuite.asm"
 .include "./src/preTest.asm"
 .include "./src/postTest.asm"
+
+; User utils
+.include "./src/utils/initRegisters.asm"
 
 ;====
 ; Global aliases (zest namespace)
@@ -106,4 +109,11 @@
 ;====
 .macro "zest.setBank" args bankNumber
     zest.mapper.setBank bankNumber
+.endm
+
+;====
+; Initialises all registers with semi-random values
+;====
+.macro "zest.initRegisters"
+    zest.utils.initRegisters
 .endm
