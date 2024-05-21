@@ -144,6 +144,28 @@ expect.stack.toContain $1234 1  ; expect the stack position before to contain $1
 expect.stack.toContain $1234 0 "my custom message"
 ```
 
+### Clobber detection
+
+Use `zest.initRegisters` to initialise all the register with unique values. You can then assert that they all retain these values with `expect.all.toBeUnclobbered`:
+
+```asm
+it "should not clobber any registers"
+    zest.initRegisters
+    call myRoutine
+    expect.all.toBeUnclobbered
+```
+
+Often a routine will intend to return values within certain registers, so opt these out of the check by using `expect.all.toBeUnclobberedExcept` and passing the register names:
+
+```asm
+zest.initRegisters
+call myFunction
+expect.all.toBeUnclobberedExcept "a" "b"
+```
+
+Acceptable register args are `"a", "f", "b", "c", "d", "e", "h", "l", "ixh", "ixl", "iyh", "iyl", "i", "a'", "f'", "b'", "c'", "d'", "e'", "h'", "l'"`.
+Register pairs are also allowed: `"af", "bc", "de", "hl", "af'", "bc'", "de'", "hl'"`
+
 ### Mock assertions
 
 See [Mocking/stubbing labels](#mockingstubbing-labels) for more details about mocks.

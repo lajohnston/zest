@@ -68,9 +68,9 @@
         add zest.utils.initRegisters.SHADOW_A_OFFSET
 
         ; Set HL to what will become AF'
-        ld h, a
+        ld h, a     ; A'
         inc a
-        ld l, a
+        ld l, a     ; F'
         push hl ; push what will be AF'
             ; Initialise BC, DE, HL
             inc a
