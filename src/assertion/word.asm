@@ -45,6 +45,96 @@
 .endm
 
 ;====
+; Generates a call the given routine followed immediately by the assertion data.
+; The routine should use ex (sp), hl to pop the assertion data pointer from the
+; stack.
+;
+; If the assertion passes, the routine should return to the caller using
+; zest.assertion.byte.return.HL or return.DE.
+;
+; @in   routine         the routine label to call
+; @in   expectedValue   the expected word value
+; @in   message         pointer to a assertion failure message, or a custom
+;                       message string
+;====
+.macro "zest.assertion.word.assert" isolated args routine expectedValue message
+    ; Assert arguments (assemble-time)
+    zest.utils.validate.equals NARGS 3 "\.: Unexpected number of arguments"
+    zest.utils.validate.word expectedValue "\. expectedValue should be a word value"
+
+    .if \?3 == ARG_STRING
+        jp +
+            \.\@messagePointer:
+                zest.console.defineString message
+        +:
+    .elif \?3 == ARG_LABEL
+        .redefine \.\@messagePointer message
+    .else
+        zest.utils.validate.fail "\.: message should be a string or a label"
+    .endif
+
+    ; Call the assertion routine
+    call routine
+
+    ; Define the assertion data. The routine should skip over this if it returns
+    _assertionData:
+        .dw expectedValue
+        .dw \.\@messagePointer
+.endm
+
+;====
+; Should be called at the end of the assertion routine if it passes. This
+; restores HL and returns to the test/caller, skipping over the inline assertion
+; data defined directly after it by zest.assertion.word.assert
+;
+; @in       hl          pointer to zest.assertion.word instance
+; @in       stack{0}    original value of HL
+;====
+.macro "zest.assertion.word.return"
+    ; Skip over the word assertion data
+    .repeat _sizeof_zest.assertion.word
+        inc hl
+    .endr
+
+    ; Push the new return address to RAM
+    ex (sp), hl     ; restore HL; push return address to stack
+    ret             ; return to the address we pushed
+.endm
+
+;====
+; Asserts DE is equal to the expected value, otherwise fails the test
+;
+; @in   de  the actual value
+; @in   hl  the expected value
+;====
+.section "zest.assertion.word.assertDEEquals" free
+    zest.assertion.word.assertDEEquals:
+        push af
+        push hl
+            ; Set HL to expected value
+            ld a, (hl)
+            inc hl
+            ld h, (hl)
+            ld l, a
+
+            or a            ; clear carry flag
+            sbc hl, de      ; subtract actual from expected
+            jr nz, _fail    ; jp if the values didn't match
+        pop hl
+        pop af
+
+        ret
+
+    _fail:
+        ; Pop message pointer into IX
+        pop ix
+
+        ; Fail test with message
+        ; DE = actual value
+        jp zest.assertion.word.failed
+.ends
+
+;====
 ; Displays details about a 16-bit value assertion that doesn't match
 ; the expectation, then stops the program
 ;

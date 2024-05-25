@@ -10,38 +10,17 @@
 ; @in   message         (optional) custom string assertion failure message
 ;====
 .macro "expect.bc.toBe" isolated args expectedValue message
-    \@_\..{expectedValue}:
     zest.utils.validate.word expectedValue "\. expects a 16-bit value"
 
-    ; Define assertion data
+    \@_\..{expectedValue}:
+
     .if NARGS == 1
-        zest.assertion.word.define expectedValue expect.rr.toBe.defaultMessages.bc
+        zest.assertion.word.assert expect.bc._toBe expectedValue expect.rr.toBe.defaultMessages.bc
     .else
         zest.utils.validate.string message "\.: Message should be a string"
-        zest.assertion.word.define expectedValue message
+        zest.assertion.word.assert expect.bc._toBe expectedValue message
     .endif
-
-    ; Call routine
-    push hl
-        ld hl, zest.assertion.word.define.returnValue
-        call expect.bc.toBe
-    pop hl
 .endm
-
-;====
-; Asserts that BC is equal to the expected value, otherwise fails the test
-;
-; @in   hl  pointer to the assertion data
-;====
-.section "expect.bc.toBe" free
-    expect.bc.toBe:
-        push de
-            ld d, b
-            ld e, c
-            call expect.de.toBe
-        pop de
-        ret
-.ends
 
 ;====
 ; Asserts the value in DE matches the expected value
@@ -51,54 +30,17 @@
 ; @in   message         (optional) custom string assertion failure message
 ;====
 .macro "expect.de.toBe" isolated args expectedValue message
-    \@_\..{expectedValue}:
     zest.utils.validate.word expectedValue "\. expects a 16-bit value"
 
-    ; Define assertion data
+    \@_\..{expectedValue}:
+
     .if NARGS == 1
-        zest.assertion.word.define expectedValue expect.rr.toBe.defaultMessages.de
+        zest.assertion.word.assert expect.de._toBe expectedValue expect.rr.toBe.defaultMessages.de
     .else
         zest.utils.validate.string message "\.: Message should be a string"
-        zest.assertion.word.define expectedValue message
+        zest.assertion.word.assert expect.de._toBe expectedValue message
     .endif
-
-    ; Call routine
-    push hl
-        ld hl, zest.assertion.word.define.returnValue
-        call expect.de.toBe
-    pop hl
 .endm
-
-;====
-; Asserts that DE is equal to the expected value, otherwise fails the test
-;
-; @in   hl  pointer to the assertion data
-;====
-.section "expect.de.toBe" free
-    expect.de.toBe:
-        push af
-        push hl
-            ; Set HL to expected value
-            ld a, (hl)
-            inc hl
-            ld h, (hl)
-            ld l, a
-
-            or a            ; clear carry flag
-            sbc hl, de      ; subtract actual from expected
-            jr nz, _fail    ; jp if the values didn't match
-        pop hl
-        pop af
-        ret
-
-    _fail:
-        ; Pop message pointer into IX
-        pop ix
-
-        ; Fail test with message
-        ; DE = actual value
-        jp zest.assertion.word.failed
-.ends
 
 ;====
 ; Asserts the value in HL matches the expected value
@@ -108,37 +50,17 @@
 ; @in   message         (optional) custom string assertion failure message
 ;====
 .macro "expect.hl.toBe" isolated args expectedValue message
-    \@_\..{expectedValue}:
     zest.utils.validate.word expectedValue "\. expects a 16-bit value"
 
-    ; Define assertion data
+    \@_\..{expectedValue}:
+
     .if NARGS == 1
-        zest.assertion.word.define expectedValue expect.rr.toBe.defaultMessages.hl
+        zest.assertion.word.assert expect.hl._toBe expectedValue expect.rr.toBe.defaultMessages.hl
     .else
         zest.utils.validate.string message "\.: Message should be a string"
-        zest.assertion.word.define expectedValue message
+        zest.assertion.word.assert expect.hl._toBe expectedValue message
     .endif
-
-    ; Call routine
-    push de
-        ld de, zest.assertion.word.define.returnValue
-        call expect.hl.toBe
-    pop de
 .endm
-
-;====
-; Asserts that HL is equal to the expected value, otherwise fails the test
-;
-; @in   hl  the actual value
-; @in   de  pointer to the assertion data
-;====
-.section "expect.hl.toBe" free
-    expect.hl.toBe:
-        ex de, hl           ; set HL to assertion pointer and DE to actual value
-        call expect.de.toBe
-        ex de, hl           ; switch values back
-        ret
-.ends
 
 ;====
 ; Asserts the value in IX matches the expected value
@@ -148,38 +70,17 @@
 ; @in   message         (optional) custom string assertion failure message
 ;====
 .macro "expect.ix.toBe" isolated args expectedValue message
-    \@_\..{expectedValue}:
     zest.utils.validate.word expectedValue "\. expects a 16-bit value"
 
-    ; Define assertion data
+    \@_\..{expectedValue}:
+
     .if NARGS == 1
-        zest.assertion.word.define expectedValue expect.rr.toBe.defaultMessages.ix
+        zest.assertion.word.assert expect.ix._toBe expectedValue expect.rr.toBe.defaultMessages.ix
     .else
         zest.utils.validate.string message "\.: Message should be a string"
-        zest.assertion.word.define expectedValue message
+        zest.assertion.word.assert expect.ix._toBe expectedValue message
     .endif
-
-    ; Call routine
-    push hl
-        ld hl, zest.assertion.word.define.returnValue
-        call expect.ix.toBe
-    pop hl
 .endm
-
-;====
-; Asserts that IX is equal to the expected value, otherwise fails the test
-;
-; @in   hl  pointer to the assertion data
-;====
-.section "expect.ix.toBe" free
-    expect.ix.toBe:
-        push de
-            ld d, ixh
-            ld e, ixl
-            call expect.de.toBe
-        pop de
-        ret
-.ends
 
 ;====
 ; Asserts the value in IY matches the expected value
@@ -189,40 +90,113 @@
 ; @in   message         (optional) custom string assertion failure message
 ;====
 .macro "expect.iy.toBe" isolated args expectedValue message
-    \@_\..{expectedValue}:
     zest.utils.validate.word expectedValue "\. expects a 16-bit value"
 
-    ; Define assertion data
+    \@_\..{expectedValue}:
+
     .if NARGS == 1
-        zest.assertion.word.define expectedValue expect.rr.toBe.defaultMessages.iy
+        zest.assertion.word.assert expect.iy._toBe expectedValue expect.rr.toBe.defaultMessages.iy
     .else
         zest.utils.validate.string message "\.: Message should be a string"
-        zest.assertion.word.define expectedValue message
+        zest.assertion.word.assert expect.iy._toBe expectedValue message
     .endif
-
-    ; Call routine
-    push hl
-        ld hl, zest.assertion.word.define.returnValue
-        call expect.iy.toBe
-    pop hl
 .endm
 
 ;====
-; Asserts that IY is equal to the expected value, otherwise fails the test
+; (Private) Asserts BC is equal to the expected value, otherwise fails the test
 ;
-; @in   hl  pointer to the assertion data
+; @in   stack{0}    pointer to the assertion data
+; @in   bc          the actual value
 ;====
-.section "expect.iy.toBe" free
-    expect.iy.toBe:
+.section "expect.bc._toBe" free
+    expect.bc._toBe:
+        ex (sp), hl
+
         push de
-            ld d, iyh
-            ld e, iyl
-            call expect.de.toBe
+            ld d, b
+            ld e, c
+            call zest.assertion.word.assertDEEquals
         pop de
+
+        zest.assertion.word.return
+.ends
+
+;====
+; (Private) Asserts DE is equal to the expected value, otherwise fails the test
+;
+; @in   stack{0}    pointer to the assertion data
+; @in   de          the actual value
+;====
+.section "expect.de._toBe" free
+    expect.de._toBe:
+        ex (sp), hl
+        call zest.assertion.word.assertDEEquals
+        zest.assertion.word.return
+.ends
+
+;====
+; (Private) Asserts HL is equal to the expected value, otherwise fails the test
+;
+; @in   stack{0}    pointer to the assertion data
+; @in   hl          the actual value
+;====
+.section "expect.hl._toBe" free
+    expect.hl._toBe:
+        ex de, hl               ; set DE to actual value
+            ex (sp), hl         ; set HL to assertion data pointer
+            call zest.assertion.word.assertDEEquals
+
+            ; Skip over the word assertion data
+            .repeat _sizeof_zest.assertion.word
+                inc hl          ; inc return address past the assertion data
+            .endr
+
+            ex (sp), hl         ; restore HL; set return address to stack
+        ex de, hl               ; switch values back
         ret
 .ends
 
+;====
+; (Private) Asserts IX is equal to the expected value, otherwise fails the test
+;
+; @in   stack{0}    pointer to the assertion data
+; @in   ix          the actual value
+;====
+.section "expect.ix._toBe" free
+    expect.ix._toBe:
+        ex (sp), hl
+
+        push de
+            ld d, ixh
+            ld e, ixl
+            call zest.assertion.word.assertDEEquals
+        pop de
+
+        zest.assertion.word.return
+.ends
+
+;====
+; (Private) Asserts IY is equal to the expected value, otherwise fails the test
+;
+; @in   stack{0}    pointer to the assertion data
+; @in   iy          the actual value
+;====
+.section "expect.iy._toBe" free
+    expect.iy._toBe:
+        ex (sp), hl
+
+        push de
+            ld d, iyh
+            ld e, iyl
+            call zest.assertion.word.assertDEEquals
+        pop de
+
+        zest.assertion.word.return
+.ends
+
+;====
 ; Default error messages for expectations
+;====
 .section "expect.rr.toBe.defaultMessages" free
     expect.rr.toBe.defaultMessages.bc:
         .asc "Unexpected value in BC"
