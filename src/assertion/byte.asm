@@ -1,5 +1,5 @@
 ;====
-; Word (16-bit value) assertion
+; Byte (8-bit value) assertion
 ;====
 .struct "zest.assertion.byte"
     expectedValue:  db
@@ -7,12 +7,12 @@
 .endst
 
 ;====
-; Generates a call the given routine followed by the assertion data. The routine
-; should use zest.assertion.byte.loadHLPointer or loadDEPointer to pop the
-; assertion data pointer from the stack.
+; Generates a call the given routine followed immediately by the assertion data.
+; The routine should use ex (sp), hl to pop the assertion data pointer from the
+; stack.
 ;
 ; If the assertion passes, the routine should return to the caller using
-; zest.assertion.byte.return.HL or return.DE.
+; zest.assertion.byte.return
 ;
 ; @in   routine         the routine label to call
 ; @in   expectedValue   the expected byte value
@@ -74,65 +74,50 @@
 .ends
 
 ;====
-; Should be called at the beginning of the assertion routine to preserve HL and
-; pop the assertion data pointer from the stack
-;
-; @out  de  pointer to the zest.assertion.byte instance
-;====
-.macro "zest.assertion.byte.loadDEPointer" isolated args routine
-    ld (zest.runner.tempWord), de   ; preserve DE
-    pop de                          ; pop data pointer to DE
-.endm
-
-;====
-; Should be called at the beginning of the assertion routine to preserve HL and
-; pop the assertion data pointer from the stack
-;
-; @out  hl  pointer to the zest.assertion.byte instance
-;====
-.macro "zest.assertion.byte.loadHLPointer" isolated args routine
-    ld (zest.runner.tempWord), hl   ; preserve HL
-    pop hl                          ; pop data pointer to HL
-.endm
-
-;====
-; Should be called at the end of the assertion routine if it passes. This
-; restores DE and returns to the test/caller, skipping over the inline assertion
-; data
-;====
-.macro "zest.assertion.byte.return.DE"
-    ; Skip over the byte assertion data
-    .repeat _sizeof_zest.assertion.byte
-        inc de
-    .endr
-
-    ; Push the new return address to RAM
-    push de
-    ld de, (zest.runner.tempWord)   ; restore DE
-    ret ; return to the address we pushed
-.endm
-
-;====
 ; Should be called at the end of the assertion routine if it passes. This
 ; restores HL and returns to the test/caller, skipping over the inline assertion
-; data
+; data defined directly after it by zest.assertion.byte.assert
+;
+; @in       hl          pointer to zest.assertion.byte instance
+; @in       stack{0}    original value of HL
 ;====
-.macro "zest.assertion.byte.return.HL"
+.macro "zest.assertion.byte.return"
     ; Skip over the byte assertion data
     .repeat _sizeof_zest.assertion.byte
         inc hl
     .endr
 
     ; Push the new return address to RAM
-    push hl
-    ld hl, (zest.runner.tempWord)   ; restore HL
-    ret ; return to the address we pushed
+    ex (sp), hl     ; restore HL; push return address to stack
+    ret             ; return to the address we pushed
 .endm
+
+;====
+; (Private) Asserts that A is equal to the expected value, otherwise fails the test
+;
+; @in   a   the value
+; @in   hl  pointer to zest.assertion.byte instance
+;====
+.section "zest.assertion.byte.assertAEquals" free
+    zest.assertion.byte.assertAEquals:
+        push af
+            cp (hl)
+            jr nz, _fail
+        pop af
+        ret
+
+    _fail:
+        ; Set IX to pointer
+        push hl
+        pop ix
+
+        jp zest.assertion.byte.failed
+.ends
 
 ;====
 ; Prints the assertion failure message to the on-screen console
 ;
-; @in   ix  pointer to the word zest.assertion.Word instance
+; @in   ix  pointer to the zest.assertion.byte instance
 ;====
 .section "zest.assertion.byte.printMessage" free
     zest.assertion.byte.printMessage:

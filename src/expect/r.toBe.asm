@@ -3,28 +3,6 @@
 ;====
 
 ;====
-; (Private) Asserts that A is equal to the expected value, otherwise fails the test
-;
-; @in   a   the value
-; @in   hl  pointer to the assertion data
-;====
-.section "expect._assertAEquals" free
-    expect._assertAEquals:
-        push af
-            cp (hl)
-            jr nz, _fail
-        pop af
-        ret
-
-    _fail:
-        ; Set IX to pointer
-        push hl
-        pop ix
-
-        call zest.assertion.byte.failed
-.ends
-
-;====
 ; Fails the test if the value in register A does not match the expected value
 ;
 ; @in   a               the actual value
@@ -43,20 +21,6 @@
         zest.assertion.byte.assert expect.a._toBe expectedValue message
     .endif
 .endm
-
-;====
-; (Private) Asserts that A is equal to the expected value, otherwise fails the test.
-; Returns to the return address + 3, to skip the assertion data
-;
-; @in   a   the value
-; @in   hl  pointer to the assertion data
-;====
-.section "expect.a._toBe" free
-    expect.a._toBe:
-        zest.assertion.byte.loadHLPointer
-            call expect._assertAEquals
-        zest.assertion.byte.return.HL
-.ends
 
 ;====
 ; Fails the test if the value in register B does not match the expected value
@@ -79,24 +43,6 @@
 .endm
 
 ;====
-; (Private) Asserts that B is equal to the expected value, otherwise fails the test
-;
-; @in   b   the value
-; @in   hl  pointer to the assertion data
-;====
-.section "expect.b._toBe" free
-    expect.b._toBe:
-        zest.assertion.byte.loadHLPointer
-
-        push af
-            ld a, b
-            call expect._assertAEquals
-        pop af
-
-        zest.assertion.byte.return.HL
-.ends
-
-;====
 ; Fails the test if the value in register C does not match the expected value
 ;
 ; @in   c               the actual value
@@ -114,24 +60,6 @@
             zest.assertion.byte.assert expect.c._toBe expectedValue message
         .endif
 .endm
-
-;====
-; (Private) Asserts that C is equal to the expected value, otherwise fails the test
-;
-; @in   c   the value
-; @in   hl  pointer to the assertion data
-;====
-.section "expect.c._toBe" free
-    expect.c._toBe:
-        zest.assertion.byte.loadHLPointer
-
-        push af
-            ld a, c
-            call expect._assertAEquals
-        pop af
-
-        zest.assertion.byte.return.HL
-.ends
 
 ;====
 ; Fails the test if the value in register D does not match the expected value
@@ -153,24 +81,6 @@
 .endm
 
 ;====
-; (Private) Asserts that D is equal to the expected value, otherwise fails the test
-;
-; @in   d   the value
-; @in   hl  pointer to the assertion data
-;====
-.section "expect.d._toBe" free
-    expect.d._toBe:
-        zest.assertion.byte.loadHLPointer
-
-        push af
-            ld a, d
-            call expect._assertAEquals
-        pop af
-
-        zest.assertion.byte.return.HL
-.ends
-
-;====
 ; Fails the test if the value in register E does not match the expected value
 ;
 ; @in   e               the actual value
@@ -188,24 +98,6 @@
             zest.assertion.byte.assert expect.e._toBe expectedValue message
         .endif
 .endm
-
-;====
-; (Private) Asserts that E is equal to the expected value, otherwise fails the test
-;
-; @in   e   the value
-; @in   hl  pointer to the assertion data
-;====
-.section "expect.e._toBe" free
-    expect.e._toBe:
-        zest.assertion.byte.loadHLPointer
-
-        push af
-            ld a, e
-            call expect._assertAEquals
-        pop af
-
-        zest.assertion.byte.return.HL
-.ends
 
 ;====
 ; Fails the test if the value in register H does not match the expected value
@@ -227,26 +119,6 @@
 .endm
 
 ;====
-; (Private) Asserts that H is equal to the expected value, otherwise fails the test
-;
-; @in   h   the value
-; @in   de  pointer to the assertion data
-;====
-.section "expect.h._toBe" free
-    expect.h._toBe:
-        zest.assertion.byte.loadDEPointer
-
-        push af
-            ld a, h
-            ex de, hl
-                call expect._assertAEquals
-            ex de, hl
-        pop af
-
-        zest.assertion.byte.return.DE
-.ends
-
-;====
 ; Fails the test if the value in register L does not match the expected value
 ;
 ; @in   l               the actual value
@@ -264,26 +136,6 @@
             zest.assertion.byte.assert expect.l._toBe expectedValue message
         .endif
 .endm
-
-;====
-; (Private) Asserts that L is equal to the expected value, otherwise fails the test
-;
-; @in   l   the value
-; @in   de  pointer to the assertion data
-;====
-.section "expect.l._toBe" free
-    expect.l._toBe:
-        zest.assertion.byte.loadDEPointer
-
-        push af
-            ld a, l
-            ex de, hl
-                call expect._assertAEquals
-            ex de, hl
-        pop af
-
-        zest.assertion.byte.return.DE
-.ends
 
 ;====
 ; Fails the test if the value in register IXH does not match the expected value
@@ -305,24 +157,6 @@
 .endm
 
 ;====
-; (Private) Asserts that IXH is equal to the expected value, otherwise fails the test
-;
-; @in   ixh the value
-; @in   hl  pointer to the assertion data
-;====
-.section "expect.ixh._toBe" free
-    expect.ixh._toBe:
-        zest.assertion.byte.loadHLPointer
-
-        push af
-            ld a, ixh
-            call expect._assertAEquals
-        pop af
-
-        zest.assertion.byte.return.HL
-.ends
-
-;====
 ; Fails the test if the value in register IXL does not match the expected value
 ;
 ; @in   ixl             the actual value
@@ -340,24 +174,6 @@
             zest.assertion.byte.assert expect.ixl._toBe expectedValue message
         .endif
 .endm
-
-;====
-; (Private) Asserts that IXL is equal to the expected value, otherwise fails the test
-;
-; @in   ixl the value
-; @in   hl  pointer to the assertion data
-;====
-.section "expect.ixl._toBe" free
-    expect.ixl._toBe:
-        zest.assertion.byte.loadHLPointer
-
-        push af
-            ld a, ixl
-            call expect._assertAEquals
-        pop af
-
-        zest.assertion.byte.return.HL
-.ends
 
 ;====
 ; Fails the test if the value in register IYH does not match the expected value
@@ -379,24 +195,6 @@
 .endm
 
 ;====
-; (Private) Asserts that IYH is equal to the expected value, otherwise fails the test
-;
-; @in   iyh the value
-; @in   hl  pointer to the assertion data
-;====
-.section "expect.iyh._toBe" free
-    expect.iyh._toBe:
-        zest.assertion.byte.loadHLPointer
-
-        push af
-            ld a, iyh
-            call expect._assertAEquals
-        pop af
-
-        zest.assertion.byte.return.HL
-.ends
-
-;====
 ; Fails the test if the value in register IYL does not match the expected value
 ;
 ; @in   iyl             the actual value
@@ -414,24 +212,6 @@
             zest.assertion.byte.assert expect.iyl._toBe expectedValue message
         .endif
 .endm
-
-;====
-; (Private) Asserts that IYL is equal to the expected value, otherwise fails the test
-;
-; @in   iyl the value
-; @in   hl  pointer to the assertion data
-;====
-.section "expect.iyl._toBe" free
-    expect.iyl._toBe:
-        zest.assertion.byte.loadHLPointer
-
-        push af
-            ld a, iyl
-            call expect._assertAEquals
-        pop af
-
-        zest.assertion.byte.return.HL
-.ends
 
 ;====
 ; Fails the test if the value in register I does not match the expected value
@@ -453,6 +233,220 @@
 .endm
 
 ;====
+; (Private) Asserts that A is equal to the expected value, otherwise fails the test.
+; Returns to the return address + 3, to skip the assertion data
+;
+; @in   a   the value
+; @in   hl  pointer to the assertion data
+;====
+.section "expect.a._toBe" free
+    expect.a._toBe:
+        ex (sp), hl
+            call zest.assertion.byte.assertAEquals
+        zest.assertion.byte.return
+.ends
+
+;====
+; (Private) Asserts that B is equal to the expected value, otherwise fails the test
+;
+; @in   b   the value
+; @in   hl  pointer to the assertion data
+;====
+.section "expect.b._toBe" free
+    expect.b._toBe:
+        ex (sp), hl
+
+        push af
+            ld a, b
+            call zest.assertion.byte.assertAEquals
+        pop af
+
+        zest.assertion.byte.return
+.ends
+
+;====
+; (Private) Asserts that C is equal to the expected value, otherwise fails the test
+;
+; @in   c   the value
+; @in   hl  pointer to the assertion data
+;====
+.section "expect.c._toBe" free
+    expect.c._toBe:
+        ex (sp), hl
+
+        push af
+            ld a, c
+            call zest.assertion.byte.assertAEquals
+        pop af
+
+        zest.assertion.byte.return
+.ends
+
+;====
+; (Private) Asserts that D is equal to the expected value, otherwise fails the test
+;
+; @in   d   the value
+; @in   hl  pointer to the assertion data
+;====
+.section "expect.d._toBe" free
+    expect.d._toBe:
+        ex (sp), hl
+
+        push af
+            ld a, d
+            call zest.assertion.byte.assertAEquals
+        pop af
+
+        zest.assertion.byte.return
+.ends
+
+;====
+; (Private) Asserts that E is equal to the expected value, otherwise fails the test
+;
+; @in   e   the value
+; @in   hl  pointer to the assertion data
+;====
+.section "expect.e._toBe" free
+    expect.e._toBe:
+        ex (sp), hl
+
+        push af
+            ld a, e
+            call zest.assertion.byte.assertAEquals
+        pop af
+
+        zest.assertion.byte.return
+.ends
+
+;====
+; (Private) Asserts that H is equal to the expected value, otherwise fails the test
+;
+; @in   h   the value
+; @in   de  pointer to the assertion data
+;====
+.section "expect.h._toBe" free
+    expect.h._toBe:
+        ex de, hl
+            ; Set HL to assertion data pointer
+            ex (sp), hl
+
+            push af
+                ld a, d ; compare 'H'
+                call zest.assertion.byte.assertAEquals
+            pop af
+
+            ; Set HL to return address (skipping over the byte assertion data)
+            .repeat _sizeof_zest.assertion.byte
+                inc hl
+            .endr
+
+            ; Set return address to the stack; Restore HL
+            ex (sp), hl
+        ex de, hl
+        ret
+.ends
+
+;====
+; (Private) Asserts that L is equal to the expected value, otherwise fails the test
+;
+; @in   l   the value
+; @in   de  pointer to the assertion data
+;====
+.section "expect.l._toBe" free
+    expect.l._toBe:
+        ex de, hl
+            ; Set HL to assertion data pointer
+            ex (sp), hl
+
+            push af
+                ld a, e ; compare 'L'
+                call zest.assertion.byte.assertAEquals
+            pop af
+
+            ; Set HL to return address (skipping over the byte assertion data)
+            .repeat _sizeof_zest.assertion.byte
+                inc hl
+            .endr
+
+            ; Set return address to the stack; Restore HL
+            ex (sp), hl
+        ex de, hl
+        ret
+.ends
+
+;====
+; (Private) Asserts that IXH is equal to the expected value, otherwise fails the test
+;
+; @in   ixh the value
+; @in   hl  pointer to the assertion data
+;====
+.section "expect.ixh._toBe" free
+    expect.ixh._toBe:
+        ex (sp), hl
+
+        push af
+            ld a, ixh
+            call zest.assertion.byte.assertAEquals
+        pop af
+
+        zest.assertion.byte.return
+.ends
+
+;====
+; (Private) Asserts that IXL is equal to the expected value, otherwise fails the test
+;
+; @in   ixl the value
+; @in   hl  pointer to the assertion data
+;====
+.section "expect.ixl._toBe" free
+    expect.ixl._toBe:
+        ex (sp), hl
+
+        push af
+            ld a, ixl
+            call zest.assertion.byte.assertAEquals
+        pop af
+
+        zest.assertion.byte.return
+.ends
+
+;====
+; (Private) Asserts that IYH is equal to the expected value, otherwise fails the test
+;
+; @in   iyh the value
+; @in   hl  pointer to the assertion data
+;====
+.section "expect.iyh._toBe" free
+    expect.iyh._toBe:
+        ex (sp), hl
+
+        push af
+            ld a, iyh
+            call zest.assertion.byte.assertAEquals
+        pop af
+
+        zest.assertion.byte.return
+.ends
+
+;====
+; (Private) Asserts that IYL is equal to the expected value, otherwise fails the test
+;
+; @in   iyl the value
+; @in   hl  pointer to the assertion data
+;====
+.section "expect.iyl._toBe" free
+    expect.iyl._toBe:
+        ex (sp), hl
+
+        push af
+            ld a, iyl
+            call zest.assertion.byte.assertAEquals
+        pop af
+
+        zest.assertion.byte.return
+.ends
+
+;====
 ; (Private) Asserts that I is equal to the expected value, otherwise fails the test
 ;
 ; @in   i the value
@@ -460,14 +454,14 @@
 ;====
 .section "expect.i._toBe" free
     expect.i._toBe:
-        zest.assertion.byte.loadHLPointer
+        ex (sp), hl
 
         push af
             ld a, i
-            call expect._assertAEquals
+            call zest.assertion.byte.assertAEquals
         pop af
 
-        zest.assertion.byte.return.HL
+        zest.assertion.byte.return
 .ends
 
 ; Default error messages for expectations
