@@ -17,13 +17,39 @@ If the above test fails, the tests will stop running and the test description an
 
 ![Zest pass scenario](examples/screenshots/pass.png) ![Zest failure scenario](examples/screenshots/fail.png)
 
+## Contents
+
+- [Zest - Sega Master System/Z80 Test Runner](#zest---sega-master-systemz80-test-runner)
+  - [What is it?](#what-is-it)
+  - [Contents](#contents)
+  - [Why?](#why)
+  - [Examples](#examples)
+  - [Assertions](#assertions)
+    - [Registers](#registers)
+    - [Flags](#flags)
+    - [Stack](#stack)
+    - [Clobber detection](#clobber-detection)
+    - [Mock assertions](#mock-assertions)
+    - [zest.fail](#zestfail)
+  - [Mocking/stubbing labels](#mockingstubbing-labels)
+    - [Mocking macros](#mocking-macros)
+  - [Mocking controller input](#mocking-controller-input)
+  - [Timeout detection](#timeout-detection)
+  - [Memory overwrite detection](#memory-overwrite-detection)
+  - [Hooks](#hooks)
+    - [zest.preSuite](#zestpresuite)
+    - [zest.preTest](#zestpretest)
+    - [zest.postTest](#zestposttest)
+  - [Paging](#paging)
+    - [zest.setBank](#zestsetbank)
+
 ## Why?
 
 Pinpointing bugs in assembly code can require lots of manual effort to recreate certain scenarios and ensure everything is working, reducing your confidence for making changes and optimisations to your code.
 
 Instead, with a test runner you can define the list of behaviours you intend a routine to have and ensure they pass, then feel confident to change and optimise the code while being informed if you accidentally break anything.
 
-## How to use it
+## Examples
 
 Examples are included in the repo (see `/examples`). You can build these in Linux/WSL using `./examples/build.sh`. The ROM will be placed in `./examples/dist` which you can then run in an emulator or on an actual system.
 
