@@ -137,12 +137,11 @@
 ; @in   message     pointer to the message string
 ;====
 .macro "zest.runner.startTest" args message
-    ; Run postTest checks for previous test (if any)
-    call zest.postTest
-
-    ; Define test description in ROM
-    zest.test.defineTestDescription message
     call zest.preTest
+    .db message.length + 2 ; message length + size byte + null terminator byte
+    zest.console.defineString message
+
+    test_\@:
 .endm
 
 ;====

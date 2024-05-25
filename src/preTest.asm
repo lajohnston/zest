@@ -5,6 +5,18 @@
 ;====
 .section "zest.preTest" free
     zest.preTest:
+        ; Ensure interrupts are disabled
+        di
+
+        ; Run checks for previous test
+        call zest.postTest
+
+        pop hl  ; set HL to test description (return address)
+        dec sp  ; point stack back to test description
+        dec sp
+
+        ; Set the test description
+        inc hl  ; inc past the string length
         zest.test.setTestDescription
 
         ; Update checksum + VRAM backup
@@ -33,8 +45,17 @@
 ;====
 .section "zest.preTest.end" appendto zest.preTest priority zest.FOOTER_PRIORITY
     zest.preTest.end:
-        pop iy                                      ; pop caller from stack
+        pop hl      ; pop caller (description pointer) from stack
+        ld a, (hl)  ; set A to test description/data size
+
+        ; Add description size to return address, to skip it
+        add a, l    ; A = A+L
+        ld l, a     ; L = A+L
+        adc a, h    ; A = A+L+H+carry
+        sub l       ; A = H+carry
+        ld h, a     ; H = H+carry
+
         ld sp, zest.runner.DEFAULT_STACK_POINTER    ; reset stack
         ei      ; ensure CPU interrupts are enabled
-        jp (iy) ; return to caller
+        jp (hl) ; return to caller (skipping over test description)
 .ends
