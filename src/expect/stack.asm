@@ -1,10 +1,41 @@
 ;====
+; Assertions for items in the stack
+;====
+
+;====
+; Constants
+;====
+.define expect.stack.TEMP_STACK_SIZE_BYTES 4
+
+;====
 ; Location to preserve registers without clobbing the stack
 ;====
 .ramsection "expect.stack" slot zest.mapper.RAM_SLOT
     expect.stack.preservedHL: dw
     expect.stack.preservedDE: dw
+
+    expect.stack.originalSP:  dw
+
+    ; Temporary stack, to preserve contents of main stack
+    expect.stack.tempStack:   dsb expect.stack.TEMP_STACK_SIZE_BYTES
 .ends
+
+;====
+; Switches to a temporary stack, so calls and push/pops don't clobber the main
+; stack
+;====
+.macro "expect.stack._switchToTempStack"
+    ; Switch to temporary stack
+    ld (expect.stack.originalSP), sp    ; preserve original stack pointer
+    ld sp, expect.stack.tempStack + expect.stack.TEMP_STACK_SIZE_BYTES
+.endm
+
+;====
+; Switches back to the main stack after a call to expect.stack._switchToTempStack
+;====
+.macro "expect.stack._switchToMainStack"
+    ld sp, (expect.stack.originalSP)
+.endm
 
 ;====
 ; Fails the test if the value in the stack doesn't match the expected value
@@ -19,59 +50,115 @@
 
     .ifdef offset
         zest.utils.validate.range offset 0 32 "\. offset should be between 0 and 32 inclusive"
+    .else
+        .define offset 0
     .endif
 
     \@_\..{expectedWord}:
 
-    ; Define assertion data
+    ; Define custom message
     .ifdef message
         zest.utils.validate.string message "\.: Message should be a string value"
-        zest.assertion.word.define expectedWord message
+
+        jr +
+            \.\@messagePointer:
+                zest.console.defineString message
+        +:
+    .endif
+
+    ; Switch to temporary stack
+    expect.stack._switchToTempStack
+
+    ; Call assertion routine and define assertion data immediately after
+    call expect.stack._toContain
+    .db offset
+    .dw expectedWord
+    .ifdef message
+        .dw \.\@messagePointer
     .else
-        zest.assertion.word.define expectedWord expect.stack.toContain.defaultMessage
+        .dw expect.stack.toContain.defaultMessage
     .endif
 
-    ; Navigate to stack position
-    .ifdef offset
-        .repeat offset
-            inc sp
-            inc sp
-        .endr
-    .endif
-
-    ld (expect.stack.preservedDE), de   ; preserve DE
-    pop de                              ; pop stack value into DE
-    push af                             ; preserve AF in the same position
-
-    ; Compare low byte
-    ld a, <expectedWord
-    cp e
-    jr nz, _fail                        ; jp if not equal
-
-    ; Compare high byte
-    ld a, >expectedWord
-    cp d
-    jr nz, _fail                        ; jp if not equal
-
-    ; Assertion passed; Restore stack
-    pop af                              ; restore AF
-    push de                             ; restore original value to stack
-    ld de, (expect.stack.preservedDE)   ; restore DE
-
-    ; Restore stack pointer
-    .ifdef offset
-        .repeat offset
-            dec sp
-            dec sp
-        .endr
-    .endif
-
-    jr +   ; jump over assertion failed routine
-        _fail:
-            ld ix, zest.assertion.word.define.returnValue
-            jp zest.assertion.word.failed
-    +:
+    ; Test passed; Restore stack pointer
+    expect.stack._switchToMainStack
 .endm
+
+;====
+; (Private) Fails the test if the stack does not contain the expected word at
+; the given offset
+;
+; @in   stack{0}    pointer to assertion data (defined immediately after call)
+;                       2 bytes - expected word
+;                       2 bytes - pointer to failure message
+;====
+.section "expect.stack._toContain" free
+    expect.stack._toContain:
+        ; Set HL to assertion data pointer; preserve HL on stack
+        ex hl, (sp)
+
+        ; Set DE to original stack
+        ld (zest.runner.tempWord), de       ; preserve DE
+        ld de, (expect.stack.originalSP)    ; set DE to original stack pointer
+
+        push af
+            ld a, (hl)  ; set A to offset
+            rlca        ; * 2 (2 bytes per stack entry)
+
+            ; Add offset to stack pointer
+            add a, e    ; A = A+E
+            ld e, a     ; E = A+E
+            adc a, d    ; A = A+E+D+carry
+            sub e       ; A = D+carry
+            ld d, a     ; D = D+carry
+
+            inc hl      ; point HL to expected value
+            ex de, hl   ; set HL to stack pointer and DE to expected word
+                ; Compare low byte
+                ld a, (de)              ; set A to expected low byte
+                cp (hl)                 ; compare with actual low byte
+                jr nz, _fail            ; jp if not equal
+
+                ; Compare high byte
+                inc de                  ; point to expected high byte
+                inc hl                  ; point to actual high byte
+                ld a, (de)              ; set A to expected high byte
+                cp (hl)                 ; compare with actual low byte
+                jr nz, _failHighByte    ; jp if high byte was not equal
+            ex de, hl
+
+            ; Restore DE
+            ld de, (zest.runner.tempWord)
+
+            ; Skip over assertion data in return address
+            inc hl  ; skip expect value (high byte)
+            inc hl  ; skip message pointer
+            inc hl
+        pop af
+
+        ex (sp), hl ; restore HL and set return address to temp stack
+        ret
+
+    _failHighByte:
+        ; Restore pointers to low bytes
+        dec de
+        dec hl
+        ; continue to _fail
+
+    _fail:
+        ; Restore SP
+        expect.stack._switchToMainStack
+
+        ; Set IX to assertion data + message pointer
+        push de
+        pop ix
+
+        ; Set DE to actual value
+        ld e, (hl)
+        inc hl
+        ld d, (hl)
+
+        jp zest.assertion.word.failed
+.ends
 
 ;====
 ; Compares the stack size to the starting to the test starting value and fails

@@ -6,62 +6,32 @@ describe "expect.stack.toContain"
         pop bc
 
     test "does not clobber the stack or registers"
+        ; Push value to stack
         ld bc, $1234
         push bc
 
-        ld a, 0
-        ld bc, 0
-        ld de, 0
-        ld hl, 0
-        scf
+        ; Initialise registers
+        zest.initRegisters
 
+        ; Assert twice, to ensure the stack value doesn't get overwritten
         expect.stack.toContain $1234
         expect.stack.toContain $1234 0 "Expected stack to be unchanged"
 
-        expect.a.toBe 0
-        expect.carry.toBe 1
-
-        expect.b.toBe 0
-        expect.de.toBe 0
-        expect.hl.toBe 0
-
-        pop bc
+        ; Expect all registers to be unclobbered
+        expect.all.toBeUnclobbered
 
 describe "expect.stack.toContain with offset"
     it "should pick the value from x stack positions back"
-        ld bc, $1234
+        ld bc, $0002
+        push bc
+        ld bc, $0001
         push bc
         ld bc, $0000
         push bc
 
-        expect.stack.toContain $1234 1
-
-        pop bc
-        pop bc
-
-    test "does not clobber the stack or registers"
-        ld bc, $1234
-        push bc
-        ld bc, $0000
-        push bc
-
-        ld a, 0
-        ld de, 0
-        ld hl, 0
-        scf
-
-        expect.stack.toContain $1234 1
-        expect.stack.toContain $1234 1
-
-        expect.a.toBe 0
-        expect.carry.toBe 1
-
-        expect.b.toBe 0
-        expect.de.toBe 0
-        expect.hl.toBe 0
-
-        pop bc
-        pop bc
+        expect.stack.toContain $0002 2
+        expect.stack.toContain $0001 1
+        expect.stack.toContain $0000 0
 
 describe "expect.stack.size.toBe"
     test "returns the number of words pushed to the stack"
