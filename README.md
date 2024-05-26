@@ -17,10 +17,15 @@ If the above test fails, the tests will stop running and the test description an
 
 ![Zest pass scenario](examples/screenshots/pass.png) ![Zest failure scenario](examples/screenshots/fail.png)
 
+## Quick start
+
+The `template` directory contains a working project with bash and batch build scripts to build the ROM on Linux and Windows respectively. For the scripts to work please ensure `wla-z80` and `wlalink` 10.6+ are in your system path or within the `template` directory.
+
 ## Contents
 
 - [Zest - Sega Master System/Z80 Test Runner](#zest---sega-master-systemz80-test-runner)
   - [What is it?](#what-is-it)
+  - [Quick start](#quick-start)
   - [Contents](#contents)
   - [Why?](#why)
   - [Examples](#examples)
