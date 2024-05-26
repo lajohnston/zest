@@ -427,7 +427,7 @@
         pop af
 
         ; Set A to index ignore list
-        ld (zest.runner.tempWord), a    ; preserve without adjusting stack
+        ld (zest.assertion.tempWord), a ; preserve without adjusting stack
             ld a, (ix + expect.all.toBeUnclobbered.ignoreList.index)
 
             ; Skip the ignoreList data in the return address
@@ -455,8 +455,7 @@
                 _postIXLCheck:
             pop bc
             pop af
-            ; ld hl, (zest.runner.)
-        ld a, (zest.runner.tempWord)
+        ld a, (zest.assertion.tempWord)
         ret
 
     ; BC

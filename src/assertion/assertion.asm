@@ -1,4 +1,12 @@
 ;====
+; General purpose tempory storage for assertion calculations
+;====
+.ramsection "zest.assertion" slot zest.mapper.RAM_SLOT
+    ; Temporary location to store a word value
+    zest.assertion.tempWord: dw
+.ends
+
+;====
 ; (Private) Prints the Test Failed heading
 ;====
 .section "zest.assertion.printTestFailedHeading" free

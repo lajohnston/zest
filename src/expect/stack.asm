@@ -94,7 +94,7 @@
         ex hl, (sp)
 
         ; Set DE to original stack
-        ld (zest.runner.tempWord), de       ; preserve DE
+        ld (zest.assertion.tempWord), de    ; preserve DE
         ld de, (expect.stack.originalSP)    ; set DE to original stack pointer
 
         push af
@@ -124,7 +124,7 @@
             ex de, hl
 
             ; Restore DE
-            ld de, (zest.runner.tempWord)
+            ld de, (zest.assertion.tempWord)
 
             ; Skip over assertion data in return address
             inc hl  ; skip expect value (high byte)
