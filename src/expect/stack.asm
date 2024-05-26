@@ -11,9 +11,6 @@
 ; Location to preserve registers without clobbing the stack
 ;====
 .ramsection "expect.stack" slot zest.mapper.RAM_SLOT
-    expect.stack.preservedHL: dw
-    expect.stack.preservedDE: dw
-
     expect.stack.originalSP:  dw
 
     ; Temporary stack, to preserve contents of main stack
@@ -170,48 +167,74 @@
 .macro "expect.stack.size.toBe" isolated args expectedSize message
     zest.utils.validate.range expectedSize, 0, 40, "\. Invalid expectedSize argument"
 
-    \@_\..{expectedSize}:
-        ; Preserve registers without affecting stack
-        ld (expect.stack.preservedDE), de   ; preserve DE in RAM
-        ld (expect.stack.preservedHL), hl   ; preserve HL in RAM
-        pop de                              ; preserve current stack value in DE
-        push af                             ; preserve AF in stack
+    ; Define custom message
+    .ifdef message
+        zest.utils.validate.string message "\.: Message should be a string value"
 
-        ; Set HL to stack
-        ld hl, 0
-        add hl, sp
-
-        ; Load A with stack size
-        ld a, <zest.runner.DEFAULT_STACK_POINTER    ; low starting stack pointer
-        sub l   ; subtract current low stack pointer
-        rrca    ; divide by 2 (2-bytes per stack item)
-
-        ; Compare with expected size
-        cp expectedSize
-        jp z, +
-            ; Unexpected stack size
-            ld b, expectedSize
-
-            .ifdef message
-                ld hl, \..customMessage.\@
-            .else
-                ld hl, expect.stack.size.toBe.defaultMessage
-            .endif
-
-            jp zest.assertion.byte.failed
-
-            .ifdef message
-                \..customMessage.\@:
-                    zest.console.defineString message
-            .endif
+        jr +
+            \.\@messagePointer:
+                zest.console.defineString message
         +:
+    .endif
 
-        ; Assertion passed - restore registers and stack
-        pop af                              ; restore AF
-        push de                             ; restore current stack value
-        ld de, (expect.stack.preservedDE)   ; restore DE
-        ld hl, (expect.stack.preservedHL)   ; restore HL
+    \@_\..{expectedSize}:
+        ; Switch to temporary stack
+        expect.stack._switchToTempStack
+
+        ; Call assertion and define assertion data directly after
+        call expect.stack.size._toBe
+        .db expectedSize
+        .ifdef message
+            .dw \.\@messagePointer
+        .else
+            .dw expect.stack.toContain.defaultMessage
+        .endif
+
+        ; Restore SP
+        expect.stack._switchToMainStack
 .endm
+
+;====
+; (Private) Fails the test if the stack isn't x words larger than the default
+;
+; @in   stack{0}    pointer to assertion data (defined immediately after call)
+;                       1 byte  - expected stack size in words
+;                       2 bytes - pointer to failure message
+;====
+.section "expect.stack.size._toBe" free
+    expect.stack.size._toBe:
+        ex (sp), hl
+        push af
+            ; Get diff between expected and actual low byte of SP
+            ld a, (expect.stack.originalSP) ; set A to actual low byte of SP
+            sub <(zest.runner.DEFAULT_STACK_POINTER)    ; sub starting pointer
+
+            ; Convert to size in words
+            neg     ; negate
+            rrca    ; divide by 2 (2 bytes per stack entry)
+
+            cp (hl)         ; compare with expected size
+            jp nz, _fail    ; jp if it isn't equal
+        pop af
+
+        ; Calculate return address (skip assertion data)
+        inc hl
+        inc hl
+        inc hl
+        ex (sp), hl ; restore HL; set return address to stack
+        ret
+
+    _fail:
+        ; Restore stack pointer
+        expect.stack._switchToMainStack
+
+        ; Set IX to assertion data pointer
+        push hl
+        pop ix
+
+        ; A = actual value; IX = pointer to assertion data
+        jp zest.assertion.byte.failed
+.ends
 
 ;====
 ; The default expect.stack.toContain validation failure message

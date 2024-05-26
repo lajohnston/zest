@@ -45,16 +45,14 @@ describe "expect.stack.size.toBe"
         pop af
 
     test "does not clobber the registers"
-        ld a, $12
-        ld de, $34
-        ld hl, $56
-        scf ; set carry flag
+        ; Initialise registers
+        zest.initRegisters
 
+        ; Call assertion
         expect.stack.size.toBe 0
-        expect.a.toBe $12
-        expect.de.toBe $34
-        expect.hl.toBe $56
-        expect.carry.toBe 1
+
+        ; Assert the register values haven't changed
+        expect.all.toBeUnclobbered
 
     test "does not clobber the stack"
         ld bc, $1234
