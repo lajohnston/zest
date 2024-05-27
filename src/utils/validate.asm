@@ -65,6 +65,21 @@
 .endm
 
 ;====
+; Asserts that the given value is a signed or unsigned word in the value range
+; of -32768 to 65,535, or a label, otherwise fails
+;
+; @in   value   the value to assert
+; @in   message the message to print to the terminal if the value is not valid
+;====
+.macro "zest.utils.validate.wordOrLabel" args value message
+    .if \?1 == ARG_NUMBER
+        zest.utils.validate.word value, message
+    .elif \?1 != ARG_LABEL
+        zest.utils.validate.fail message
+    .endif
+.endm
+
+;====
 ; Asserts that the given value is a 1 or a 0
 ;
 ; @in   value   the value to assert

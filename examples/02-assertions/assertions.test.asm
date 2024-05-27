@@ -57,6 +57,22 @@ describe "Assertions"
         ld iy, $1234
         expect.iy.toBe $1234
 
+    test "expect.rr.toBe should pass if they contain the given address label"
+        someLabel:
+            nop
+
+        ld bc, someLabel
+        ld de, someLabel
+        ld hl, someLabel
+        ld ix, someLabel
+        ld iy, someLabel
+
+        expect.bc.toBe someLabel
+        expect.de.toBe someLabel
+        expect.hl.toBe someLabel
+        expect.ix.toBe someLabel
+        expect.iy.toBe someLabel
+
     test "expect.carry.toBe 0 passes when carry flag is reset"
         scf ; set carry flag
         ccf ; invert carry flag to off

@@ -10,9 +10,9 @@
 ; @in   message         (optional) custom string assertion failure message
 ;====
 .macro "expect.bc.toBe" isolated args expectedValue message
-    zest.utils.validate.word expectedValue "\. expects a 16-bit value"
+    zest.utils.validate.wordOrLabel expectedValue "\. expects a 16-bit value or a label"
 
-    \@_\..{expectedValue}:
+    \@_\..:
 
     .if NARGS == 1
         zest.assertion.word.assert expect.bc._toBe expectedValue expect.rr.toBe.defaultMessages.bc
@@ -30,9 +30,9 @@
 ; @in   message         (optional) custom string assertion failure message
 ;====
 .macro "expect.de.toBe" isolated args expectedValue message
-    zest.utils.validate.word expectedValue "\. expects a 16-bit value"
+    zest.utils.validate.wordOrLabel expectedValue "\. expects a 16-bit value or a label"
 
-    \@_\..{expectedValue}:
+    \@_\..:
 
     .if NARGS == 1
         zest.assertion.word.assert expect.de._toBe expectedValue expect.rr.toBe.defaultMessages.de
@@ -50,9 +50,9 @@
 ; @in   message         (optional) custom string assertion failure message
 ;====
 .macro "expect.hl.toBe" isolated args expectedValue message
-    zest.utils.validate.word expectedValue "\. expects a 16-bit value"
+    zest.utils.validate.wordOrLabel expectedValue "\. expects a 16-bit value or a label"
 
-    \@_\..{expectedValue}:
+    \@_\..:
 
     .if NARGS == 1
         zest.assertion.word.assert expect.hl._toBe expectedValue expect.rr.toBe.defaultMessages.hl
@@ -70,9 +70,9 @@
 ; @in   message         (optional) custom string assertion failure message
 ;====
 .macro "expect.ix.toBe" isolated args expectedValue message
-    zest.utils.validate.word expectedValue "\. expects a 16-bit value"
+    zest.utils.validate.wordOrLabel expectedValue "\. expects a 16-bit value or a label"
 
-    \@_\..{expectedValue}:
+    \@_\..:
 
     .if NARGS == 1
         zest.assertion.word.assert expect.ix._toBe expectedValue expect.rr.toBe.defaultMessages.ix
@@ -90,9 +90,9 @@
 ; @in   message         (optional) custom string assertion failure message
 ;====
 .macro "expect.iy.toBe" isolated args expectedValue message
-    zest.utils.validate.word expectedValue "\. expects a 16-bit value"
+    zest.utils.validate.wordOrLabel expectedValue "\. expects a 16-bit value or a label"
 
-    \@_\..{expectedValue}:
+    \@_\..:
 
     .if NARGS == 1
         zest.assertion.word.assert expect.iy._toBe expectedValue expect.rr.toBe.defaultMessages.iy

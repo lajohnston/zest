@@ -22,7 +22,7 @@
 .macro "zest.assertion.word.assert" isolated args routine expectedValue message
     ; Assert arguments (assemble-time)
     zest.utils.validate.equals NARGS 3 "\.: Unexpected number of arguments"
-    zest.utils.validate.word expectedValue "\. expectedValue should be a word value"
+    zest.utils.validate.wordOrLabel expectedValue "\. expectedValue should be a word or a label"
 
     .if \?3 == ARG_STRING
         jp +

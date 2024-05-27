@@ -132,7 +132,7 @@ expect.iyh.toBe 255
 expect.iyl.toBe 255
 
 expect.bc.toBe -32768
-expect.de.toBe 65535
+expect.de.toBe someLabel
 expect.hl.toBe 65535
 expect.ix.toBe 65535
 expect.iy.toBe 65535
