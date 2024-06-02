@@ -146,7 +146,7 @@
 ;
 ; @in   [message]   optional message
 ;====
-.macro "zest.runner.fail" args message
+.macro "zest.runner.fail" isolated args message
     .if \?1 == ARG_STRING
         jr +
             \.\@:

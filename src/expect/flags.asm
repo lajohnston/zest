@@ -24,7 +24,7 @@
 ; @in   f               flags
 ; @in   expectedValue   either a 1 or a 0
 ;====
-.macro "expect.carry.toBe" args expectedValue
+.macro "expect.carry.toBe" isolated args expectedValue
     zest.utils.validate.boolean expectedValue "\. expects a boolean (0 or 1) value"
 
     \@_\..{expectedValue}:
@@ -46,7 +46,7 @@
 ; @in   f               flags
 ; @in   expectedValue   either a 1 or a 0
 ;====
-.macro "expect.parityOverflow.toBe" args expectedValue
+.macro "expect.parityOverflow.toBe" isolated args expectedValue
     zest.utils.validate.boolean expectedValue "\. expects a boolean (0 or 1) value"
 
     \@_\..{expectedValue}:
@@ -68,7 +68,7 @@
 ; @in   f               flags
 ; @in   expectedValue   either a 1 or a 0
 ;====
-.macro "expect.sign.toBe" args expectedValue
+.macro "expect.sign.toBe" isolated args expectedValue
     zest.utils.validate.boolean expectedValue "\. expects a boolean (0 or 1) value"
 
     \@_\..{expectedValue}:
@@ -90,7 +90,7 @@
 ; @in   f               flags
 ; @in   expectedValue   either a 1 or a 0
 ;====
-.macro "expect.zeroFlag.toBe" args expectedValue
+.macro "expect.zeroFlag.toBe" isolated args expectedValue
     zest.utils.validate.boolean expectedValue "\. expects a boolean (0 or 1) value"
 
     \@_\..{expectedValue}:

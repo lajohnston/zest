@@ -192,7 +192,7 @@
 ;
 ; @in   mock        the mock (instance in RAM)
 ;====
-.macro "expect.mock.toHaveBeenCalled" args mock
+.macro "expect.mock.toHaveBeenCalled" isolated args mock
     \@_\.:
 
     push af

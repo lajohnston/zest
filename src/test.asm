@@ -33,7 +33,7 @@
 ; Describe a block of tests. Stores a pointer to the description test
 ; which is used to identify the test to the user if it fails
 ;====
-.macro "zest.test.setBlockDescription" args blockDescription
+.macro "zest.test.setBlockDescription" isolated args blockDescription
     jr +
         describe_\@:
             zest.console.defineString blockDescription
@@ -49,7 +49,7 @@
 ; @in  description  description the text string
 ; @out hl           pointer to the description in ROM
 ;====
-.macro "zest.test.defineTestDescription" args description
+.macro "zest.test.defineTestDescription" isolated args description
     jr +
         test_\@:
             zest.console.defineString description
