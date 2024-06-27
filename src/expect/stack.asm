@@ -24,6 +24,7 @@
 .macro "expect.stack._switchToTempStack"
     ; Switch to temporary stack
     ld (expect.stack.originalSP), sp    ; preserve original stack pointer
+    di
     ld sp, expect.stack.tempStack + expect.stack.TEMP_STACK_SIZE_BYTES
 .endm
 
