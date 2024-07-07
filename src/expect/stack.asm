@@ -38,13 +38,14 @@
 ;====
 ; Fails the test if the value in the stack doesn't match the expected value
 ;
-; @in   expectedWord    the expected word value
+; @in   expectedWord    the expected word value or address
 ; @in   offset          (optional) offset to the stack item
 ;                       0 = most recent; 1 = previous etc
 ; @in   message         (optional) custom message to display if the assertion fails
 ;====
 .macro "expect.stack.toContain" isolated args expectedWord offset message
-    zest.utils.validate.word expectedWord "\. expectedWord should be a 16-bit value"
+    zest.utils.validate.range NARGS 1 3 "\.: Invalid number of arguments"
+    zest.utils.validate.wordOrLabel expectedWord "\. expectedWord should be a 16-bit value"
 
     .ifdef offset
         zest.utils.validate.range offset 0 32 "\. offset should be between 0 and 32 inclusive"
@@ -52,7 +53,12 @@
         .define offset 0
     .endif
 
-    \@_\..{expectedWord}:
+    ; Label macro call
+    .if \?1 == ARG_NUMBER
+        \@_\..{expectedWord}:
+    .else
+        \@_\..label:
+    .endif
 
     ; Define custom message
     .ifdef message
