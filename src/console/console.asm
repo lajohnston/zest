@@ -54,6 +54,9 @@
             ld a, asc(' ')
             call zest.vdp.clearTilemap
 
+            ; Hide any sprites in the sprite table
+            call zest.vdp.hideSprites
+
             ; Initial cursor position in tilemap
             ld hl, zest.vdp.TILEMAP_BASE | zest.vdp.VRAMWrite
             ld (zest.console.cursor_vram_address), hl

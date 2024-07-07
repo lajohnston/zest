@@ -4,6 +4,7 @@
 .define zest.vdp.VRAMWrite      $4000
 .define zest.vdp.CRAMWrite      $c000
 
+.define zest.vdp.SPRITE_BASE    $3f00
 .define zest.vdp.TILEMAP_BASE   $3800
 
 .define zest.vdp.CONTROL_PORT   $bf
@@ -193,6 +194,19 @@
             or c
         jr nz,-
 
+        ret
+.ends
+
+;====
+; Hides all sprites currently in the sprite table
+;====
+.section "zest.vdp.hideSprites" free
+    zest.vdp.hideSprites:
+        ; Set VRAM write address to first sprite in the sprite table
+        ld hl, zest.vdp.SPRITE_BASE | zest.vdp.VRAMWrite
+        call zest.vdp.setAddress
+        ld a, $d0                   ; sprite terminator
+        out (zest.vdp.DATA_PORT), a
         ret
 .ends
 
