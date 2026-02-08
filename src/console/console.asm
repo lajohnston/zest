@@ -290,7 +290,7 @@
 .endm
 
 ;====
-; Outputs the value of register sas a hex value onto the screen, e.g $F2 of $F12A
+; Outputs the value of registers as a hex value onto the screen
 ;====
 .section "zest.console.outputHexA" free
     ;====
@@ -311,6 +311,17 @@
         ; Store cursor position
         ld (zest.console.cursor_vram_address), de
         pop de  ; restore de
+        ret
+
+    ;====
+    ; Outputs the value of register B as a hex value onto the screen, e.g $F2
+    ; @in   b
+    ;====
+    zest.console.outputHexB:
+        push af
+            ld a, b
+            call zest.console.outputHexA
+        pop af
         ret
 
     ;===
