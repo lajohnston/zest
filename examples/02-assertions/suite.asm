@@ -12,6 +12,7 @@
 
 ; Append your test files to zest.suite
 .section "suite" appendto zest.suite
+    .include "addressAssertions.test.asm"
     .include "assertions.test.asm"
     .include "stackAssertions.test.asm"
 .ends

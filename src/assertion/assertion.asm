@@ -88,6 +88,19 @@
 .ends
 
 ;====
+; Prints the 'Address:' label
+;====
+.section "zest.assertion.printAddressLabel" free
+    zest.assertion.printAddressLabel:
+        push hl
+            ld hl, zest.console.data.addressValueLabel
+            call zest.console.out
+        pop hl
+
+        ret
+.ends
+
+;====
 ; Prints the message of the assertion that failed
 ;
 ; @in   hl  pointer to the message

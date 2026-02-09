@@ -17,6 +17,9 @@
     zest.console.data.expectedValueLabel:
         zest.console.defineString "Expected: "
 
+    zest.console.data.addressValueLabel:
+        zest.console.defineString "Address:  "
+
     zest.console.data.separatorText:
         zest.console.defineString "            ~~~~~~~~"
 

@@ -175,6 +175,15 @@ expect.stack.toContain $1234 1  ; expect the stack position before to contain $1
 expect.stack.toContain $1234 0 "my custom message"
 ```
 
+### Data
+
+Assert the data at the given address contains the given sequence of bytes.
+
+```asm
+expect.address.toContain $C000 $00          ; expect $C000 to contain $00
+expect.address.toContain $C001 $01 $02 $03  ; expect sequence from $C001 to becontain $01, $02, $03
+```
+
 ### Clobber detection
 
 Use `zest.initRegisters` to initialise all the register with unique values. You can then assert that they all retain these values with `expect.all.toBeUnclobbered`:
