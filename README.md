@@ -184,6 +184,12 @@ expect.address.toContain $C000 $00          ; expect $C000 to contain $00
 expect.address.toContain $C001 $01 $02 $03  ; expect sequence from $C001 to contain $01, $02, $03
 ```
 
+Assert the address in HL points to the expected value
+
+```asm
+expect.hl.toPointTo 100 "optional failure message"  ; expect the byte pointed to by HL to be 100
+```
+
 ### Clobber detection
 
 Use `zest.initRegisters` to initialise all the register with unique values. You can then assert that they all retain these values with `expect.all.toBeUnclobbered`:

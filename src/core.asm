@@ -42,6 +42,7 @@
 .include "./src/expect/flags.asm"
 .include "./src/expect/r.toBe.asm"
 .include "./src/expect/rr.toBe.asm"
+.include "./src/expect/rr.toPointTo.asm"
 .include "./src/expect/stack.asm"
 
 ; Hooks
