@@ -65,10 +65,12 @@
 ; @in   value
 ;====
 .macro "zest.vdp.setRegister" args registerNumber value
-    ld a, value                         ; load A with value
-    out (zest.vdp.CONTROL_PORT), a      ; send the register value first
-    ld a, %10000000 | registerNumber    ; load write command with register number
-    out (zest.vdp.CONTROL_PORT), a      ; send the register write command
+    push af
+        ld a, value                         ; load A with value
+        out (zest.vdp.CONTROL_PORT), a      ; send the register value first
+        ld a, %10000000 | registerNumber    ; load write command with register number
+        out (zest.vdp.CONTROL_PORT), a      ; send the register write command
+    pop af
 .endm
 
 ;====
@@ -224,8 +226,10 @@
 ;             ;`--------  Unused; always 1
 ;====
 .macro "zest.vdp.setRegister1" args value
-    ld a, value
-    out (zest.vdp.CONTROL_PORT), a
-    ld a, $81   ; register 1
-    out (zest.vdp.CONTROL_PORT), a
+    push af
+        ld a, value
+        out (zest.vdp.CONTROL_PORT), a
+        ld a, $81   ; register 1
+        out (zest.vdp.CONTROL_PORT), a
+    pop af
 .endm
