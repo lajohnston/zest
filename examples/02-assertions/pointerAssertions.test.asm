@@ -1,5 +1,5 @@
 describe "pointerAssertions"
-    test "expect.hl.toPointTo"
+    test "expect.hl.toPointToByte"
         jr +
             -:
             .db 100
@@ -8,7 +8,7 @@ describe "pointerAssertions"
         zest.initRegisters
 
         ld hl, -
-        expect.hl.toPointTo 100
+        expect.hl.toPointToByte 100
 
         expect.all.toBeUnclobberedExcept "hl"
 

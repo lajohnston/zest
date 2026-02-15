@@ -1,11 +1,11 @@
 ;====
-; Asserts the value pointed at by the given register matches a given value
+; Asserts the value pointed at by the given register matches a given byte
 ;
 ; @in   hl              the pointer to assert
 ; @in   expectedValue   the expected value
 ; @in   message         (optional) custom assertion failure message
 ;====
-.macro "expect.hl.toPointTo" isolated args expectedValue message
+.macro "expect.hl.toPointToByte" isolated args expectedValue message
     zest.utils.validate.byte expectedValue "\. expects a byte value"
 
     \@_\..{expectedValue}:
@@ -23,7 +23,7 @@
     ; Call routine
     call expect.hl._toPointToByte
 
-    ; Define assertion data immediately after call
+    ; Define expected byte immediately after call
     .db expectedValue
 
     ; Assertion message pointer
