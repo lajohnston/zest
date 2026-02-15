@@ -187,7 +187,10 @@ expect.address.toContain $C001 $01 $02 $03  ; expect sequence from $C001 to cont
 Assert the address in HL points to the expected value
 
 ```asm
-expect.hl.toPointToByte 100 "optional failure message"  ; expect the byte pointed to by HL to be 100
+expect.hl.toPointToByte 100 "optional failure message"
+
+; Assert pointer points to the given little-endian word value
+expect.hl.toPointToWord $1234 "optional failure message"
 ```
 
 ### Clobber detection
