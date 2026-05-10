@@ -61,6 +61,17 @@
 ;====
 ; Sets the given VDP register
 ;
+; Register 1  %00000000
+;             ;|||||||`-  Zoomed sprites -> 16x16 pixels
+;             ;||||||`--  Tall sprites -> 2 tiles per sprite, 8x16
+;             ;|||||`---  Mega Drive mode 5 enable
+;             ;||||`----  30 row/240 line mode (SMS2 only)
+;             ;|||`-----  28 row/224 line mode (SMS2 only)
+;             ;||`------  Enable VBlank interrupts
+;             ;|`-------  Enable display
+;             ;`--------  Unused; always 1
+;
+;
 ; @in   registerNumber
 ; @in   value
 ;====
@@ -211,25 +222,3 @@
         out (zest.vdp.DATA_PORT), a
         ret
 .ends
-
-;====
-; Sets the value of register 1
-;
-; @in   value %00000000
-;             ;|||||||`-  Zoomed sprites -> 16x16 pixels
-;             ;||||||`--  Tall sprites -> 2 tiles per sprite, 8x16
-;             ;|||||`---  Mega Drive mode 5 enable
-;             ;||||`----  30 row/240 line mode (SMS2 only)
-;             ;|||`-----  28 row/224 line mode (SMS2 only)
-;             ;||`------  Enable VBlank interrupts
-;             ;|`-------  Enable display
-;             ;`--------  Unused; always 1
-;====
-.macro "zest.vdp.setRegister1" args value
-    push af
-        ld a, value
-        out (zest.vdp.CONTROL_PORT), a
-        ld a, $81   ; register 1
-        out (zest.vdp.CONTROL_PORT), a
-    pop af
-.endm

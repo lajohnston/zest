@@ -24,9 +24,7 @@
         push hl
         push bc
             ; Ensure the display is off
-            push af
-                zest.vdp.setRegister1 %10000000
-            pop af
+            zest.vdp.setRegister 1 %10000000
 
             ; Set palette index 0 write address
             ld hl, zest.vdp.CRAMWrite   ; palette index 0
@@ -241,7 +239,7 @@
 .section "zest.console.displayAndStop" free
     zest.console.displayAndStop:
         ; Enable the display
-        zest.vdp.setRegister1 %11000000
+        zest.vdp.setRegister 1 %11000000
 
         ; Stop program
         -:

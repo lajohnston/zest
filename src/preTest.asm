@@ -31,8 +31,8 @@
         ld (zest.runner.flags), a
 
         ; Disable display
-        in a, (zest.vdp.STATUS_PORT)    ; clear pending interrupts
-        zest.vdp.setRegister1 %10100000 ; enable VBlank interrupts
+        in a, (zest.vdp.STATUS_PORT)        ; clear pending interrupts
+        zest.vdp.setRegister 1 %10100000    ; enable VBlank interrupts
 
         ; Custom hooks will go here
 
