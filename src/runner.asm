@@ -1,8 +1,8 @@
 ;====
 ; Constants
 ;====
-.define zest.runner.TEST_IN_PROGRESS_BIT 0
-.define zest.runner.TEST_IN_PROGRESS_MASK %00000001
+.define zest.runner._TEST_IN_PROGRESS_BIT 0
+.define zest.runner._TEST_IN_PROGRESS_MASK %00000001
 
 ; Default pointer minus 2 for zest.suite call
 .define zest.runner.DEFAULT_STACK_POINTER $dff0 - 2
@@ -42,6 +42,34 @@
         ; Finish tests (all tests passed)
         jp zest.runner.finish
 .ends
+
+;====
+; Indicates if a test is currently in progress
+;
+; @out      z   1 (nz) if test is in progress, otherwise 0 (z)
+; @clobbers a
+;====
+.macro "zest.runner.cpTestInProgress"
+    ld a, (zest.runner.flags)
+    and zest.runner._TEST_IN_PROGRESS_MASK
+.endm
+
+;====
+; Sets or clears the test in progress flag
+;
+; @in       inProgress     1 to set the flag, 0 to clear it
+;====
+.macro "zest.runner.setTestInProgress" args inProgress
+    ld a, (zest.runner.flags)
+
+    .if inProgress == 1
+        or zest.runner._TEST_IN_PROGRESS_MASK
+    .else
+        and ~zest.runner._TEST_IN_PROGRESS_MASK
+    .endif
+
+    ld (zest.runner.flags), a
+.endm
 
 ;====
 ; Finishes the test run. Displays either a success message, or a warning

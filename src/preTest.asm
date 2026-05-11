@@ -26,9 +26,7 @@
         zest.timeout.reset
 
         ; Set test in progress flag
-        ld a, (zest.runner.flags)
-        or zest.runner.TEST_IN_PROGRESS_MASK
-        ld (zest.runner.flags), a
+        zest.runner.setTestInProgress 1
 
         ; Disable display
         in a, (zest.vdp.STATUS_PORT)        ; clear pending interrupts

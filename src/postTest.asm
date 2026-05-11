@@ -7,13 +7,11 @@
         di
 
         ; If no test is in progress, return
-        ld a, (zest.runner.flags)
-        bit zest.runner.TEST_IN_PROGRESS_BIT, a
-        ret z   ; return if a test isn't in progress
+        zest.runner.cpTestInProgress
+        ret z
 
         ; Reset the test in progress flag
-        and (zest.runner.TEST_IN_PROGRESS_MASK ~ $ff)   ; reset the bit
-        ld (zest.runner.flags), a                       ; store
+        zest.runner.setTestInProgress 0
 
         ; Set Z if checksum is valid
         zest.test.validateChecksum
