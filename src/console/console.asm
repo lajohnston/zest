@@ -27,7 +27,7 @@
             zest.vdp.setRegister 1 %10000000
 
             ; Set palette index 0 write address
-            ld hl, zest.vdp.CRAMWrite   ; palette index 0
+            ld hl, zest.vdp.CRAM_WRITE  ; palette index 0
             call zest.vdp.setAddress
 
             ; Set background color
@@ -40,7 +40,7 @@
             out (zest.vdp.DATA_PORT), a
 
             ; Set pattern address in VRAM
-            ld hl, $0000 | zest.vdp.VRAMWrite
+            ld hl, $0000 | zest.vdp.VRAM_WRITE
             call zest.vdp.setAddress          ; set VRAM write address to tile index 0
 
             ; Load pattern data (font) into VRAM
@@ -56,7 +56,7 @@
             call zest.vdp.hideSprites
 
             ; Initial cursor position in tilemap
-            ld hl, zest.vdp.TILEMAP_BASE | zest.vdp.VRAMWrite
+            ld hl, zest.vdp.TILEMAP_BASE | zest.vdp.VRAM_WRITE
             ld (zest.console.cursor_vram_address), hl
             call zest.vdp.setAddress
         pop bc

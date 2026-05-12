@@ -1,8 +1,8 @@
 ;====
 ; Constants
 ;====
-.define zest.vdp.VRAMWrite      $4000
-.define zest.vdp.CRAMWrite      $c000
+.define zest.vdp.VRAM_WRITE      $4000
+.define zest.vdp.CRAM_WRITE      $c000
 
 .define zest.vdp.SPRITE_BASE    $3f00
 .define zest.vdp.TILEMAP_BASE   $3800
@@ -90,7 +90,7 @@
 .section "zest.vdp.clearVram" free
     zest.vdp.clearVram:
         ; Clear color RAM
-        zest.vdp.setAddress $0000 | zest.vdp.CRAMWrite
+        zest.vdp.setAddress $0000 | zest.vdp.CRAM_WRITE
 
         xor a   ; black
         ld b, 8 ; 8 * 4 = 32
@@ -103,7 +103,7 @@
         djnz -
 
         ; Set VRAM write address to $0000
-        ld hl, $0000 | zest.vdp.VRAMWrite
+        ld hl, $0000 | zest.vdp.VRAM_WRITE
         call zest.vdp.setAddress
 
         ; Output 16KB of zeroes
@@ -134,7 +134,7 @@
         zest.vdp.setRegister zest.vdp.SCROLL_Y_REGISTER 0
 
         ; Set tilemap address
-        zest.vdp.setAddress zest.vdp.TILEMAP_BASE | zest.vdp.VRAMWrite
+        zest.vdp.setAddress zest.vdp.TILEMAP_BASE | zest.vdp.VRAM_WRITE
 
         ; Clear tiles
         ld bc, 32 * 28
@@ -216,7 +216,7 @@
 .section "zest.vdp.hideSprites" free
     zest.vdp.hideSprites:
         ; Set VRAM write address to first sprite in the sprite table
-        ld hl, zest.vdp.SPRITE_BASE | zest.vdp.VRAMWrite
+        ld hl, zest.vdp.SPRITE_BASE | zest.vdp.VRAM_WRITE
         call zest.vdp.setAddress
         ld a, $d0                   ; sprite terminator
         out (zest.vdp.DATA_PORT), a

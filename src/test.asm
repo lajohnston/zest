@@ -15,7 +15,7 @@
 ; 64 bytes of Y coordinates
 ;===
 .define zest.test.VRAM_BACKUP_READ_ADDRESS $3f00 + 64   ; sprite table + skip 64 bytes of Y coordinates
-.define zest.test.VRAM_BACKUP_WRITE_ADDRESS zest.test.VRAM_BACKUP_READ_ADDRESS | zest.vdp.VRAMWrite
+.define zest.test.VRAM_BACKUP_WRITE_ADDRESS zest.test.VRAM_BACKUP_READ_ADDRESS | zest.vdp.VRAM_WRITE
 
 ;====
 ; RAM
