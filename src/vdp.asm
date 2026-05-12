@@ -21,11 +21,20 @@
 ;====
 .section "zest.vdp.init" free
     zest.vdp.init:
-        ; Set up VDP registers
-        ld hl, _initData
-        ld b, _initDataEnd - _initData
-        ld c, zest.vdp.CONTROL_PORT
-        otir
+        push af
+        push bc
+        push hl
+            ; Read status port to reset VDP's internal address latch
+            in a, zest.vdp.STATUS_PORT
+
+            ; Set up VDP registers
+            ld hl, _initData
+            ld b, _initDataEnd - _initData
+            ld c, zest.vdp.CONTROL_PORT
+            otir
+        pop hl
+        pop bc
+        pop af
         ret
 
     ; VDP initialisation data

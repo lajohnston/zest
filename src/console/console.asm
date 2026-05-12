@@ -23,10 +23,10 @@
     zest.console.init:
         push hl
         push bc
-            ; Ensure the display is off
-            zest.vdp.setRegister 1 %10000000
+            ; Initialise VDP registers
+            call zest.vdp.init
 
-            ; Set palette index 0 write address
+            ; Set palette write address
             ld hl, zest.vdp.CRAM_WRITE  ; palette index 0
             call zest.vdp.setAddress
 
