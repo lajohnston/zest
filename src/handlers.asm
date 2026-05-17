@@ -28,6 +28,9 @@
 
         ; Ensure timeout limit hasn't been reached
         call zest.timeout.update
+
+        ; Set the VBlank indicator
+        zest.runner.setVBlankFlag 1
     pop hl
     pop af
 

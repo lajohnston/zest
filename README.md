@@ -33,6 +33,7 @@ The `template` directory contains a working project with bash and batch build sc
     - [Registers](#registers)
     - [Flags](#flags)
     - [Stack](#stack)
+    - [Data](#data)
     - [Clobber detection](#clobber-detection)
     - [Mock assertions](#mock-assertions)
     - [zest.fail](#zestfail)
@@ -40,6 +41,7 @@ The `template` directory contains a working project with bash and batch build sc
     - [Mocking macros](#mocking-macros)
   - [Mocking controller input](#mocking-controller-input)
   - [Timeout detection](#timeout-detection)
+    - [zest.waitForVBlank](#zestwaitforvblank)
   - [Memory overwrite detection](#memory-overwrite-detection)
   - [Hooks](#hooks)
     - [zest.preSuite](#zestpresuite)
@@ -361,6 +363,12 @@ it "should not timeout"
     zest.setTimeout 20
     call mySlowRoutine
 ```
+
+### zest.waitForVBlank
+
+The interrupt handler used for timeout detection must reset the VDP status flags. If your code or test was in the middle of 2-byte VDP address/command set, this reset would cause it to go into an invalid state. You can enable the `Break on invalid VDP access` option in Emulicious to detect when this happens.
+
+To prevent the issue you can use `di` before any code that is potentially affected, though this will opt-out of timeout and crash detection. Alternatively, use `zest.waitForVBlank` to wait until after the next interrupt, so long as the code is expected to complete before the interrupt after it.
 
 ## Memory overwrite detection
 

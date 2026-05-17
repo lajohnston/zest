@@ -17,9 +17,6 @@
 .include "./src/mapper.asm"
 .bank zest.mapper.ZEST_BANK slot zest.mapper.ZEST_SLOT
 
-; Handlers (boot, interrupts, pause)
-.include "./src/handlers.asm"
-
 ; Console
 .include "./src/vdp.asm"
 .include "./src/console/console.asm"
@@ -52,6 +49,9 @@
 
 ; User utils
 .include "./src/utils/initRegisters.asm"
+
+; Handlers (boot, interrupts, pause)
+.include "./src/handlers.asm"
 
 ;====
 ; Global aliases (zest namespace)
@@ -94,6 +94,13 @@
 ;====
 .macro "zest.setTimeout" args frames
     zest.timeout.setCurrent frames
+.endm
+
+;====
+; Waits for the next VBlank
+;====
+.macro "zest.waitForVBlank"
+    call zest.runner.waitForVBlank
 .endm
 
 ;====

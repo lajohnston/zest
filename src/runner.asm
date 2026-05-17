@@ -3,6 +3,7 @@
 ;====
 .define zest.runner._TEST_IN_PROGRESS_BIT 0
 .define zest.runner._TEST_IN_PROGRESS_MASK %00000001
+.define zest.runner._VBLANK_MASK %00000010
 
 ; Default pointer minus 2 for zest.suite call
 .define zest.runner.DEFAULT_STACK_POINTER $dff0 - 2
@@ -66,6 +67,23 @@
         or zest.runner._TEST_IN_PROGRESS_MASK
     .else
         and ~zest.runner._TEST_IN_PROGRESS_MASK
+    .endif
+
+    ld (zest.runner.flags), a
+.endm
+
+;====
+; Sets the VBlank flag
+; @in       value 0 or 1
+; @clobbers af
+;====
+.macro "zest.runner.setVBlankFlag" args value
+    ld a, (zest.runner.flags)
+
+    .if value == 1
+        or zest.runner._VBLANK_MASK
+    .else
+        and ~zest.runner._VBLANK_MASK
     .endif
 
     ld (zest.runner.flags), a
@@ -188,3 +206,22 @@
 
     call zest.assertion.failed
 .endm
+
+;====
+; Waits for the VBlank interrupt handler to next return
+;====
+.section "zest.runner.waitForVBlank" free
+    zest.runner.waitForVBlank:
+        push af
+            in a, (zest.vdp.STATUS_PORT)    ; reset VDP flags
+            zest.runner.setVBlankFlag 0     ; reset VBlank indicator
+            ei
+
+            -:
+                halt
+                ld a, (zest.runner.flags)
+                and zest.runner._VBLANK_MASK
+            jr z, - ; jump if not yet set
+        pop af
+        ret
+.ends
