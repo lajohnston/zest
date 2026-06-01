@@ -22,20 +22,28 @@
 .orga $0038
 .section "zest.handlers.interrupts" force
     push af
-    push hl
-        ; Satisfy interrupt
+        ; Reset VDP status flags to satisfy interrupt
         in a, (zest.vdp.STATUS_PORT)
+        rlca                ; rotate 7th/VBlank bit into Carry
+        jr nc, _onHBlank    ; jump if VBlank bit was not set
 
-        ; Ensure timeout limit hasn't been reached
-        call zest.timeout.update
+        push hl
+            ; Ensure timeout limit hasn't been reached
+            call zest.timeout.update
 
-        ; Set the VBlank indicator
-        zest.runner.setVBlankFlag 1
-    pop hl
+            ; Set a flag indicating a VBlank occurred
+            zest.runner.setVBlankFlag 1
+        pop hl
+        +:
     pop af
 
     ei      ; re-enable interrupts
-    reti    ; return
+    ret     ; return; ret is faster than reti, which is not needed on SMS
+
+    _onHBlank:
+        pop af
+        ei
+        ret
 .ends
 
 ;====
