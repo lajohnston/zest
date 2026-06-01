@@ -22,6 +22,9 @@
         inc hl
         ld (zest.runner.tests_passed), hl
 
+        ; Reset VBlank callback
+        zest.onVBlank.resetCallback
+
         ; Custom hooks go here
 
         ; zest.postTest.end returns

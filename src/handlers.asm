@@ -37,6 +37,7 @@
         +:
     pop af
 
+    zest.onVBlank.invokeCallback
     ei      ; re-enable interrupts
     ret     ; return; ret is faster than reti, which is not needed on SMS
 

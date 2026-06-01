@@ -40,9 +40,11 @@ The `template` directory contains a working project with bash and batch build sc
   - [Mocking/stubbing labels](#mockingstubbing-labels)
     - [Mocking macros](#mocking-macros)
   - [Mocking controller input](#mocking-controller-input)
-  - [Timeout detection](#timeout-detection)
+  - [Utils](#utils)
+    - [Timeout detection](#timeout-detection)
     - [zest.waitForVBlank](#zestwaitforvblank)
-  - [Memory overwrite detection](#memory-overwrite-detection)
+    - [zest.onVBlank](#zestonvblank)
+    - [Memory overwrite detection](#memory-overwrite-detection)
   - [Hooks](#hooks)
     - [zest.preSuite](#zestpresuite)
     - [zest.preTest](#zestpretest)
@@ -338,7 +340,9 @@ zest.mockController2 zest.DOWN|zest.BUTTON_1
 
 These mock controller values are reset at the start of each test.
 
-## Timeout detection
+## Utils
+
+### Timeout detection
 
 By default, Zest will timeout and fail a test if it takes more than 10 full frames/VBlanks to complete, in case the code has got itself into an infinite loop, forgotten to return, or jumped to an invalid location. It does this by decrementing a counter at each VBlank and timing out when it reaches zero. Note: this timeout detection relies on the code not disabling interrupts.
 
@@ -370,7 +374,26 @@ The interrupt handler used for timeout detection must reset the VDP status flags
 
 To prevent the issue you can use `di` before any code that is potentially affected, though this will opt-out of timeout and crash detection. Alternatively, use `zest.waitForVBlank` to wait until after the next interrupt, so long as the code is expected to complete before the interrupt after it.
 
-## Memory overwrite detection
+### zest.onVBlank
+
+Sets a custom VBlank callback that will be called when the next VBlank occurs. This will be reset at the end of the test. This is mainly of use for routines that have a `halt` instruction and expect a side effect to have occurred by the time the interrupt returns.
+
+Make sure to `ret` at the end of the routine.
+
+```asm
+test "my code"
+    zest.onVBlank +
+        ; Custom routine that will run next VBlank
+        ld a, 1
+        ret
+    +:
+
+    ld a, 0
+    halt    ; wait for the VBlank
+    ; a is now 1
+```
+
+### Memory overwrite detection
 
 Zest will attempt to detect if its RAM state has been overwritten by a test, and if so will stop the program with an error message. A backup of the test description pointers is kept in VRAM (within the sprite attribute table gap) and Zest will attempt to restore these so it can recover and display the test that exhibits the issue.
 
