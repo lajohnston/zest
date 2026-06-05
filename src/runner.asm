@@ -29,10 +29,14 @@
 
         ; Initialise VDP
         call zest.vdp.init
-        call zest.vdp.clearVram
+
+        ; Set background colour to black
+        ld hl, zest.vdp.CRAM_WRITE  ; palette index 0
+        call zest.vdp.setAddress
+        xor a                       ; 0 = black
+        out (zest.vdp.DATA_PORT), a
 
         ; Reset test counter
-        xor a
         ld (zest.runner.tests_passed), a
         ld (zest.runner.tests_passed + 1), a
 
