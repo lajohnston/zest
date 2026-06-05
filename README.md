@@ -45,6 +45,7 @@ The `template` directory contains a working project with bash and batch build sc
     - [zest.waitForVBlank](#zestwaitforvblank)
     - [zest.onVBlank](#zestonvblank)
     - [Memory overwrite detection](#memory-overwrite-detection)
+    - [Terminating tests manually](#terminating-tests-manually)
   - [Hooks](#hooks)
     - [zest.preSuite](#zestpresuite)
     - [zest.preTest](#zestpretest)
@@ -396,6 +397,10 @@ test "my code"
 ### Memory overwrite detection
 
 Zest will attempt to detect if its RAM state has been overwritten by a test, and if so will stop the program with an error message. A backup of the test description pointers is kept in VRAM (within the sprite attribute table gap) and Zest will attempt to restore these so it can recover and display the test that exhibits the issue.
+
+### Terminating tests manually
+
+Timeout detection relies on interrupts being enabled so it can periodically interrupt the running code to check everything's ok. If all else fails and you just see a blank screen, press the pause button to terminate the current test and display the test description. The code may have disabled interrupts and is stuck with a `halt` instruction or an infinite loop.
 
 ## Hooks
 

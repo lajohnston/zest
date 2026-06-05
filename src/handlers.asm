@@ -52,5 +52,5 @@
 ;====
 .orga $0066
 .section "zest.handlers.pause" force
-    retn
+    zest.runner.fail "Test terminated by pause button"
 .ends

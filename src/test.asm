@@ -164,7 +164,19 @@
 ;====
 .section "zest.test.printTestDescription" free
     zest.test.printTestDescription:
+        push af
         push hl
+            ; Verify the test description and attempt to recover if needed
+            call zest.test.ensureDescriptionIsValid
+            call zest.console.restoreCursor
+
+            jp z, +
+                ; Description is invalid and could not be recovered
+                ld hl, _unknownTestDescription
+                call zest.console.out
+                jp ++
+            +:
+
             ; Write describe block description
             ld hl, (zest.test.unit_text_addr)
             call zest.console.out
@@ -173,9 +185,14 @@
             zest.console.newlines 2
             ld hl, (zest.test.test_text_addr)
             call zest.console.out
+        ++:
         pop hl
+        pop af
 
         ret
+
+    _unknownTestDescription:
+        zest.console.defineString "Unknown test - description corrupted"
 .ends
 
 ;====

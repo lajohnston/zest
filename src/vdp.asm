@@ -199,6 +199,21 @@
 .ends
 
 ;====
+; Sets the VDP address from a value in memory
+;
+; @in   pointer    address of the address (including read/write command)
+;====
+.macro "zest.vdp.setAddressFromPointer" args pointer
+    push af
+        ; Set VRAM address
+        ld a, (pointer)
+        out (zest.vdp.CONTROL_PORT), a
+        ld a, (pointer + 1)
+        out (zest.vdp.CONTROL_PORT), a
+    pop af
+.endm
+
+;====
 ; Copies data to the VDP
 ;
 ; @in       hl  data address

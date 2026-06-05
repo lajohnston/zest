@@ -248,6 +248,18 @@
 .ends
 
 ;====
+; Restores the cursor position in VRAM
+;
+; @in   hl      the VRAM address to set the cursor to
+; @out  vram    the tilemap address
+;====
+.section "zest.console.restoreCursor" free
+    zest.console.restoreCursor:
+        zest.vdp.setAddressFromPointer zest.console.cursor_vram_address
+        ret
+.ends
+
+;====
 ; Add the given number of rows to the cursor and set the column to 0
 ;
 ; @in       hl  the number of rows to add * 64
