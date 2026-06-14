@@ -1,0 +1,24 @@
+;====
+; Zest - input mocking example
+;====
+
+; Include Zest
+.incdir "../../"
+    .include "zest.asm"
+.incdir "."
+
+;====
+; Rather than importing the real 'readPort' macro, we'll define this fake one
+; that calls the Zest input macros instead
+;===
+.macro "readPort" args portNumber
+    zest.ports.loadA portNumber
+.endm
+
+; Include the files to test
+.include "vdpStatusFlags.asm"
+
+; Append your test files to zest.suite
+.section "suite" appendto zest.suite
+    .include "vdpStatusFlags.test.asm"
+.ends

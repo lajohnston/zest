@@ -21,3 +21,7 @@
 .ifndef zest.plugin.mock
     .include "./src/plugins/mock.asm"
 .endif
+
+.ifndef zest.plugin.mockVdpStatusFlags
+    .include "./src/plugins/mockVdpStatusFlags.asm"
+.endif

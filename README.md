@@ -41,6 +41,7 @@ The `template` directory contains a working project with bash and batch build sc
     - [Mocking macros](#mocking-macros)
   - [Mocking port reads](#mocking-port-reads)
     - [Mocking controller input](#mocking-controller-input)
+    - [Mocking VDP status flags](#mocking-vdp-status-flags)
   - [Utils](#utils)
     - [Timeout detection](#timeout-detection)
     - [zest.waitForVBlank](#zestwaitforvblank)
@@ -349,6 +350,21 @@ zest.mockController2 zest.DOWN|zest.BUTTON_1
 ```
 
 These mock controller values are reset at the start of each test.
+
+### Mocking VDP status flags
+
+For routines that require the VDP status flags, you can use `zest.ports.set $bf` directly, or use the `zest.mockVdpStatusFlags` helper macro passing one of the following constants (ORed together with | if you want multiple):
+
+- `zest.VDP_NO_STATUS_FLAGS`
+- `zest.VDP_VBLANK_STATUS`
+- `zest.VDP_SPRITE_OVERFLOW_STATUS`
+- `zest.VDP_SPRITE_COLLISION_STATUS`
+
+
+```asm
+zest.mockVdpStatusFlags zest.VDP_VBLANK_STATUS
+zest.mockVdpStatusFlags zest.VDP_VBLANK_STATUS|zest.VDP_SPRITE_COLLISION_STATUS
+```
 
 ## Utils
 
