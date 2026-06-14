@@ -25,6 +25,7 @@
 ; Runner
 .include "./src/suites.asm"
 .include "./src/onVBlank.asm"
+.include "./src/ports.asm"
 .include "./src/runner.asm"
 .include "./src/test.asm"
 .include "./src/timeout.asm"

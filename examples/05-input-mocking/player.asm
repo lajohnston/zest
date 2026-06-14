@@ -1,3 +1,13 @@
+;====
+; Some code that updates the position of the player entity. It reads the input
+; from the controller ports ($dc and $dd) and updates the position accordingly.
+;
+; Our test suite needs to be able to mock this input value to test different
+; scenarios. A 'readPort' macro has been placed into its own file, and in the
+; test suite we'll import a fake version with the same name, and when this code
+; here executes it won't know the difference
+;====
+
 ; The input bits
 .define LEFT_BIT      2
 .define RIGHT_BIT     3

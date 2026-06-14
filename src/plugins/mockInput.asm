@@ -16,24 +16,13 @@
 .define zest.NO_INPUT     %00000000
 
 ;====
-; RAM variables
-;====
-.ramsection "zest.mockInput" slot zest.mapper.RAM_SLOT
-    ; Fake value for port DC
-    zest.mockInput.portDC:    db
-
-    ; Fake value for port DD
-    zest.mockInput.portDD:    db
-.ends
-
-;====
 ; Reset the port values at the beginning of each test
 ;====
 .section "zest.mockInput.init" appendto zest.preTest
     zest.mockInput.init:
         ld a, $ff   ; no buttons pressed
-        ld (zest.mockInput.portDC), a
-        ld (zest.mockInput.portDD), a
+        zest.ports.set $dc
+        zest.ports.set $dd
 .ends
 
 ;====
@@ -73,24 +62,6 @@
 .endm
 
 ;====
-; Loads A with the fake $dc port value
-;
-; @out  a   the fake $dc port value
-;====
-.macro "zest.loadFakePortDC"
-    ld a, (zest.mockInput.portDC)
-.endm
-
-;====
-; Loads A with the fake $dd port value#
-;
-; @out  a   the fake $dd port value
-;====
-.macro "zest.loadFakePortDD"
-    ld a, (zest.mockInput.portDD)
-.endm
-
-;====
 ; (Private) Mocks the raw controller 1 input
 ;
 ; @in   b   input values (--21rldu) (0 = pressed)
@@ -98,10 +69,10 @@
 .section "zest.mockInput._setController1" free
     zest.mockInput._controller1:
         push af
-            ld a, (zest.mockInput.portDC)
-            and %11000000                   ; clear current controller 1 buttons
-            or b                            ; set values
-            ld (zest.mockInput.portDC), a   ; store
+            zest.ports.loadA $dc    ; load current stubbed value
+            and %11000000           ; clear current controller 1 buttons
+            or b                    ; set values
+            zest.ports.set $dc      ; store result
         pop af
 
         ret
@@ -119,23 +90,23 @@
             ; Load current fake portDC value. This mostly contains controller 1
             ; buttons but also contains UP and DOWN for controller 2 (DU------)
             ;===
-            ld a, (zest.mockInput.portDC)   ; load current stubbed value
-            and %00111111                   ; reset current up and down port 2
-            ld c, a                         ; preserve in C
+            zest.ports.loadA $dc    ; load current stubbed value
+            and %00111111           ; reset current up and down port 2
+            ld c, a                 ; preserve in C
 
             ; Set the fake UP and DOWN values in fake port $DC
-            ld a, b                         ; restore fake input (--21rldu)
-            rrca                            ; u--21rld
-            rrca                            ; du--21rl
-            ld b, a                         ; preserve rotated value in B
-            and %11000000                   ; du------
-            or c                            ; combine with current fake portDC
-            ld (zest.mockInput.portDC), a   ; store result
+            ld a, b                 ; restore fake input (--21rldu)
+            rrca                    ; u--21rld
+            rrca                    ; du--21rl
+            ld b, a                 ; preserve rotated value in B
+            and %11000000           ; du------
+            or c                    ; combine with current fake portDC
+            zest.ports.set $dc      ; store result
 
             ; Store remaining values in fake port $DD
-            ld a, b                         ; du--21rl
-            or %11110000                    ; ----21rl
-            ld (zest.mockInput.portDD), a   ; load current stubbed value
+            ld a, b                 ; du--21rl
+            or %11110000            ; ----21rl
+            zest.ports.set $dd      ; store result
         pop af
 
         ret

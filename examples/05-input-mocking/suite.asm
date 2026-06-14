@@ -12,11 +12,7 @@
 ; that calls the Zest input macros instead
 ;===
 .macro "readPort" args portNumber
-    .if portNumber == $dc
-        zest.loadFakePortDC
-    .elif portNumber == $dd
-        zest.loadFakePortDD
-    .endif
+    zest.ports.loadA portNumber
 .endm
 
 ; Include the files to test

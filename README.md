@@ -39,7 +39,8 @@ The `template` directory contains a working project with bash and batch build sc
     - [zest.fail](#zestfail)
   - [Mocking/stubbing labels](#mockingstubbing-labels)
     - [Mocking macros](#mocking-macros)
-  - [Mocking controller input](#mocking-controller-input)
+  - [Mocking port reads](#mocking-port-reads)
+    - [Mocking controller input](#mocking-controller-input)
   - [Utils](#utils)
     - [Timeout detection](#timeout-detection)
     - [zest.waitForVBlank](#zestwaitforvblank)
@@ -289,11 +290,9 @@ The principals of mocking macros is the same in that you'd need to ensure you do
 .endm
 ```
 
-## Mocking controller input
+## Mocking port reads
 
-For code that relies on user input, you'll want to be able to mock out the controller ports to return set values such as up, button 1 etc. You could use mocks to mock out your user input handling routines completely, but if you'd rather include this input handling in the test coverage, Zest provides some macros to fake the raw input values at the port level.
-
-It isn't possible to mock out the ports directly, so you'll need to decouple your code from the `in a, (port)` instruction and put this in a macro instead, such as:
+It isn't possible to mock the value returned from the `in a, (port)` instruction directly. Instead, define a macro that wraps this instruction, i.e:
 
 ```asm
 .macro "readPort" args portNumber
@@ -301,19 +300,29 @@ It isn't possible to mock out the ports directly, so you'll need to decouple you
 .endm
 ```
 
-Place this in a separate file and don't import it in your test suite. Instead, define a fake version with the same name that loads register A with a fake value. You can use `zest.loadFakePortDC` and/or `zest.loadFakePortDD` to load fake input values, which we'll set later. `zest.loadFakePortDD` is only needed if you need to mock controller 2:
+This can live in a separate file that the code will `.include` but the test suite won't. Instead, the test suite will include its own version with the same name and args and when the code runs it won't know the difference.
 
 ```asm
+; Our fake version of the readPort macro
 .macro "readPort" args portNumber
-    .if portNumber == $dc
-        zest.loadFakePortDC
-    .elif portNumber == $dd
-        zest.loadFakePortDD
-    .endif
+    zest.ports.loadA portNumber ; load A with a fake value (see below)
 .endm
 ```
 
-To set the values these return, you can use `zest.mockController1` and `zest.mockController2` in your tests, and provide one or more buttons you wish to simulate as being pressed.
+To set the value for each of the ports, using `zest.ports.set`:
+
+```asm
+; In our test
+ld a, $ff
+zest.ports.set $dc  ; store the fake value $ff for port $DC
+zest.ports.set $dd  ; store the fake value $ff for port $DD
+```
+
+### Mocking controller input
+
+For code that relies on user input, you'll want to be able to mock out the controller ports to return set values such as up, button 1 etc. You could use mocks to mock out your user input handling routines completely, but if you'd rather include this input handling in the test coverage, Zest provides some macros to fake the raw input values at the port level.
+
+The controller input is read from ports $DC and $DD, so you could mock these port values directly. For convenience, Zest also provides `zest.mockController1` and `zest.mockController2` helper macros to ensure the correct bits are set in the correct port.
 
 ```asm
 zest.mockController1 zest.UP
