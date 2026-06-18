@@ -1,9 +1,8 @@
-describe "zest.onVBlank"
-    it "calls the onVBlank callback when VBlank occurs"
-        zest.onVBlank, +
+describe "zest.vblank.start"
+    it "calls the zest.vblank.start callback when VBlank occurs"
+        zest.vblank.start
             inc a
-            ret
-        +:
+        zest.vblank.end
 
         ld a, 1
         halt

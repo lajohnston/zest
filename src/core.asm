@@ -24,8 +24,8 @@
 
 ; Runner
 .include "./src/suites.asm"
-.include "./src/onVBlank.asm"
 .include "./src/ports.asm"
+.include "./src/vblank.asm"
 .include "./src/runner.asm"
 .include "./src/test.asm"
 .include "./src/timeout.asm"
@@ -103,19 +103,6 @@
 ;====
 .macro "zest.waitForVBlank"
     call zest.runner.waitForVBlank
-.endm
-
-;====
-; On VBlank will execute the code immediately following this macro call.
-; This will remain in effect until the end of the test.
-;
-; Make sure to `ret` at the end of the routine
-;
-; @in   labelAfterCallback  a label after the callback so it can be skipped for now
-;                           (usually a +)
-;====
-.macro "zest.onVBlank" args labelAfterCallback
-    zest.onVBlank.defineCallback labelAfterCallback
 .endm
 
 ;====

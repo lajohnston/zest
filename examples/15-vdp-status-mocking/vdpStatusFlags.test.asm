@@ -2,10 +2,9 @@ describe "waitForVBlank"
     it "returns when the VBlank flag is set"
         zest.mockVdpStatusFlags zest.VDP_NO_STATUS_FLAGS
 
-        zest.onVBlank, +
+        zest.vblank.start
             zest.mockVdpStatusFlags zest.VDP_VBLANK_STATUS
-            ret
-        +:
+        zest.vblank.end
 
         call waitForVBlank
 

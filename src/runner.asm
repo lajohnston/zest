@@ -25,7 +25,7 @@
 ;====
 .section "zest.runner.init" free
     zest.runner.init:
-        zest.onVBlank.resetCallback
+        zest.vblank.resetCallback
 
         ; Initialise VDP
         call zest.vdp.init

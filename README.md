@@ -45,7 +45,7 @@ The `template` directory contains a working project with bash and batch build sc
   - [Utils](#utils)
     - [Timeout detection](#timeout-detection)
     - [zest.waitForVBlank](#zestwaitforvblank)
-    - [zest.onVBlank](#zestonvblank)
+    - [zest.vblank.start](#zestvblankstart)
     - [Memory overwrite detection](#memory-overwrite-detection)
     - [Terminating tests manually](#terminating-tests-manually)
   - [Hooks](#hooks)
@@ -400,19 +400,16 @@ The interrupt handler used for timeout detection must reset the VDP status flags
 
 To prevent the issue you can use `di` before any code that is potentially affected, though this will opt-out of timeout and crash detection. Alternatively, use `zest.waitForVBlank` to wait until after the next interrupt, so long as the code is expected to complete before the interrupt after it.
 
-### zest.onVBlank
+### zest.vblank.start
 
 Sets a custom VBlank callback that will be called when the next VBlank occurs. This will be reset at the end of the test. This is mainly of use for routines that have a `halt` instruction and expect a side effect to have occurred by the time the interrupt returns.
 
-Make sure to `ret` at the end of the routine.
-
 ```asm
 test "my code"
-    zest.onVBlank +
+    zest.vblank.start
         ; Custom routine that will run next VBlank
         ld a, 1
-        ret
-    +:
+    zest.vblank.end
 
     ld a, 0
     halt    ; wait for the VBlank
