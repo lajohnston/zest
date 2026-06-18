@@ -9,8 +9,8 @@
 ;====
 ; (Private) Prints the Test Failed heading
 ;====
-.section "zest.assertion.printTestFailedHeading" free
-    zest.assertion.printTestFailedHeading:
+.section "zest.assertion.printZestTestFailedHeading" free
+    zest.assertion.printZestTestFailedHeading:
         push hl
             ; Write test failed message
             ld hl, zest.console.data.testFailedHeading
@@ -37,7 +37,7 @@
         zest.console.initFailure
 
         ; Print test details
-        call zest.assertion.printTestFailedHeading
+        call zest.assertion.printZestTestFailedHeading
         jp zest.test.printTestDescription   ; jp (then ret)
 .ends
 

@@ -146,7 +146,7 @@
 
         ; Description has been overwritten - display generic message
         zest.console.initFailure
-        call zest.assertion.printTestFailedHeading
+        call zest.assertion.printZestTestFailedHeading
 
         ; Display RAM overwritten error
         ld hl, _memoryCorruptionMessage
@@ -156,7 +156,7 @@
     _printTestDescription:
         ; Initialise failure heading
         zest.console.initFailure
-        call zest.assertion.printTestFailedHeading
+        call zest.assertion.printZestTestFailedHeading
 
         ; Print the test description
         call zest.test.printTestDescription
