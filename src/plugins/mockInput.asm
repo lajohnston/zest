@@ -37,10 +37,8 @@
     zest.utils.validate.byte value, "\. expects a numeric byte value"
 
     \@_\.:
-    push bc
-        ld b, value ~ $ff               ; invert so 0 = pressed
-        call zest.mockInput._controller1
-    pop bc
+    call zest.mockInput._setController1
+    .db value ~ $ff   ; invert so 0 = pressed
 .endm
 
 ;====
@@ -55,10 +53,8 @@
     zest.utils.validate.byte value, "\. expects a numeric byte value"
 
     \@_\.:
-    push bc
-        ld b, value ~ $ff   ; invert so 0 = pressed
-        call zest.mockInput._controller2
-    pop bc
+    call zest.mockInput._setController2
+    .db value ~ $ff   ; invert so 0 = pressed
 .endm
 
 ;====
@@ -67,14 +63,18 @@
 ; @in   b   input values (--21rldu) (0 = pressed)
 ;====
 .section "zest.mockInput._setController1" free
-    zest.mockInput._controller1:
+    zest.mockInput._setController1:
+        ex (sp), hl   ; get input values from stack; preserve hl
+
         push af
             zest.ports.loadA $dc    ; load current stubbed value
             and %11000000           ; clear current controller 1 buttons
-            or b                    ; set values
+            or (hl)                 ; set values
             zest.ports.set $dc      ; store result
         pop af
 
+        inc hl  ; point to address after the input data
+        ex (sp), hl   ; restore hl; push return address to stack
         ret
 .ends
 
@@ -84,8 +84,11 @@
 ; @in   b   input values (--21rldu) (0 = pressed)
 ;====
 .section "zest.mockInput._setController2" free
-    zest.mockInput._controller2:
+    zest.mockInput._setController2:
+        ex (sp), hl   ; get input values from stack; preserve hl
+
         push af
+        push bc
             ;===
             ; Load current fake portDC value. This mostly contains controller 1
             ; buttons but also contains UP and DOWN for controller 2 (DU------)
@@ -95,7 +98,7 @@
             ld c, a                 ; preserve in C
 
             ; Set the fake UP and DOWN values in fake port $DC
-            ld a, b                 ; restore fake input (--21rldu)
+            ld a, (hl)              ; load fake input (--21rldu)
             rrca                    ; u--21rld
             rrca                    ; du--21rl
             ld b, a                 ; preserve rotated value in B
@@ -107,7 +110,10 @@
             ld a, b                 ; du--21rl
             or %11110000            ; ----21rl
             zest.ports.set $dd      ; store result
+        pop bc
         pop af
 
+        inc hl      ; point to address after the input data
+        ex (sp), hl ; restore hl; push return address to stack
         ret
 .ends
