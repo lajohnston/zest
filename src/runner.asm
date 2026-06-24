@@ -214,6 +214,34 @@
 .endm
 
 ;====
+; Waits for the active display period
+;====
+.section "zest.runner._waitForActiveDisplay" free
+    zest.runner.waitForActiveDisplay:
+        ex (sp), hl
+        push af
+            ; Poll line counter until line count is less than 150 to ensure
+            ; there's still active display time left for the test
+            -:
+                in a, ($7e)
+                cp (hl) ; compare with threshold
+                jp c, + ; stop poll if line is less than the threshold
+            jr -
+        +:
+        pop af
+        inc hl
+        ex (sp), hl
+
+        zest.vdp.setRegister 1 %11000000
+        ret
+.ends
+
+.macro "zest.runner.waitForActiveDisplay"
+    call zest.runner.waitForActiveDisplay
+    .db 100
+.endm
+
+;====
 ; Waits for the VBlank interrupt handler to next return
 ;====
 .section "zest.runner.waitForVBlank" free

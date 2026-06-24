@@ -99,6 +99,13 @@
 .endm
 
 ;====
+; Waits for the active display period
+;====
+.macro "zest.waitForActiveDisplay"
+    zest.runner.waitForActiveDisplay
+.endm
+
+;====
 ; Waits for the next VBlank
 ;====
 .macro "zest.waitForVBlank"
