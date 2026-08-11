@@ -47,6 +47,7 @@
         .ends
 
         .section "{suites._label}.footer" appendto {suites._label} priority zest.FOOTER_PRIORITY
+            ld sp, zest.runner.DEFAULT_STACK_POINTER
             ret
         .ends
     .endr
