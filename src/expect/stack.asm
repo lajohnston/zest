@@ -194,7 +194,7 @@
         .ifdef message
             .dw \.\@messagePointer
         .else
-            .dw expect.stack.toContain.defaultMessage
+            .dw expect.stack.size.toBe.defaultMessage
         .endif
 
         ; Restore SP
