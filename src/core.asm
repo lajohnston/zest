@@ -62,12 +62,20 @@
 .define zest.RAM_SLOT   zest.mapper.RAM_SLOT
 
 ;====
+; Variables
+;====
+.define zest.currentBlock "<No block>"
+.define zest.currentTest "<No test>"
+
+;====
 ; Describes the unit being tested
 ;
 ; @in   message     a description string of the unit
 ;====
 .macro "describe" args message
     zest.runner.startDescribeBlock message
+
+    .redefine zest.currentBlock message
 .endm
 
 ;====
@@ -77,6 +85,8 @@
 ;====
 .macro "it" args message
     zest.runner.startTest message
+
+    .redefine zest.currentTest message
 .endm
 
 ;====

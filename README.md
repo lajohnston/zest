@@ -1,5 +1,37 @@
 # Zest - Sega Master System/Z80 Test Runner
 
+- [What is it?](#what-is-it)
+- [Quick start](#quick-start)
+- [Contents](#contents)
+- [Why?](#why)
+- [Examples](#examples)
+- [Assertions](#assertions)
+  - [Registers](#registers)
+  - [Flags](#flags)
+  - [Stack](#stack)
+  - [Data](#data)
+  - [Clobber detection](#clobber-detection)
+  - [Mock assertions](#mock-assertions)
+  - [zest.fail](#zestfail)
+- [Mocking/stubbing labels](#mockingstubbing-labels)
+  - [Mocking macros](#mocking-macros)
+- [Mocking port reads](#mocking-port-reads)
+  - [Mocking controller input](#mocking-controller-input)
+  - [Mocking VDP status flags](#mocking-vdp-status-flags)
+- [Utils](#utils)
+  - [Timeout detection](#timeout-detection)
+  - [zest.waitForVBlank](#zestwaitforvblank)
+  - [zest.vblank.start](#zestvblankstart)
+  - [Memory overwrite detection](#memory-overwrite-detection)
+  - [Terminating tests manually](#terminating-tests-manually)
+  - [zest.currentBlock, zest.currentTest](#zestcurrentblock-zestcurrenttest)
+- [Hooks](#hooks)
+  - [zest.preSuite](#zestpresuite)
+  - [zest.preTest](#zestpretest)
+  - [zest.postTest](#zestposttest)
+- [Paging](#paging)
+  - [zest.setBank](#zestsetbank)
+
 ## What is it?
 
 Zest is a unit test runner for use with the Sega Master System and WLA DX assembler (v10.6+). Utilising the WLA DX macro features, it provides a high-level syntax so you can easily feed routines with fixed inputs and assert their output.
@@ -23,37 +55,37 @@ The `template` directory contains a working project with bash and batch build sc
 
 ## Contents
 
-- [Zest - Sega Master System/Z80 Test Runner](#zest---sega-master-systemz80-test-runner)
-  - [What is it?](#what-is-it)
-  - [Quick start](#quick-start)
-  - [Contents](#contents)
-  - [Why?](#why)
-  - [Examples](#examples)
-  - [Assertions](#assertions)
-    - [Registers](#registers)
-    - [Flags](#flags)
-    - [Stack](#stack)
-    - [Data](#data)
-    - [Clobber detection](#clobber-detection)
-    - [Mock assertions](#mock-assertions)
-    - [zest.fail](#zestfail)
-  - [Mocking/stubbing labels](#mockingstubbing-labels)
-    - [Mocking macros](#mocking-macros)
-  - [Mocking port reads](#mocking-port-reads)
-    - [Mocking controller input](#mocking-controller-input)
-    - [Mocking VDP status flags](#mocking-vdp-status-flags)
-  - [Utils](#utils)
-    - [Timeout detection](#timeout-detection)
-    - [zest.waitForVBlank](#zestwaitforvblank)
-    - [zest.vblank.start](#zestvblankstart)
-    - [Memory overwrite detection](#memory-overwrite-detection)
-    - [Terminating tests manually](#terminating-tests-manually)
-  - [Hooks](#hooks)
-    - [zest.preSuite](#zestpresuite)
-    - [zest.preTest](#zestpretest)
-    - [zest.postTest](#zestposttest)
-  - [Paging](#paging)
-    - [zest.setBank](#zestsetbank)
+- [What is it?](#what-is-it)
+- [Quick start](#quick-start)
+- [Contents](#contents)
+- [Why?](#why)
+- [Examples](#examples)
+- [Assertions](#assertions)
+  - [Registers](#registers)
+  - [Flags](#flags)
+  - [Stack](#stack)
+  - [Data](#data)
+  - [Clobber detection](#clobber-detection)
+  - [Mock assertions](#mock-assertions)
+  - [zest.fail](#zestfail)
+- [Mocking/stubbing labels](#mockingstubbing-labels)
+  - [Mocking macros](#mocking-macros)
+- [Mocking port reads](#mocking-port-reads)
+  - [Mocking controller input](#mocking-controller-input)
+  - [Mocking VDP status flags](#mocking-vdp-status-flags)
+- [Utils](#utils)
+  - [Timeout detection](#timeout-detection)
+  - [zest.waitForVBlank](#zestwaitforvblank)
+  - [zest.vblank.start](#zestvblankstart)
+  - [Memory overwrite detection](#memory-overwrite-detection)
+  - [Terminating tests manually](#terminating-tests-manually)
+  - [zest.currentBlock, zest.currentTest](#zestcurrentblock-zestcurrenttest)
+- [Hooks](#hooks)
+  - [zest.preSuite](#zestpresuite)
+  - [zest.preTest](#zestpretest)
+  - [zest.postTest](#zestposttest)
+- [Paging](#paging)
+  - [zest.setBank](#zestsetbank)
 
 ## Why?
 
@@ -423,6 +455,15 @@ Zest will attempt to detect if its RAM state has been overwritten by a test, and
 ### Terminating tests manually
 
 Timeout detection relies on interrupts being enabled so it can periodically interrupt the running code to check everything's ok. If all else fails and you just see a blank screen, press the pause button to terminate the current test and display the test description. The code may have disabled interrupts and is stuck with a `halt` instruction or an infinite loop.
+
+### zest.currentBlock, zest.currentTest
+
+Variables will be set for each describe block and test that starts. These can be `.print`ed within macros for debugging purposes.
+
+```
+.print "Current block ", zest.currentBlock
+.print "Current test ", zest.currentTest
+```
 
 ## Hooks
 
