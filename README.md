@@ -1,39 +1,5 @@
 # Zest - Sega Master System/Z80 Test Runner
 
-- [What is it?](#what-is-it)
-- [Quick start](#quick-start)
-- [Contents](#contents)
-- [Why?](#why)
-- [Examples](#examples)
-- [Assertions](#assertions)
-  - [Registers](#registers)
-  - [Flags](#flags)
-  - [Stack](#stack)
-  - [Data](#data)
-  - [Clobber detection](#clobber-detection)
-  - [Mock assertions](#mock-assertions)
-  - [zest.fail](#zestfail)
-- [Mocking/stubbing labels](#mockingstubbing-labels)
-  - [Mocking macros](#mocking-macros)
-- [Mocking port reads](#mocking-port-reads)
-  - [Mocking controller input](#mocking-controller-input)
-  - [Mocking VDP status flags](#mocking-vdp-status-flags)
-- [Utils](#utils)
-  - [Timeout detection](#timeout-detection)
-  - [zest.waitForVBlank](#zestwaitforvblank)
-  - [zest.vblank.start](#zestvblankstart)
-  - [Memory overwrite detection](#memory-overwrite-detection)
-  - [Terminating tests manually](#terminating-tests-manually)
-  - [zest.currentBlock, zest.currentTest](#zestcurrentblock-zestcurrenttest)
-- [Hooks](#hooks)
-  - [zest.preSuite](#zestpresuite)
-  - [zest.preTest](#zestpretest)
-  - [zest.postTest](#zestposttest)
-- [Paging](#paging)
-  - [zest.setBank](#zestsetbank)
-
-## What is it?
-
 Zest is a unit test runner for use with the Sega Master System and WLA DX assembler (v10.6+). Utilising the WLA DX macro features, it provides a high-level syntax so you can easily feed routines with fixed inputs and assert their output.
 
 ```asm
@@ -49,16 +15,14 @@ If the above test fails, the tests will stop running and the test description an
 
 ![Zest pass scenario](examples/screenshots/pass.png) ![Zest failure scenario](examples/screenshots/fail.png)
 
-## Quick start
+Pinpointing bugs in assembly code can require lots of manual effort to recreate certain scenarios and ensure everything is working, reducing your confidence for making changes and optimisations to your code.
 
-The `template` directory contains a working project with bash and batch build scripts to build the ROM on Linux and Windows respectively. For the scripts to work please ensure `wla-z80` and `wlalink` 10.6+ are in your system path or within the `template` directory.
+Instead, with a test runner you can define the list of behaviours you intend a routine to have and ensure they pass, then feel confident to change and optimise the code while being informed if you accidentally break anything.
 
+<!-- omit in toc -->
 ## Contents
 
-- [What is it?](#what-is-it)
 - [Quick start](#quick-start)
-- [Contents](#contents)
-- [Why?](#why)
 - [Examples](#examples)
 - [Assertions](#assertions)
   - [Registers](#registers)
@@ -87,19 +51,15 @@ The `template` directory contains a working project with bash and batch build sc
 - [Paging](#paging)
   - [zest.setBank](#zestsetbank)
 
-## Why?
+## Quick start
 
-Pinpointing bugs in assembly code can require lots of manual effort to recreate certain scenarios and ensure everything is working, reducing your confidence for making changes and optimisations to your code.
+The `template` directory contains a working starter project with bash and batch build scripts to build the ROM on Linux and Windows respectively. For the scripts to work please ensure `wla-z80` and `wlalink` 10.6+ are in your system path or within the `template` directory.
 
-Instead, with a test runner you can define the list of behaviours you intend a routine to have and ensure they pass, then feel confident to change and optimise the code while being informed if you accidentally break anything.
-
-## Examples
-
-Examples are included in the repo (see `/examples`). You can build these in Linux/WSL using `./examples/build.sh`. The ROM will be placed in `./examples/dist` which you can then run in an emulator or on an actual system.
-
-Create a blank test suite asm file that will serve as the entry point. In this file, use .include to pull in the Zest library and the code files you want to test.
+Create a blank test suite asm file (i.e. `suite.asm`) that will serve as the entry point. In this file, use `.include` to pull in the Zest library and the code files you want to test.
 
 ```asm
+; ...suite.asm
+
 ; Include Zest library
 .incdir "../zest"           ; point to zest directory
     .include "zest.asm"     ; include the zest.asm library
@@ -117,6 +77,8 @@ Create a blank test suite asm file that will serve as the entry point. In this f
 Within the test file (`increment.test.asm`), the 'describe' and 'it' macros let you define the unit being tested and what behaviours it should exhibit:
 
 ```asm
+; ...increment.test.asm
+
 describe "increment"
 
 it "should increment the value in A"
@@ -143,6 +105,10 @@ test "add"
 test "subtract"
     ...
 ```
+
+## Examples
+
+Examples are included in the repo (see `/examples`). These also double as E2E tests for Zest itself. You can build these in Linux/WSL using `./examples/build.sh`, but you won't really need to unless your contributing to the repo. The ROMs will be placed in `./examples/dist` which you can then run in an emulator or on an actual system. Most are set to pass, but there are a few that test failure scenarios like memory corruption.
 
 ## Assertions
 
@@ -460,7 +426,7 @@ Timeout detection relies on interrupts being enabled so it can periodically inte
 
 Variables will be set for each describe block and test that starts. These can be `.print`ed within macros for debugging purposes.
 
-```
+```asm
 .print "Current block ", zest.currentBlock
 .print "Current test ", zest.currentTest
 ```
